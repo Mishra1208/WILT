@@ -93,6 +93,8 @@ export const Footer = () => {
             {/* Creators Attribution Pill */}
             <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs">
               <span className="text-slate-500">Built by</span>
+              <span className="text-slate-900 font-extrabold">Narendra Mishra</span>
+              <span className="text-slate-400">,</span>
               <span className="text-slate-900 font-extrabold">Avinendra Pratap Singh</span>
               <span className="text-slate-400">&</span>
               <span className="text-slate-900 font-extrabold">Kumar</span>
@@ -207,6 +209,14 @@ export const Footer = () => {
                   onClick={() => setCurrentView('about')}
                   className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
                 >
+                  <span>Narendra Mishra</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => setCurrentView('about')}
+                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
+                >
                   <span>Avinendra Pratap Singh</span>
                 </button>
               </li>
@@ -233,6 +243,66 @@ export const Footer = () => {
                 >
                   <span>Active Recall Engine</span>
                 </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Community & Guidelines */}
+          <div className="space-y-4">
+            <p className="text-[11px] font-black tracking-widest text-slate-900 uppercase flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-500 inline-block" />
+              <span>Community</span>
+            </p>
+            <ul className="space-y-3 text-xs font-semibold text-slate-600">
+              <li>
+                <a
+                  href="?page=standards"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
+                >
+                  <span>Honor Code</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="?page=standards"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
+                >
+                  <span>Quality Guidelines</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="?page=standards"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
+                >
+                  <span>Formula Verification</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="?page=privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
+                >
+                  <span>Student Privacy</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="?page=terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
+                >
+                  <span>Terms of Service</span>
+                </a>
               </li>
             </ul>
           </div>
@@ -299,6 +369,7 @@ export const Footer = () => {
         <div className="mt-14 pt-8 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-slate-500">
           <p className="text-center sm:text-left">
             © {new Date().getFullYear()} WILT. Designed for university scholars by{' '}
+            <strong className="text-slate-800 font-bold">Narendra Mishra</strong>,{' '}
             <strong className="text-slate-800 font-bold">Avinendra Pratap Singh</strong> &{' '}
             <strong className="text-slate-800 font-bold">Kumar</strong>.
           </p>

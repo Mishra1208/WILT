@@ -61,6 +61,14 @@ export const AboutView = () => {
 
   const creators = [
     {
+      name: "Narendra Mishra",
+      role: "Co-Creator & Lead Architect",
+      badge: "⚡ Co-Founder",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=250&auto=format&fit=crop&q=80",
+      quote: "Knowledge grows when shared. WILT makes continuous peer learning seamless, high-yield, and accessible to every student.",
+      focus: "Full-Stack System Architecture & Cloud Infrastructure"
+    },
+    {
       name: "Avinendra Pratap Singh",
       role: "Co-Creator & Concept Architect",
       badge: "🎓 Co-Founder",
@@ -71,7 +79,7 @@ export const AboutView = () => {
     {
       name: "Kumar",
       role: "Co-Creator & Platform Lead",
-      badge: "⚡ Co-Founder",
+      badge: "🚀 Co-Founder",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=250&auto=format&fit=crop&q=80",
       quote: "The secret to acing exams isn't memorization—it's active recall. We engineered WILT to turn revision into a fast, gamified habit.",
       focus: "Spaced Repetition Engine & Gamification"
@@ -120,7 +128,7 @@ export const AboutView = () => {
     },
     {
       q: 'Who started the WILT project?',
-      a: 'WILT was conceptualized and created by Avinendra Pratap Singh and Kumar as a modern peer-learning ecosystem combining micro-notes, spaced repetition, and university hierarchy leaderboards.'
+      a: 'WILT was conceptualized and created by Narendra Mishra, Avinendra Pratap Singh, and Kumar as a modern peer-learning ecosystem combining micro-notes, spaced repetition, and university hierarchy leaderboards.'
     }
   ];
 
@@ -226,12 +234,12 @@ export const AboutView = () => {
             Meet the Creators
           </h2>
           <p className="text-xs text-slate-500">
-            WILT was envisioned and created by <strong>Avinendra Pratap Singh</strong> and <strong>Kumar</strong> to solve how college students retain complex knowledge.
+            WILT was envisioned and created by <strong>Narendra Mishra</strong>, <strong>Avinendra Pratap Singh</strong>, and <strong>Kumar</strong> to solve how college students retain complex knowledge.
           </p>
         </div>
 
-        {/* 2 Founders Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 3 Founders Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {creators.map((creator, idx) => (
             <div
               key={idx}

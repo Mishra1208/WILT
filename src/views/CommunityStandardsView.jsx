@@ -35,7 +35,7 @@ export const CommunityStandardsView = () => {
           Community Standards
         </h1>
         <p className="text-xs text-slate-400 font-mono">
-          Guidelines instituted by Avinendra Pratap Singh & Kumar to maintain high academic trust
+          Guidelines instituted by Narendra Mishra, Avinendra Pratap Singh & Kumar to maintain high academic trust
         </p>
       </div>
 

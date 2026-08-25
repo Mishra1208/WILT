@@ -1,7 +1,7 @@
 # WILT — What I Learned Today 🎓⚡
 
 > **The peer micro-learning & active recall platform for university scholars.**  
-> Conceived & engineered by **Avinendra Pratap Singh** & **Kumar**.
+> Conceived & engineered by **Narendra Mishra**, **Avinendra Pratap Singh** & **Kumar**.
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
@@ -80,6 +80,7 @@ This repository includes a pre-configured `vercel.json` optimized for Vite SPAs.
 
 ## 👥 Project Creators & Leadership
 
+- **Narendra Mishra** — *Co-Creator & Lead Architect*
 - **Avinendra Pratap Singh** — *Co-Creator & Concept Architect*
 - **Kumar** — *Co-Creator & Platform Lead*
 

@@ -38,7 +38,7 @@ export const TermsView = () => {
             <span>1. Acceptance of Terms</span>
           </h2>
           <p>
-            By accessing or contributing to WILT (What I Learned Today), created by <strong>Avinendra Pratap Singh</strong> and <strong>Kumar</strong>, you agree to comply with these terms, our Community Standards, and all applicable university honor codes.
+            By accessing or contributing to WILT (What I Learned Today), created by <strong>Narendra Mishra</strong>, <strong>Avinendra Pratap Singh</strong>, and <strong>Kumar</strong>, you agree to comply with these terms, our Community Standards, and all applicable university honor codes.
           </p>
         </section>
 
@@ -68,7 +68,7 @@ export const TermsView = () => {
             <span>4. Intellectual Property Attribution</span>
           </h2>
           <p>
-            WILT's interface, proprietary active recall quiz engine, gamification hierarchy, and math symbol ribbon are intellectual creations of <strong>Avinendra Pratap Singh</strong> and <strong>Kumar</strong>. Unauthorized commercial replication or scraping is prohibited.
+            WILT's interface, proprietary active recall quiz engine, gamification hierarchy, and math symbol ribbon are intellectual creations of <strong>Narendra Mishra</strong>, <strong>Avinendra Pratap Singh</strong>, and <strong>Kumar</strong>. Unauthorized commercial replication or scraping is prohibited.
           </p>
         </section>
 

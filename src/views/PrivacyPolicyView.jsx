@@ -38,7 +38,7 @@ export const PrivacyPolicyView = () => {
             <span>1. Our Commitment to Student Privacy</span>
           </h2>
           <p>
-            WILT (What I Learned Today), conceived and maintained by <strong>Avinendra Pratap Singh</strong> & <strong>Kumar</strong>, is dedicated to providing an academic peer-learning ecosystem where students can share insights freely without worrying about intrusive data harvesting.
+            WILT (What I Learned Today), conceived and maintained by <strong>Narendra Mishra</strong>, <strong>Avinendra Pratap Singh</strong> & <strong>Kumar</strong>, is dedicated to providing an academic peer-learning ecosystem where students can share insights freely without worrying about intrusive data harvesting.
           </p>
           <p>
             We <strong>never sell, monetize, or broker student information</strong> to advertisers or third-party marketing firms.
