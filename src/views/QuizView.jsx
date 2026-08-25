@@ -15,6 +15,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { generateWeeklyQuiz } from '../services/quizEngine';
+import { saveQuizAttemptToSupabase } from '../services/supabase';
 
 export const QuizView = () => {
   const { posts, openPostDetail, setCurrentView } = useApp();
@@ -62,8 +63,18 @@ export const QuizView = () => {
       setIsAnswerSubmitted(false);
     } else {
       setIsQuizCompleted(true);
-      const earnedXP = (score + (selectedOption === quizQuestions[currentIdx]?.correctIndex ? 1 : 0)) * 20 + 50;
+      const finalScore = score + (selectedOption === quizQuestions[currentIdx]?.correctIndex ? 1 : 0);
+      const earnedXP = finalScore * 20 + 50;
       addXP(earnedXP, true);
+
+      // Save Quiz attempt to Supabase
+      saveQuizAttemptToSupabase({
+        userHandle: user?.username || 'anonymous',
+        userName: user?.name || 'Student Scholar',
+        score: finalScore,
+        totalQuestions: quizQuestions.length,
+        xpEarned: earnedXP
+      });
 
       try {
         confetti({

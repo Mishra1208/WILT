@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useUser, useClerk } from '@clerk/clerk-react';
 import confetti from 'canvas-confetti';
 import { getStoredUser, saveStoredUser, updateLeaderboardUser } from '../services/storage';
+import { saveUserProfileToSupabase } from '../services/supabase';
 
 const AuthContext = createContext();
 
@@ -49,6 +50,7 @@ export const AuthProvider = ({ children }) => {
         setUser(authenticatedUser);
         saveStoredUser(authenticatedUser);
         updateLeaderboardUser(authenticatedUser);
+        saveUserProfileToSupabase(authenticatedUser);
         setIsAuthModalOpen(false);
 
         try {
@@ -149,6 +151,7 @@ export const AuthProvider = ({ children }) => {
     setUser(updatedUser);
     saveStoredUser(updatedUser);
     updateLeaderboardUser(updatedUser);
+    saveUserProfileToSupabase(updatedUser);
   };
 
   return (

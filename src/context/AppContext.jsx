@@ -7,14 +7,21 @@ import {
   saveConcept as storageSaveConcept,
   getStoredLeaderboard
 } from '../services/storage';
-import { savePostToSupabase, fetchPostsFromSupabase } from '../services/supabase';
+import { 
+  savePostToSupabase, 
+  fetchPostsFromSupabase,
+  saveConceptToSupabase,
+  fetchConceptsFromSupabase
+} from '../services/supabase';
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  // Initialize storage seeds and fetch remote Supabase posts
+  // Initialize storage seeds and fetch remote Supabase posts & concepts
   useEffect(() => {
     initStorage();
+    
+    // 1. Fetch remote posts from Supabase
     fetchPostsFromSupabase().then((remotePosts) => {
       if (remotePosts && remotePosts.length > 0) {
         setPosts((current) => {
@@ -22,6 +29,21 @@ export const AppProvider = ({ children }) => {
           current.forEach((p) => {
             if (!merged.some((m) => m.id === p.id)) {
               merged.push(p);
+            }
+          });
+          return merged;
+        });
+      }
+    });
+
+    // 2. Fetch remote concepts from Supabase
+    fetchConceptsFromSupabase().then((remoteConcepts) => {
+      if (remoteConcepts && remoteConcepts.length > 0) {
+        setConcepts((current) => {
+          const merged = [...remoteConcepts];
+          current.forEach((c) => {
+            if (!merged.some((m) => m.term.toLowerCase() === c.term.toLowerCase())) {
+              merged.push(c);
             }
           });
           return merged;
@@ -133,6 +155,9 @@ export const AppProvider = ({ children }) => {
     const updated = storageSaveConcept(concept);
     setConcepts(updated);
     setIsNewConceptModalOpen(false);
+
+    // Save to Supabase cloud database
+    saveConceptToSupabase(concept);
     return concept;
   };
 

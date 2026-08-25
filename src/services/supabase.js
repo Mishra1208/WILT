@@ -19,7 +19,7 @@ export const supabase = createClient(
 );
 
 /**
- * Record weekly digest newsletter subscriber in Supabase
+ * 1. Record weekly digest newsletter subscriber in Supabase
  */
 export const subscribeToNewsletter = async (email) => {
   if (!email || !email.includes('@')) return { success: false, error: 'Invalid email' };
@@ -37,8 +37,7 @@ export const subscribeToNewsletter = async (email) => {
       .select();
 
     if (error) {
-      console.warn('Supabase newsletter subscription info:', error.message);
-      // Fallback local storage save so no user signup is lost
+      console.warn('Supabase newsletter info:', error.message);
       saveLocalNewsletter(email);
       return { success: true, fallback: true };
     }
@@ -52,7 +51,7 @@ export const subscribeToNewsletter = async (email) => {
 };
 
 /**
- * Save user post / knowledge slate entry to Supabase
+ * 2. Save user post / knowledge slate entry to Supabase
  */
 export const savePostToSupabase = async (post) => {
   if (!post) return { success: false };
@@ -60,7 +59,7 @@ export const savePostToSupabase = async (post) => {
   try {
     const { data, error } = await supabase
       .from('posts')
-      .insert([
+      .upsert([
         {
           id: post.id,
           title: post.title,
@@ -90,7 +89,7 @@ export const savePostToSupabase = async (post) => {
 };
 
 /**
- * Fetch all posts from Supabase
+ * 3. Fetch all posts from Supabase
  */
 export const fetchPostsFromSupabase = async () => {
   try {
@@ -104,7 +103,6 @@ export const fetchPostsFromSupabase = async () => {
       return [];
     }
 
-    // Map Supabase snake_case fields to app model
     return (data || []).map((row) => ({
       id: row.id,
       title: row.title,
@@ -128,6 +126,143 @@ export const fetchPostsFromSupabase = async () => {
     }));
   } catch (err) {
     console.warn('Supabase fetch posts catch:', err);
+    return [];
+  }
+};
+
+/**
+ * 4. Save or Update Student Profile in Supabase
+ */
+export const saveUserProfileToSupabase = async (user) => {
+  if (!user || !user.username) return { success: false };
+
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .upsert([
+        {
+          id: user.id || `user_${user.username}`,
+          username: user.username,
+          name: user.name,
+          avatar: user.avatar,
+          email: user.email || '',
+          phone: user.phone || '',
+          university: user.university || 'University Student',
+          major: user.major || 'Finance & Tech',
+          xp: user.xp || 150,
+          tier: user.tier || 'Curious Scholar',
+          rank: user.rank || 12,
+          accuracy: user.accuracy || 90,
+          quizzes_completed: user.quizzesCompleted || 0,
+          updated_at: new Date().toISOString()
+        }
+      ], { onConflict: 'username' })
+      .select();
+
+    if (error) {
+      console.warn('Supabase user profile info:', error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true, data };
+  } catch (err) {
+    console.warn('Supabase user profile catch:', err);
+    return { success: false, error: err.message };
+  }
+};
+
+/**
+ * 5. Save Quiz Attempt to Supabase
+ */
+export const saveQuizAttemptToSupabase = async ({ userHandle, userName, score, totalQuestions, xpEarned }) => {
+  try {
+    const { data, error } = await supabase
+      .from('quiz_attempts')
+      .insert([
+        {
+          user_handle: userHandle || 'anonymous',
+          user_name: userName || 'Student Scholar',
+          score: score,
+          total_questions: totalQuestions,
+          accuracy_percentage: totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 100,
+          xp_earned: xpEarned,
+          created_at: new Date().toISOString()
+        }
+      ])
+      .select();
+
+    if (error) {
+      console.warn('Supabase quiz attempt info:', error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true, data };
+  } catch (err) {
+    console.warn('Supabase quiz attempt catch:', err);
+    return { success: false, error: err.message };
+  }
+};
+
+/**
+ * 6. Save Peer Dictionary Concept to Supabase
+ */
+export const saveConceptToSupabase = async (concept) => {
+  if (!concept || !concept.term) return { success: false };
+
+  try {
+    const { data, error } = await supabase
+      .from('concepts')
+      .upsert([
+        {
+          id: concept.id,
+          term: concept.term,
+          category: concept.category,
+          definition: concept.definition,
+          plain_explanation: concept.plainExplanation,
+          formula: concept.formula || '',
+          examples: concept.examples || '',
+          contributor: concept.contributor || 'peer',
+          created_at: new Date().toISOString()
+        }
+      ])
+      .select();
+
+    if (error) {
+      console.warn('Supabase concept info:', error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true, data };
+  } catch (err) {
+    console.warn('Supabase concept catch:', err);
+    return { success: false, error: err.message };
+  }
+};
+
+/**
+ * 7. Fetch Peer Dictionary Concepts from Supabase
+ */
+export const fetchConceptsFromSupabase = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('concepts')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.warn('Supabase fetch concepts info:', error.message);
+      return [];
+    }
+
+    return (data || []).map((row) => ({
+      id: row.id,
+      term: row.term,
+      category: row.category,
+      definition: row.definition,
+      plainExplanation: row.plain_explanation,
+      formula: row.formula || '',
+      examples: row.examples || '',
+      contributor: row.contributor || 'peer'
+    }));
+  } catch (err) {
+    console.warn('Supabase fetch concepts catch:', err);
     return [];
   }
 };
