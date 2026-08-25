@@ -1,13 +1,12 @@
-import { INITIAL_POSTS, INITIAL_CONCEPTS, INITIAL_LEADERBOARD_USERS, CURRENT_DEMO_USER } from '../data/seedData';
+import { INITIAL_POSTS, INITIAL_CONCEPTS, INITIAL_LEADERBOARD_USERS } from '../data/seedData';
 
 const STORAGE_KEYS = {
-  POSTS: 'wilt_posts_v3',
-  CONCEPTS: 'wilt_concepts_v3',
-  LEADERBOARD: 'wilt_leaderboard_v3',
-  USER: 'wilt_current_user_v3',
-  THEME: 'wilt_theme_v3',
-  SAVED_POSTS: 'wilt_saved_posts_v3',
-  QUIZ_HISTORY: 'wilt_quiz_history_v3',
+  POSTS: 'wilt_posts_v4',
+  CONCEPTS: 'wilt_concepts_v4',
+  LEADERBOARD: 'wilt_leaderboard_v4',
+  USER: 'wilt_current_user_v5', // upgraded to v5 for clean logged-out state
+  SAVED_POSTS: 'wilt_saved_posts_v4',
+  QUIZ_HISTORY: 'wilt_quiz_history_v4',
 };
 
 // Initialize Storage with clean real user data
@@ -21,9 +20,7 @@ export const initStorage = () => {
   if (!localStorage.getItem(STORAGE_KEYS.LEADERBOARD)) {
     localStorage.setItem(STORAGE_KEYS.LEADERBOARD, JSON.stringify(INITIAL_LEADERBOARD_USERS));
   }
-  if (!localStorage.getItem(STORAGE_KEYS.USER)) {
-    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(CURRENT_DEMO_USER));
-  }
+  // User starts as null (Logged Out) so they can sign in with Clerk
 };
 
 export const getStoredPosts = () => {
@@ -97,14 +94,18 @@ export const updateLeaderboardUser = (updatedUser) => {
 export const getStoredUser = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.USER);
-    return raw ? JSON.parse(raw) : CURRENT_DEMO_USER;
+    return raw ? JSON.parse(raw) : null;
   } catch (e) {
-    return CURRENT_DEMO_USER;
+    return null;
   }
 };
 
 export const saveStoredUser = (user) => {
-  localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+  if (user) {
+    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+  } else {
+    localStorage.removeItem(STORAGE_KEYS.USER);
+  }
   return user;
 };
 

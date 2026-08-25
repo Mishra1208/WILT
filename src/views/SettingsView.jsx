@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Settings, LogOut, Check } from 'lucide-react';
+import { Settings, LogOut, Check, Sparkles, User, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { INITIAL_LEADERBOARD_USERS, CURRENT_DEMO_USER } from '../data/seedData';
 
 export const SettingsView = () => {
-  const { user, setUser, switchAccount, logout } = useAuth();
+  const { user, setUser, logout, setIsAuthModalOpen } = useAuth();
 
   const [displayName, setDisplayName] = useState(user?.name || '');
   const [username, setUsername] = useState(user?.username || '');
@@ -34,21 +33,24 @@ export const SettingsView = () => {
           Account Settings
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Manage your student credentials and university standing.
+          Manage your verified student credentials and campus standing.
         </p>
       </div>
 
-      {user && (
+      {user ? (
         <form onSubmit={handleSaveProfile} className="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
           <div className="flex items-center gap-4">
             <img
-              src={user.avatar}
+              src={user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'}
               alt={user.name}
-              className="w-14 h-14 rounded-full object-cover border-2 border-primary-500"
+              className="w-14 h-14 rounded-full object-cover border-2 border-primary-500 shadow-sm"
             />
             <div>
-              <h3 className="text-base font-bold text-slate-900">
-                {user.name}
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <span>{user.name}</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" /> Verified Scholar
+                </span>
               </h3>
               <p className="text-xs text-primary-600 font-mono font-bold">@{user.username} • {user.tier}</p>
               <p className="text-xs text-slate-400 mt-0.5">{user.xp} XP Earned</p>
@@ -124,33 +126,28 @@ export const SettingsView = () => {
             </button>
           </div>
         </form>
-      )}
-
-      {/* Switch Demo Profile */}
-      <div className="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-4">
-        <h3 className="text-base font-bold text-slate-900">
-          Switch Demo Student Profile
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[CURRENT_DEMO_USER, ...INITIAL_LEADERBOARD_USERS.slice(0, 2)].map((demo) => (
-            <button
-              key={demo.id}
-              onClick={() => switchAccount(demo)}
-              className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-left flex items-center gap-3 hover:border-primary-300 hover:bg-white transition-all shadow-sm"
-            >
-              <img
-                src={demo.avatar}
-                alt={demo.name}
-                className="w-9 h-9 rounded-full object-cover"
-              />
-              <div className="truncate">
-                <div className="text-xs font-bold text-slate-900 truncate">{demo.name}</div>
-                <div className="text-[11px] text-primary-600 font-mono font-semibold">@{demo.username}</div>
-              </div>
-            </button>
-          ))}
+      ) : (
+        <div className="p-12 rounded-3xl bg-white border border-dashed border-slate-200 text-center space-y-4 shadow-soft">
+          <div className="w-14 h-14 rounded-2xl bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center mx-auto">
+            <User className="w-7 h-7" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-slate-900">
+              You are currently signed out
+            </h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+              Sign in with your Google account or Phone OTP to manage your profile and view your campus ranking.
+            </p>
+          </div>
+          <button
+            onClick={() => setIsAuthModalOpen(true)}
+            className="px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs shadow-btn transition-all inline-flex items-center gap-2 transform active:scale-95 cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Sign In with Clerk (Google / Phone OTP) ⚡</span>
+          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 };

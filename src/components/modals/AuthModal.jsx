@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from '../../context/AuthContext';
-import { INITIAL_LEADERBOARD_USERS, CURRENT_DEMO_USER } from '../../data/seedData';
 
 export const AuthModal = () => {
   const { isAuthModalOpen, setIsAuthModalOpen, login, switchAccount } = useAuth();
@@ -307,37 +306,6 @@ export const AuthModal = () => {
                 <Phone className="w-4 h-4" />
                 <span>Send Verification OTP 📱</span>
               </button>
-            </div>
-
-            {/* Instant Demo Switcher */}
-            <div className="pt-2 space-y-2 border-t border-slate-100">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-coral-500" />
-                <span>Test Demo Scholars</span>
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                {[CURRENT_DEMO_USER, INITIAL_LEADERBOARD_USERS[0]].map((demo) => (
-                  <button
-                    key={demo.id}
-                    onClick={() => switchAccount(demo)}
-                    className="p-2.5 rounded-2xl bg-slate-50 hover:bg-primary-50 border border-slate-200/80 hover:border-primary-200 text-left flex items-center gap-2 transition-all group cursor-pointer"
-                  >
-                    <img
-                      src={demo.avatar}
-                      alt={demo.name}
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                    <div className="truncate">
-                      <div className="text-[11px] font-bold text-slate-900 group-hover:text-primary-700 truncate">
-                        {demo.name}
-                      </div>
-                      <div className="text-[9px] text-primary-600 font-mono">
-                        @{demo.username}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
         )}

@@ -64,23 +64,3 @@ export const INITIAL_LEADERBOARD_USERS = [
     badges: ["⚡ Co-Founder", "🧠 Recall Engineer"]
   }
 ];
-
-export const CURRENT_DEMO_USER = {
-  id: "user-me",
-  name: "Student Scholar",
-  username: "learner",
-  avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-  university: "University Student",
-  major: "Business & Technology",
-  rank: 3,
-  tier: "Active Scholar",
-  tierColor: "from-indigo-400 to-indigo-600",
-  xp: 0,
-  weeklyScore: 0,
-  accuracy: 100,
-  postsShared: 0,
-  quizzesCompleted: 0,
-  streakDays: 1,
-  savedPosts: [],
-  likedPosts: []
-};
