@@ -7,13 +7,27 @@ import {
   saveConcept as storageSaveConcept,
   getStoredLeaderboard
 } from '../services/storage';
+import { savePostToSupabase, fetchPostsFromSupabase } from '../services/supabase';
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  // Initialize storage seeds
+  // Initialize storage seeds and fetch remote Supabase posts
   useEffect(() => {
     initStorage();
+    fetchPostsFromSupabase().then((remotePosts) => {
+      if (remotePosts && remotePosts.length > 0) {
+        setPosts((current) => {
+          const merged = [...remotePosts];
+          current.forEach((p) => {
+            if (!merged.some((m) => m.id === p.id)) {
+              merged.push(p);
+            }
+          });
+          return merged;
+        });
+      }
+    });
   }, []);
 
   const getInitialView = () => {
@@ -75,6 +89,9 @@ export const AppProvider = ({ children }) => {
     const updated = storageSavePost(post);
     setPosts(updated);
     setIsNewPostModalOpen(false);
+
+    // Save directly to Supabase cloud database
+    savePostToSupabase(post);
 
     // If terms were extracted, ensure they exist in peer dictionary
     if (newPostData.terms && newPostData.terms.length > 0) {

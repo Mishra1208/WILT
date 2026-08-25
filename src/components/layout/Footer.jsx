@@ -18,15 +18,20 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
+import { subscribeToNewsletter } from '../../services/supabase';
 
 export const Footer = () => {
   const { setCurrentView } = useApp();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email.trim() || !email.includes('@')) return;
+    
+    // Save subscriber directly to Supabase
+    await subscribeToNewsletter(email.trim());
+
     setSubscribed(true);
     try {
       confetti({
