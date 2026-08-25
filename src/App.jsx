@@ -123,10 +123,10 @@ export function App() {
           <Sidebar />
 
           {/* Main Content Area */}
-          <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#FAFAFB]">
+          <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden bg-[#FAFAFB]">
             <Header />
-            <main className="flex-1 overflow-y-auto flex flex-col justify-between">
-              <div>
+            <main className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col justify-between min-h-0">
+              <div className="flex-1">
                 {renderDashboardView()}
               </div>
               <Footer />

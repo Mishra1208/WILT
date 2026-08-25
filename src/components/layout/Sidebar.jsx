@@ -37,8 +37,8 @@ export const Sidebar = () => {
   }
 
   return (
-    <aside className="w-64 h-screen flex-shrink-0 flex flex-col justify-between border-r border-slate-200/80 bg-white select-none transition-all duration-300 animate-fadeIn z-30">
-      <div className="p-5 flex flex-col gap-6 overflow-y-auto">
+    <aside className="w-64 h-screen max-h-screen flex-shrink-0 flex flex-col justify-between border-r border-slate-200/80 bg-white select-none transition-all duration-300 animate-fadeIn z-30 overflow-hidden">
+      <div className="p-5 flex-1 flex flex-col gap-5 overflow-y-auto min-h-0">
         {/* Brand Header with Close Button */}
         <div className="flex items-center justify-between px-1 pt-1">
           <button
