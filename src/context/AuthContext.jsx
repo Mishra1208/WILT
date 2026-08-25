@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useUser, useClerk } from '@clerk/clerk-react';
+import confetti from 'canvas-confetti';
 import { getStoredUser, saveStoredUser, updateLeaderboardUser, getStoredLeaderboard } from '../services/storage';
 
 const AuthContext = createContext();
@@ -7,11 +9,62 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => getStoredUser());
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
+  // Real Clerk User Hook
+  const { user: clerkUser, isLoaded: isClerkLoaded, isSignedIn } = useUser();
+  const { signOut: clerkSignOut } = useClerk();
+
+  // Synchronize Clerk user state with local app state
   useEffect(() => {
-    if (user) {
-      saveStoredUser(user);
+    if (isClerkLoaded) {
+      if (isSignedIn && clerkUser) {
+        const email = clerkUser.primaryEmailAddress?.emailAddress || '';
+        const phone = clerkUser.primaryPhoneNumber?.phoneNumber || '';
+        const displayName = clerkUser.fullName || clerkUser.firstName || (email ? email.split('@')[0] : '') || phone || 'Student Scholar';
+        const rawUsername = clerkUser.username || (email ? email.split('@')[0] : '') || `scholar_${clerkUser.id.slice(-4)}`;
+        const cleanUsername = rawUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+        const avatar = clerkUser.imageUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80`;
+
+        const authenticatedUser = {
+          id: clerkUser.id,
+          name: displayName,
+          username: cleanUsername,
+          avatar: avatar,
+          email: email,
+          phone: phone,
+          university: clerkUser.publicMetadata?.university || "University Scholar",
+          major: clerkUser.publicMetadata?.major || "Finance & Tech",
+          rank: 3,
+          tier: "Curious Scholar",
+          tierColor: "from-indigo-400 to-indigo-600",
+          xp: 150,
+          weeklyScore: 50,
+          accuracy: 92,
+          postsShared: 0,
+          quizzesCompleted: 0,
+          streakDays: 1,
+          savedPosts: [],
+          likedPosts: []
+        };
+
+        setUser(authenticatedUser);
+        saveStoredUser(authenticatedUser);
+        updateLeaderboardUser(authenticatedUser);
+        setIsAuthModalOpen(false);
+
+        try {
+          confetti({
+            particleCount: 70,
+            spread: 60,
+            origin: { y: 0.6 }
+          });
+        } catch (e) {}
+      } else {
+        // Logged out from Clerk
+        setUser(null);
+        saveStoredUser(null);
+      }
     }
-  }, [user]);
+  }, [isClerkLoaded, isSignedIn, clerkUser]);
 
   const login = ({ username, name, university, major, avatar }) => {
     const newUser = {
@@ -34,13 +87,19 @@ export const AuthProvider = ({ children }) => {
       likedPosts: []
     };
     setUser(newUser);
+    saveStoredUser(newUser);
     updateLeaderboardUser(newUser);
     setIsAuthModalOpen(false);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      if (clerkSignOut) {
+        await clerkSignOut();
+      }
+    } catch (e) {}
     setUser(null);
-    localStorage.removeItem('wilt_current_user_v1');
+    saveStoredUser(null);
   };
 
   const addXP = (amount, isQuizPassed = false) => {
@@ -76,13 +135,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     setUser(updatedUser);
+    saveStoredUser(updatedUser);
     updateLeaderboardUser(updatedUser);
-  };
-
-  const switchAccount = (demoUser) => {
-    setUser(demoUser);
-    saveStoredUser(demoUser);
-    setIsAuthModalOpen(false);
   };
 
   return (
@@ -93,7 +147,6 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         addXP,
-        switchAccount,
         isAuthModalOpen,
         setIsAuthModalOpen,
         setUser
