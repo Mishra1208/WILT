@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { useApp } from './context/AppContext';
 import { FloatingNavbar } from './components/layout/FloatingNavbar';
 import { Sidebar } from './components/layout/Sidebar';
@@ -139,6 +140,9 @@ export function App() {
       <PostDetailModal />
       <NewConceptModal />
       <AuthModal />
+
+      {/* Vercel Web Traffic Analytics */}
+      <Analytics />
     </>
   );
 }
