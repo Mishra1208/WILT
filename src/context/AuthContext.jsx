@@ -13,60 +13,54 @@ export const AuthProvider = ({ children }) => {
   const { user: clerkUser, isLoaded: isClerkLoaded, isSignedIn } = useUser();
   const { signOut: clerkSignOut } = useClerk();
 
-  // Synchronize Clerk user state with local app state
+  // Synchronize Clerk user state when signed in
   useEffect(() => {
-    if (isClerkLoaded) {
-      if (isSignedIn && clerkUser) {
-        const email = clerkUser.primaryEmailAddress?.emailAddress || '';
-        const phone = clerkUser.primaryPhoneNumber?.phoneNumber || '';
-        const displayName = clerkUser.fullName || clerkUser.firstName || (email ? email.split('@')[0] : '') || phone || 'Student Scholar';
-        const rawUsername = clerkUser.username || (email ? email.split('@')[0] : '') || `scholar_${clerkUser.id.slice(-4)}`;
-        const cleanUsername = rawUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
-        const avatar = clerkUser.imageUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80`;
+    if (isClerkLoaded && isSignedIn && clerkUser) {
+      const email = clerkUser.primaryEmailAddress?.emailAddress || '';
+      const phone = clerkUser.primaryPhoneNumber?.phoneNumber || '';
+      const displayName = clerkUser.fullName || clerkUser.firstName || (email ? email.split('@')[0] : '') || phone || 'Student Scholar';
+      const rawUsername = clerkUser.username || (email ? email.split('@')[0] : '') || `scholar_${clerkUser.id.slice(-4)}`;
+      const cleanUsername = rawUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+      const avatar = clerkUser.imageUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80`;
 
-        const authenticatedUser = {
-          id: clerkUser.id,
-          name: displayName,
-          username: cleanUsername,
-          avatar: avatar,
-          email: email,
-          phone: phone,
-          university: clerkUser.publicMetadata?.university || "University Scholar",
-          major: clerkUser.publicMetadata?.major || "Finance & Tech",
-          rank: 3,
-          tier: "Curious Scholar",
-          tierColor: "from-indigo-400 to-indigo-600",
-          xp: 150,
-          weeklyScore: 50,
-          accuracy: 92,
-          postsShared: 0,
-          quizzesCompleted: 0,
-          streakDays: 1,
-          savedPosts: [],
-          likedPosts: []
-        };
+      const authenticatedUser = {
+        id: clerkUser.id,
+        name: displayName,
+        username: cleanUsername,
+        avatar: avatar,
+        email: email,
+        phone: phone,
+        university: clerkUser.publicMetadata?.university || "University Scholar",
+        major: clerkUser.publicMetadata?.major || "Finance & Tech",
+        rank: 3,
+        tier: "Curious Scholar",
+        tierColor: "from-indigo-400 to-indigo-600",
+        xp: 150,
+        weeklyScore: 50,
+        accuracy: 92,
+        postsShared: 0,
+        quizzesCompleted: 0,
+        streakDays: 1,
+        savedPosts: [],
+        likedPosts: []
+      };
 
-        setUser(authenticatedUser);
-        saveStoredUser(authenticatedUser);
-        updateLeaderboardUser(authenticatedUser);
-        setIsAuthModalOpen(false);
+      setUser(authenticatedUser);
+      saveStoredUser(authenticatedUser);
+      updateLeaderboardUser(authenticatedUser);
+      setIsAuthModalOpen(false);
 
-        try {
-          confetti({
-            particleCount: 70,
-            spread: 60,
-            origin: { y: 0.6 }
-          });
-        } catch (e) {}
-      } else {
-        // Logged out from Clerk
-        setUser(null);
-        saveStoredUser(null);
-      }
+      try {
+        confetti({
+          particleCount: 70,
+          spread: 60,
+          origin: { y: 0.6 }
+        });
+      } catch (e) {}
     }
   }, [isClerkLoaded, isSignedIn, clerkUser]);
 
-  const login = ({ username, name, university, major, avatar }) => {
+  const login = ({ username, name, university, major, avatar, email, phone }) => {
     const newUser = {
       id: `user-${Date.now()}`,
       name: name || "Student Scholar",
@@ -74,6 +68,8 @@ export const AuthProvider = ({ children }) => {
       avatar: avatar || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80`,
       university: university || "University Student",
       major: major || "Finance & Tech",
+      email: email || '',
+      phone: phone || '',
       rank: 12,
       tier: "Curious Scholar",
       tierColor: "from-indigo-400 to-indigo-600",

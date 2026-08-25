@@ -133,26 +133,14 @@ export const AuthModal = () => {
       if (signIn?.authenticateWithRedirect) {
         await signIn.authenticateWithRedirect({
           strategy: 'oauth_google',
-          redirectUrl: '/sso-callback',
-          redirectUrlComplete: '/'
+          redirectUrl: window.location.origin,
+          redirectUrlComplete: window.location.origin
         });
         return;
       }
-    } catch (e) {}
-
-    // Fallback direct sign-in with Google profile prompt
-    const defaultName = emailInput ? emailInput.split('@')[0] : "Google Scholar";
-    login({
-      username: defaultName.toLowerCase().replace(/[^a-z0-9_]/g, '') || `scholar_${Date.now().toString().slice(-4)}`,
-      name: defaultName,
-      university: "Stanford University",
-      major: "Quantitative Finance",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
-    });
-    try {
-      confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
-    } catch (e) {}
-    setIsAuthModalOpen(false);
+    } catch (e) {
+      console.warn("Clerk Google auth:", e);
+    }
   };
 
   // 3. OTP Digit Input & Auto-Advance
