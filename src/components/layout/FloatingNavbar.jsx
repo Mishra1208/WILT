@@ -8,12 +8,13 @@ import {
   PenTool,
   GraduationCap
 } from 'lucide-react';
+import { SignInButton, UserButton, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const FloatingNavbar = () => {
   const { currentView, setCurrentView } = useApp();
-  const { user, isLoggedIn, setIsAuthModalOpen } = useAuth();
+  const { user } = useAuth();
 
   return (
     <header className="sticky top-5 z-40 px-4 max-w-5xl mx-auto w-full">
@@ -72,31 +73,37 @@ export const FloatingNavbar = () => {
           </button>
         </div>
 
-        {/* Right CTA Button */}
+        {/* Right CTA Button using Official Clerk Modal & UserButton */}
         <div className="flex items-center gap-2">
-          {isLoggedIn ? (
-            <button
-              onClick={() => setCurrentView('settings')}
-              className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
-            >
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className="w-6 h-6 rounded-full object-cover"
-              />
-              <span className="text-xs font-semibold text-slate-800 hidden sm:inline">
-                @{user.username}
-              </span>
-            </button>
-          ) : (
-            <button
-              onClick={() => setIsAuthModalOpen(true)}
-              className="px-4 py-2 rounded-full text-xs font-bold bg-primary-600 hover:bg-primary-700 text-white shadow-btn transition-all flex items-center gap-1.5 transform active:scale-95"
-            >
-              <span>Sign In</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          )}
+          <SignedIn>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentView('settings')}
+                className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
+              >
+                <img
+                  src={user?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"}
+                  alt={user?.name || "Scholar"}
+                  className="w-6 h-6 rounded-full object-cover"
+                />
+                <span className="text-xs font-semibold text-slate-800 hidden sm:inline">
+                  @{user?.username || 'scholar'}
+                </span>
+              </button>
+              <UserButton afterSignOutUrl="/" />
+            </div>
+          </SignedIn>
+
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button
+                className="px-4 py-2 rounded-full text-xs font-bold bg-primary-600 hover:bg-primary-700 text-white shadow-btn transition-all flex items-center gap-1.5 transform active:scale-95 cursor-pointer"
+              >
+                <span>Sign In</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            </SignInButton>
+          </SignedOut>
         </div>
       </nav>
     </header>
