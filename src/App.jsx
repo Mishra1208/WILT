@@ -117,20 +117,22 @@ export function App() {
           <Footer />
         </div>
       ) : (
-        /* FULL DASHBOARD EXPERIENCE: Sidebar + Header + Page Views + Footer */
-        <div className="flex h-screen w-screen overflow-hidden bg-[#FAFAFB] text-slate-900 font-sans">
-          {/* Sidebar */}
-          <Sidebar />
+        /* FULL DASHBOARD EXPERIENCE: Sticky Sidebar + Sticky Header + Full Page Scrolling + Footer */
+        <div className="min-h-screen bg-[#FAFAFB] text-slate-900 font-sans flex selection:bg-indigo-100 selection:text-indigo-900">
+          {/* Sticky Sidebar */}
+          <div className="sticky top-0 h-screen flex-shrink-0 z-30">
+            <Sidebar />
+          </div>
 
-          {/* Main Content Area */}
-          <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden bg-[#FAFAFB]">
-            <Header />
-            <main className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col justify-between min-h-0">
-              <div className="flex-1">
+          {/* Main Content & Natural Window Flow */}
+          <div className="flex-1 min-w-0 flex flex-col justify-between min-h-screen">
+            <div>
+              <Header />
+              <main className="flex-1">
                 {renderDashboardView()}
-              </div>
-              <Footer />
-            </main>
+              </main>
+            </div>
+            <Footer />
           </div>
         </div>
       )}
