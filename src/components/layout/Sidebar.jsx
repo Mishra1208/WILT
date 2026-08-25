@@ -1,0 +1,171 @@
+import React from 'react';
+import {
+  Compass,
+  BookOpen,
+  HelpCircle,
+  Brain,
+  Bookmark,
+  Bell,
+  Settings,
+  PlusCircle,
+  Trophy,
+  PenTool,
+  Info,
+  PanelLeftClose
+} from 'lucide-react';
+import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
+
+export const Sidebar = () => {
+  const { currentView, setCurrentView, setIsNewPostModalOpen, isSidebarOpen, toggleSidebar } = useApp();
+  const { user, isLoggedIn, setIsAuthModalOpen } = useAuth();
+
+  const mainNav = [
+    { id: 'notepad', label: 'Notepad Slate', icon: PenTool, badge: 'Landing' },
+    { id: 'discover', label: 'Discover', icon: Compass },
+    { id: 'dictionary', label: 'Dictionary', icon: BookOpen },
+    { id: 'quiz', label: 'Quiz', icon: HelpCircle, badge: 'Weekly' },
+    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
+    { id: 'revision', label: 'Revision', icon: Brain },
+    { id: 'saved', label: 'Saved', icon: Bookmark },
+    { id: 'about', label: 'About WILT', icon: Info },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+  ];
+
+  if (!isSidebarOpen) {
+    return null;
+  }
+
+  return (
+    <aside className="w-64 h-screen flex-shrink-0 flex flex-col justify-between border-r border-slate-200/80 bg-white select-none transition-all duration-300 animate-fadeIn z-30">
+      <div className="p-5 flex flex-col gap-6 overflow-y-auto">
+        {/* Brand Header with Close Button */}
+        <div className="flex items-center justify-between px-1 pt-1">
+          <button
+            onClick={() => setCurrentView('notepad')}
+            className="flex items-center gap-2.5 text-left group"
+          >
+            <div className="w-8 h-8 rounded-xl bg-primary-600 text-white font-extrabold text-base flex items-center justify-center shadow-btn group-hover:scale-105 transition-transform">
+              W
+            </div>
+            <div>
+              <span className="font-extrabold text-xl tracking-tight text-slate-900 block leading-tight">
+                WILT
+              </span>
+              <span className="text-[10px] font-semibold text-primary-600 uppercase tracking-wider block">
+                What I Learned Today
+              </span>
+            </div>
+          </button>
+
+          {/* Close Sidebar Button */}
+          <button
+            onClick={toggleSidebar}
+            title="Close sidebar (⌘B)"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+          >
+            <PanelLeftClose className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Main Navigation List */}
+        <nav className="flex flex-col gap-1">
+          {mainNav.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentView === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setCurrentView(item.id)}
+                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  isActive
+                    ? 'bg-primary-50 text-primary-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon
+                    className={`w-4 h-4 ${
+                      isActive ? 'text-primary-600' : 'text-slate-400'
+                    }`}
+                  />
+                  <span>{item.label}</span>
+                </div>
+                {item.badge && (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-coral-50 text-coral-600 border border-coral-100">
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* CREATE Section */}
+        <div className="flex flex-col gap-2 pt-2">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">
+            Create
+          </div>
+          <button
+            onClick={() => setIsNewPostModalOpen(true)}
+            className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 shadow-btn transition-all transform active:scale-95"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>Share What You Learned</span>
+          </button>
+        </div>
+
+        {/* ACCOUNT Section */}
+        <div className="flex flex-col gap-1 pt-2">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">
+            Account
+          </div>
+          <button
+            onClick={() => setCurrentView('settings')}
+            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              currentView === 'settings'
+                ? 'bg-primary-50 text-primary-700'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <Settings className="w-4 h-4 text-slate-400" />
+            <span>Settings</span>
+          </button>
+        </div>
+      </div>
+
+      {/* User Footer Card */}
+      <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+        {isLoggedIn ? (
+          <div
+            onClick={() => setCurrentView('settings')}
+            className="flex items-center justify-between p-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 cursor-pointer transition-all"
+          >
+            <div className="flex items-center gap-2.5 truncate">
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className="w-8 h-8 rounded-full object-cover border border-slate-200"
+              />
+              <div className="truncate">
+                <div className="text-xs font-bold text-slate-900 truncate">
+                  {user.name}
+                </div>
+                <div className="text-[11px] text-primary-600 font-mono">
+                  {user.xp} XP • {user.tier}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setIsAuthModalOpen(true)}
+            className="w-full py-2.5 px-3 rounded-xl text-xs font-bold bg-primary-600 text-white hover:bg-primary-700 transition-colors shadow-btn"
+          >
+            Student Sign In
+          </button>
+        )}
+      </div>
+    </aside>
+  );
+};
