@@ -55,7 +55,7 @@ export const DiscoverView = () => {
   );
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8 animate-fadeIn">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-fadeIn">
       {/* Top Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

@@ -36,9 +36,23 @@ export const Sidebar = () => {
     return null;
   }
 
+  const handleNavClick = (id) => {
+    setCurrentView(id);
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      toggleSidebar();
+    }
+  };
+
   return (
-    <aside className="w-64 h-screen max-h-screen flex-shrink-0 flex flex-col justify-between border-r border-slate-200/80 bg-white select-none transition-all duration-300 animate-fadeIn z-30 overflow-hidden">
-      <div className="p-5 flex-1 flex flex-col gap-5 overflow-y-auto min-h-0">
+    <>
+      {/* Dark Mobile Backdrop (Only rendered on mobile screens < md) */}
+      <div
+        onClick={toggleSidebar}
+        className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs z-40 md:hidden animate-fadeIn"
+      />
+
+      <aside className="fixed inset-y-0 left-0 md:sticky md:top-0 w-72 md:w-64 h-screen max-h-screen flex-shrink-0 flex flex-col justify-between border-r border-slate-200/80 bg-white select-none transition-all duration-300 animate-fadeIn z-50 md:z-30 overflow-hidden shadow-2xl md:shadow-none">
+        <div className="p-5 flex-1 flex flex-col gap-5 overflow-y-auto min-h-0">
         {/* Brand Header with Close Button */}
         <div className="flex items-center justify-between px-1 pt-1">
           <button
@@ -76,11 +90,11 @@ export const Sidebar = () => {
             return (
               <button
                 key={item.id}
-                onClick={() => setCurrentView(item.id)}
+                onClick={() => handleNavClick(item.id)}
                 className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-primary-50 text-primary-700 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -107,7 +121,12 @@ export const Sidebar = () => {
             Create
           </div>
           <button
-            onClick={() => setIsNewPostModalOpen(true)}
+            onClick={() => {
+              setIsNewPostModalOpen(true);
+              if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                toggleSidebar();
+              }
+            }}
             className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 shadow-btn transition-all transform active:scale-95"
           >
             <PlusCircle className="w-4 h-4" />
@@ -121,7 +140,7 @@ export const Sidebar = () => {
             Account
           </div>
           <button
-            onClick={() => setCurrentView('settings')}
+            onClick={() => handleNavClick('settings')}
             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
               currentView === 'settings'
                 ? 'bg-primary-50 text-primary-700'
@@ -138,7 +157,7 @@ export const Sidebar = () => {
       <div className="p-4 border-t border-slate-100 bg-slate-50/50">
         {isLoggedIn ? (
           <div
-            onClick={() => setCurrentView('settings')}
+            onClick={() => handleNavClick('settings')}
             className="flex items-center justify-between p-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 cursor-pointer transition-all"
           >
             <div className="flex items-center gap-2.5 truncate">
@@ -159,7 +178,12 @@ export const Sidebar = () => {
           </div>
         ) : (
           <button
-            onClick={() => setIsAuthModalOpen(true)}
+            onClick={() => {
+              setIsAuthModalOpen(true);
+              if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                toggleSidebar();
+              }
+            }}
             className="w-full py-2.5 px-3 rounded-xl text-xs font-bold bg-primary-600 text-white hover:bg-primary-700 transition-colors shadow-btn"
           >
             Student Sign In
@@ -167,5 +191,6 @@ export const Sidebar = () => {
         )}
       </div>
     </aside>
+    </>
   );
 };

@@ -65,8 +65,8 @@ export const FloatingNavbar = () => {
             </div>
           </div>
 
-          {/* Center Nav Links */}
-          <div className="flex items-center gap-1 sm:gap-2 text-xs font-bold">
+          {/* Center Nav Links (Desktop md and up) */}
+          <div className="hidden md:flex items-center gap-1 sm:gap-2 text-xs font-bold">
             <button
               onClick={() => setCurrentView('notepad')}
               className={`px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 ${
@@ -104,18 +104,18 @@ export const FloatingNavbar = () => {
             </button>
           </div>
 
-          {/* Right CTA Button */}
-          <div className="flex items-center gap-2">
+          {/* Right CTA Button & Mobile Menu Button */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <SignedIn>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   onClick={() => setCurrentView('settings')}
-                  className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
+                  className="flex items-center gap-1.5 pl-1.5 pr-2.5 sm:pr-3 py-1 rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
                 >
                   <img
                     src={user?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"}
                     alt={user?.name || "Scholar"}
-                    className="w-6 h-6 rounded-full object-cover"
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
                   />
                   <span className="text-xs font-semibold text-slate-800 hidden sm:inline">
                     @{user?.username || 'scholar'}
@@ -128,13 +128,22 @@ export const FloatingNavbar = () => {
             <SignedOut>
               <SignInButton mode="modal">
                 <button
-                  className="px-4 py-2 rounded-full text-xs font-bold bg-primary-600 hover:bg-primary-700 text-white shadow-btn transition-all flex items-center gap-1.5 transform active:scale-95 cursor-pointer"
+                  className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold bg-primary-600 hover:bg-primary-700 text-white shadow-btn transition-all flex items-center gap-1.5 transform active:scale-95 cursor-pointer whitespace-nowrap"
                 >
                   <span>Sign In</span>
                   <ArrowRight className="w-3 h-3" />
                 </button>
               </SignInButton>
             </SignedOut>
+
+            {/* Mobile Hamburger Trigger for Small Devices */}
+            <button
+              onClick={() => setIsFlyoutOpen(true)}
+              className="md:hidden p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors flex items-center justify-center cursor-pointer"
+              title="Open Navigation"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
           </div>
         </nav>
       </header>

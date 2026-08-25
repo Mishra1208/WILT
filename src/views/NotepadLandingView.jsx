@@ -178,7 +178,7 @@ export const NotepadLandingView = () => {
   const hasTrustSource = sourceUrl.trim().length > 0 || sourceContext.trim().length > 0;
 
   return (
-    <div className="py-8 px-4 sm:px-6 max-w-5xl mx-auto space-y-10 animate-fadeIn">
+    <div className="py-5 sm:py-8 px-3 sm:px-6 max-w-5xl mx-auto space-y-8 sm:space-y-10 animate-fadeIn">
       {/* Top ReactBits Masked Heading with Animated Hand-Drawn Scribble */}
       <MaskedHeading />
 
@@ -198,24 +198,24 @@ export const NotepadLandingView = () => {
       {/* STYLISH DIGITAL NOTEPAD SLATE BOX */}
       <div className="relative rounded-3xl bg-white border border-slate-200/90 shadow-[0_20px_50px_rgba(0,0,0,0.06)] overflow-hidden transition-all">
         {/* Notepad Top Header Bar */}
-        <div className="px-6 py-4 bg-slate-50/80 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <span className="w-3 h-3 rounded-full bg-rose-400 inline-block" />
-            <span className="w-3 h-3 rounded-full bg-amber-400 inline-block" />
-            <span className="w-3 h-3 rounded-full bg-emerald-400 inline-block" />
-            <span className="text-xs font-mono font-semibold text-slate-500 ml-2">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50/80 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-rose-400 inline-block" />
+            <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-400 inline-block" />
+            <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-400 inline-block" />
+            <span className="text-[11px] sm:text-xs font-mono font-semibold text-slate-500 ml-1.5">
               📅 {currentDateStr}
             </span>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">
               Topic:
             </span>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="px-3 py-1 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 font-bold focus:outline-none focus:border-primary-500 cursor-pointer"
+              className="px-2.5 sm:px-3 py-1 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 font-bold focus:outline-none focus:border-primary-500 cursor-pointer"
             >
               {CATEGORIES.filter((c) => c !== 'All').map((cat) => (
                 <option key={cat} value={cat}>
@@ -231,18 +231,18 @@ export const NotepadLandingView = () => {
                 required
                 value={customCategory}
                 onChange={(e) => setCustomCategory(e.target.value)}
-                placeholder="Type your custom topic..."
-                className="px-3 py-1 text-xs rounded-xl bg-white border-2 border-primary-500 text-slate-900 font-bold placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-100 animate-fadeIn"
+                placeholder="Type custom topic..."
+                className="px-2.5 sm:px-3 py-1 text-xs rounded-xl bg-white border-2 border-primary-500 text-slate-900 font-bold placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-100 animate-fadeIn"
               />
             )}
           </div>
         </div>
 
         {/* Notepad Typing Body */}
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-5">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-4 sm:space-y-5">
           {/* Post Title */}
           <div className="space-y-1">
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <label className="block text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               Title
             </label>
             <input
@@ -251,13 +251,13 @@ export const NotepadLandingView = () => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title (e.g. How to calculate Fixed Assets in 10 seconds)..."
-              className="w-full text-lg sm:text-xl font-extrabold text-slate-900 placeholder-slate-300 focus:outline-none border-b border-slate-100 pb-2"
+              className="w-full text-base sm:text-xl font-extrabold text-slate-900 placeholder-slate-300 focus:outline-none border-b border-slate-100 pb-2"
             />
           </div>
 
           {/* Quick Summary / Hook */}
           <div className="space-y-1">
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <label className="block text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               One-Sentence Teaser (Optional)
             </label>
             <input
@@ -272,7 +272,7 @@ export const NotepadLandingView = () => {
           {/* MS WORD STYLE SYMBOL & FORMULA TOOLBAR */}
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+              <span className="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider">
                 Math & Tools:
               </span>
 
@@ -280,14 +280,15 @@ export const NotepadLandingView = () => {
               <button
                 type="button"
                 onClick={() => setIsMathRibbonOpen(!isMathRibbonOpen)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs ${
                   isMathRibbonOpen
                     ? 'bg-primary-600 text-white shadow-btn'
                     : 'bg-primary-50 hover:bg-primary-100 text-primary-700 border border-primary-200'
                 }`}
               >
                 <Sigma className="w-3.5 h-3.5" />
-                <span>Math & Finance Equation Palette</span>
+                <span className="hidden sm:inline">Math & Finance Equation Palette</span>
+                <span className="sm:hidden">Math Palette</span>
                 {isMathRibbonOpen ? (
                   <ChevronUp className="w-3.5 h-3.5 ml-0.5" />
                 ) : (
@@ -457,15 +458,15 @@ export const NotepadLandingView = () => {
           </div>
 
           {/* Submit Action Button */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-[11px] text-slate-400 font-mono">
+          <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <span className="text-[11px] text-slate-400 font-mono text-center sm:text-left">
               {content.length} characters written
             </span>
 
             <button
               type="submit"
               disabled={!title.trim() || !content.trim() || !hasTrustSource}
-              className="px-7 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs shadow-btn hover:shadow-hover transition-all transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs shadow-btn hover:shadow-hover transition-all transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <ShieldCheck className="w-4 h-4" />
               <span>Publish & Index Insight 🚀</span>
