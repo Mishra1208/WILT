@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Supabase Project Keys
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://default.supabase.co';
+export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://itokltjrkzqmbbagjnme.supabase.co';
 export const SUPABASE_PUBLISHABLE_KEY = 
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 
   import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 
