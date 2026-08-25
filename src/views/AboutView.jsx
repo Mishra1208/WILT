@@ -239,46 +239,46 @@ export const AboutView = () => {
         </div>
 
         {/* 3 Founders Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {creators.map((creator, idx) => (
             <div
               key={idx}
-              className="p-6 sm:p-7 rounded-3xl bg-slate-50/70 hover:bg-white border border-slate-200/80 hover:border-primary-300 shadow-soft hover:shadow-hover transition-all duration-300 flex flex-col justify-between group"
+              className="p-5 sm:p-6 rounded-3xl bg-slate-50/70 hover:bg-white border border-slate-200/80 hover:border-primary-300 shadow-soft hover:shadow-hover transition-all duration-300 flex flex-col justify-between group"
             >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3.5">
+              <div className="space-y-3.5">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-3 min-w-0">
                     <img
                       src={creator.avatar}
                       alt={creator.name}
-                      className="w-14 h-14 rounded-2xl object-cover ring-2 ring-primary-100 group-hover:ring-primary-400 transition-all shadow-xs"
+                      className="w-12 h-12 rounded-2xl object-cover ring-2 ring-primary-100 group-hover:ring-primary-400 transition-all shadow-xs flex-shrink-0"
                     />
-                    <div>
-                      <h3 className="text-base font-bold text-slate-900 group-hover:text-primary-700 transition-colors">
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-bold text-slate-900 group-hover:text-primary-700 transition-colors truncate">
                         {creator.name}
                       </h3>
-                      <p className="text-xs text-primary-600 font-semibold font-mono">
+                      <p className="text-[11px] text-primary-600 font-semibold font-mono truncate">
                         {creator.role}
                       </p>
                     </div>
                   </div>
 
-                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-white border border-slate-200 text-slate-700 shadow-2xs whitespace-nowrap flex-shrink-0">
                     {creator.badge}
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-600 leading-relaxed italic bg-white p-3.5 rounded-2xl border border-slate-100 font-serif">
+                <p className="text-xs text-slate-600 leading-relaxed italic bg-white p-3 rounded-2xl border border-slate-100 font-serif">
                   "{creator.quote}"
                 </p>
               </div>
 
-              <div className="pt-4 mt-4 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500 font-medium">
-                <span className="flex items-center gap-1 text-primary-700 font-bold">
-                  <Award className="w-3.5 h-3.5 text-primary-600" />
-                  <span>{creator.focus}</span>
+              <div className="pt-3 mt-3 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500 font-medium gap-2">
+                <span className="flex items-center gap-1 text-primary-700 font-bold truncate">
+                  <Award className="w-3.5 h-3.5 text-primary-600 flex-shrink-0" />
+                  <span className="truncate">{creator.focus}</span>
                 </span>
-                <span className="font-mono text-slate-400">Class of '26</span>
+                <span className="font-mono text-slate-400 text-[10px] flex-shrink-0">Class of '26</span>
               </div>
             </div>
           ))}

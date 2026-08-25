@@ -65,10 +65,10 @@ export const Footer = () => {
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/40 to-transparent" />
 
       <div className="px-6 py-14 sm:py-16 mx-auto max-w-7xl lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-y-12 gap-x-8 lg:gap-x-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
           
-          {/* Brand Info & Mission (2 cols) */}
-          <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-4">
+          {/* Brand Info & Mission (4 cols on desktop) */}
+          <div className="lg:col-span-4 space-y-4 pr-0 lg:pr-6">
             <button
               onClick={() => setCurrentView('notepad')}
               className="flex items-center gap-2.5 text-left group"
@@ -86,18 +86,14 @@ export const Footer = () => {
               </div>
             </button>
 
-            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-sm font-medium">
+            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
               The high-retention micro-learning platform for university students. Master complex formulas, models, and concepts in 30-second peer insights with spaced recall.
             </p>
 
-            {/* Creators Attribution Pill */}
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs">
+            {/* Clean Single-Line Built by Narendra Mishra Attribution Pill */}
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs whitespace-nowrap">
               <span className="text-slate-500">Built by</span>
               <span className="text-slate-900 font-extrabold">Narendra Mishra</span>
-              <span className="text-slate-400">,</span>
-              <span className="text-slate-900 font-extrabold">Avinendra Pratap Singh</span>
-              <span className="text-slate-400">&</span>
-              <span className="text-slate-900 font-extrabold">Kumar</span>
             </div>
 
             {/* Social Icons */}
@@ -113,7 +109,7 @@ export const Footer = () => {
               </a>
 
               <a
-                href="https://github.com"
+                href="https://github.com/Mishra1208/WILT"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
@@ -134,17 +130,17 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Column 1: Platform Navigation */}
-          <div className="space-y-4">
+          {/* Column 1: Platform Navigation (2 cols on desktop) */}
+          <div className="lg:col-span-2 space-y-4">
             <p className="text-[11px] font-black tracking-widest text-slate-900 uppercase flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-primary-600 inline-block" />
               <span>Platform</span>
             </p>
-            <ul className="space-y-3 text-xs font-semibold text-slate-600">
+            <ul className="space-y-2.5 text-xs font-semibold text-slate-600">
               <li>
                 <button
                   onClick={() => setCurrentView('notepad')}
-                  className="hover:text-primary-600 transition-all flex items-center gap-2 hover:translate-x-1"
+                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
                 >
                   <PenTool className="w-3.5 h-3.5 text-slate-400" />
                   <span>Notepad Studio</span>
@@ -153,7 +149,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => setCurrentView('discover')}
-                  className="hover:text-primary-600 transition-all flex items-center gap-2 hover:translate-x-1"
+                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
                 >
                   <Compass className="w-3.5 h-3.5 text-slate-400" />
                   <span>Discover Feed</span>
@@ -162,7 +158,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => setCurrentView('dictionary')}
-                  className="hover:text-primary-600 transition-all flex items-center gap-2 hover:translate-x-1"
+                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
                 >
                   <BookOpen className="w-3.5 h-3.5 text-slate-400" />
                   <span>Peer Glossary</span>
@@ -171,31 +167,31 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => setCurrentView('quiz')}
-                  className="hover:text-primary-600 transition-all flex items-center gap-2 hover:translate-x-1"
+                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <Sparkles className="w-3.5 h-3.5 text-primary-500" />
                   <span>Weekly Quiz (+150 XP)</span>
                 </button>
               </li>
               <li>
                 <button
                   onClick={() => setCurrentView('leaderboard')}
-                  className="hover:text-primary-600 transition-all flex items-center gap-2 hover:translate-x-1"
+                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
                 >
-                  <Trophy className="w-3.5 h-3.5 text-slate-400" />
+                  <Trophy className="w-3.5 h-3.5 text-amber-500" />
                   <span>Campus Leaderboard</span>
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Column 2: Story & Pillars */}
-          <div className="space-y-4">
+          {/* Column 2: About & Project (2 cols on desktop) */}
+          <div className="lg:col-span-2 space-y-4">
             <p className="text-[11px] font-black tracking-widest text-slate-900 uppercase flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-coral-500 inline-block" />
-              <span>About & Story</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block" />
+              <span>About</span>
             </p>
-            <ul className="space-y-3 text-xs font-semibold text-slate-600">
+            <ul className="space-y-2.5 text-xs font-semibold text-slate-600">
               <li>
                 <button
                   onClick={() => setCurrentView('about')}
@@ -209,23 +205,7 @@ export const Footer = () => {
                   onClick={() => setCurrentView('about')}
                   className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
                 >
-                  <span>Narendra Mishra</span>
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setCurrentView('about')}
-                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
-                >
-                  <span>Avinendra Pratap Singh</span>
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setCurrentView('about')}
-                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
-                >
-                  <span>Kumar</span>
+                  <span>Meet the Creators</span>
                 </button>
               </li>
               <li>
@@ -247,68 +227,8 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Column 4: Community & Guidelines */}
-          <div className="space-y-4">
-            <p className="text-[11px] font-black tracking-widest text-slate-900 uppercase flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-500 inline-block" />
-              <span>Community</span>
-            </p>
-            <ul className="space-y-3 text-xs font-semibold text-slate-600">
-              <li>
-                <a
-                  href="?page=standards"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
-                >
-                  <span>Honor Code</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="?page=standards"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
-                >
-                  <span>Quality Guidelines</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="?page=standards"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
-                >
-                  <span>Formula Verification</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="?page=privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
-                >
-                  <span>Student Privacy</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="?page=terms"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-600 transition-all hover:translate-x-1 flex items-center gap-1.5"
-                >
-                  <span>Terms of Service</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 3: Newsletter (2 cols) */}
-          <div className="col-span-1 md:col-span-2 lg:col-span-2 space-y-4">
+          {/* Column 3: Newsletter Digest (4 cols on desktop) */}
+          <div className="lg:col-span-4 space-y-4">
             <div className="space-y-1.5">
               <p className="text-[11px] font-black tracking-widest text-slate-900 uppercase flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
@@ -368,10 +288,8 @@ export const Footer = () => {
         {/* Bottom Legal & Copyright Bar */}
         <div className="mt-14 pt-8 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-slate-500">
           <p className="text-center sm:text-left">
-            © {new Date().getFullYear()} WILT. Designed for university scholars by{' '}
-            <strong className="text-slate-800 font-bold">Narendra Mishra</strong>,{' '}
-            <strong className="text-slate-800 font-bold">Avinendra Pratap Singh</strong> &{' '}
-            <strong className="text-slate-800 font-bold">Kumar</strong>.
+            © {new Date().getFullYear()} WILT. Built with ⚡ by{' '}
+            <strong className="text-slate-800 font-bold">Narendra Mishra</strong>.
           </p>
 
           {/* New Tab Legal Links */}
@@ -408,3 +326,5 @@ export const Footer = () => {
     </footer>
   );
 };
+
+export default Footer;
