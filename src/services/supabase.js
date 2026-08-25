@@ -22,14 +22,34 @@ export const supabase = createClient(
  * 1. Record weekly digest newsletter subscriber in Supabase
  */
 export const subscribeToNewsletter = async (email) => {
-  if (!email || !email.includes('@')) return { success: false, error: 'Invalid email' };
+  if (!email || !email.includes('@')) {
+    return { success: false, status: 'invalid', message: 'Please enter a valid email address.' };
+  }
+
+  const cleanEmail = email.trim().toLowerCase();
 
   try {
+    // Check if the subscriber already exists in Supabase
+    const { data: existing } = await supabase
+      .from('newsletter_subscribers')
+      .select('id, email')
+      .eq('email', cleanEmail)
+      .maybeSingle();
+
+    if (existing) {
+      return {
+        success: false,
+        status: 'already_exists',
+        message: 'You are already subscribed to the Weekly Digest! 📬'
+      };
+    }
+
+    // Insert new subscriber
     const { data, error } = await supabase
       .from('newsletter_subscribers')
       .insert([
         {
-          email: email.trim().toLowerCase(),
+          email: cleanEmail,
           source: 'wilt_footer_digest',
           created_at: new Date().toISOString()
         }
@@ -37,16 +57,26 @@ export const subscribeToNewsletter = async (email) => {
       .select();
 
     if (error) {
+      if (error.code === '23505' || error.message?.includes('duplicate') || error.message?.includes('unique')) {
+        return {
+          success: false,
+          status: 'already_exists',
+          message: 'You are already subscribed to the Weekly Digest! 📬'
+        };
+      }
       console.warn('Supabase newsletter info:', error.message);
-      saveLocalNewsletter(email);
-      return { success: true, fallback: true };
+      return { success: false, status: 'error', message: 'Failed to subscribe. Please try again.' };
     }
 
-    return { success: true, data };
+    return {
+      success: true,
+      status: 'subscribed',
+      message: 'Subscribed Successfully! 🎉',
+      data
+    };
   } catch (err) {
     console.warn('Supabase newsletter catch:', err);
-    saveLocalNewsletter(email);
-    return { success: true, fallback: true };
+    return { success: false, status: 'error', message: 'Something went wrong. Please try again.' };
   }
 };
 

@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { 
   Sparkles, 
   Send, 
@@ -14,7 +13,8 @@ import {
   Compass,
   ArrowRight,
   ShieldCheck,
-  Zap
+  Zap,
+  AlertCircle
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
@@ -23,26 +23,39 @@ import { subscribeToNewsletter } from '../../services/supabase';
 export const Footer = () => {
   const { setCurrentView } = useApp();
   const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
+  const [subStatus, setSubStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'already_exists' | 'error'
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email.trim() || !email.includes('@')) return;
     
-    // Save subscriber directly to Supabase
-    await subscribeToNewsletter(email.trim());
+    setSubStatus('loading');
+    const result = await subscribeToNewsletter(email.trim());
 
-    setSubscribed(true);
-    try {
-      confetti({
-        particleCount: 60,
-        spread: 50,
-        origin: { y: 0.85 }
-      });
-    } catch (err) {}
-    setTimeout(() => {
-      setEmail('');
-    }, 2500);
+    if (result.status === 'subscribed') {
+      setSubStatus('success');
+      try {
+        confetti({
+          particleCount: 60,
+          spread: 50,
+          origin: { y: 0.85 }
+        });
+      } catch (err) {}
+      setTimeout(() => {
+        setEmail('');
+        setSubStatus('idle');
+      }, 3500);
+    } else if (result.status === 'already_exists') {
+      setSubStatus('already_exists');
+      setTimeout(() => {
+        setSubStatus('idle');
+      }, 3500);
+    } else {
+      setSubStatus('error');
+      setTimeout(() => {
+        setSubStatus('idle');
+      }, 3500);
+    }
   };
 
   return (
@@ -249,12 +262,26 @@ export const Footer = () => {
 
               <button
                 type="submit"
-                className="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-btn hover:shadow-hover transition-all flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer"
+                disabled={subStatus === 'loading'}
+                className={`w-full py-3 px-5 rounded-2xl text-white font-extrabold text-xs shadow-btn hover:shadow-hover transition-all flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer ${
+                  subStatus === 'success'
+                    ? 'bg-emerald-600 hover:bg-emerald-700'
+                    : subStatus === 'already_exists'
+                    ? 'bg-amber-600 hover:bg-amber-700'
+                    : 'bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700'
+                }`}
               >
-                {subscribed ? (
+                {subStatus === 'loading' ? (
+                  <span>Joining Weekly Digest...</span>
+                ) : subStatus === 'success' ? (
                   <>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+                    <CheckCircle2 className="w-4 h-4 text-white" />
                     <span>Subscribed Successfully! 🎉</span>
+                  </>
+                ) : subStatus === 'already_exists' ? (
+                  <>
+                    <AlertCircle className="w-4 h-4 text-white" />
+                    <span>Email Already Subscribed! 📬</span>
                   </>
                 ) : (
                   <>
