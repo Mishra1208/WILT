@@ -46,7 +46,7 @@ body {
   scrollbar-width: none;
 }
 
-/* Continuous 1-Way Running Gradient Wave Loop (No Back-and-Forth Bouncing) */
+/* Continuous 1-Way Running Gradient Wave Loop for Cross-Browser Safari/Chrome */
 @keyframes auroraGradient {
   0% {
     background-position: 0% 50%;
@@ -57,6 +57,9 @@ body {
 }
 
 .animate-aurora {
-  background-size: 200% 200%;
-  animation: auroraGradient 7s linear infinite;
+  background-size: 300% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: auroraGradient 8s linear infinite !important;
 }
