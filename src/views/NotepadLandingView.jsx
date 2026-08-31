@@ -213,8 +213,13 @@ export const NotepadLandingView = () => {
           onSubmit={handleOpenModal}
           className="w-full max-w-2xl mt-4 relative rounded-[24px] sm:rounded-[36px] bg-white border border-slate-300 p-4 sm:p-8 text-left transition-colors focus-within:border-slate-600 box-border overflow-hidden"
         >
-          {/* Location 2: Centered Lottie Watermark Animation Floating Inside Text Box Area */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30 z-0">
+          {/* Centered Lottie Watermark Animation - Automatically stops/fades when typing */}
+          <div 
+            className={cn(
+              "absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300 z-0",
+              text.trim().length > 0 ? "opacity-0 scale-90" : "opacity-30 scale-100"
+            )}
+          >
             <div className="w-44 sm:w-56 h-44 sm:h-56">
               <DotLottieReact
                 src="https://lottie.host/5e442ac2-7c1a-409d-bd82-e0bb29865217/wWauCc4g7H.lottie"
