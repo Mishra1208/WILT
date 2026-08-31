@@ -153,15 +153,15 @@ export const NotepadLandingView = () => {
         </p>
 
         {/* MagicUI DiaTextReveal Animated WILT Title */}
-        <div className="relative flex flex-col items-center select-none my-1">
+        <div className="relative flex flex-col items-center select-none my-1 w-full max-w-full overflow-hidden">
           <DiaTextReveal
             text="WILT"
-            colors={["#4F46E5", "#6366F1", "#38BDF8", "#00b4db", "#2774ae", "#4338CA", "#818CF8", "#4F46E5"]}
-            className="text-7xl sm:text-9xl md:text-[10.5rem] font-black tracking-tight uppercase leading-none font-display px-4"
+            colors={["#4F46E5", "#6366F1", "#38BDF8", "#00b4db", "#2774ae", "#4338CA", "#818CF8"]}
+            className="text-5xl sm:text-8xl md:text-[10.5rem] font-black tracking-tight uppercase leading-none font-display px-2 sm:px-4"
           />
 
           {/* Elegant Expanded Acronym Badge */}
-          <div className="mt-2.5 sm:mt-3 flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-extrabold tracking-[0.22em] text-slate-500 uppercase">
+          <div className="mt-2 sm:mt-3 flex items-center gap-1 sm:gap-2 text-[9px] sm:text-xs font-extrabold tracking-[0.14em] sm:tracking-[0.22em] text-slate-500 uppercase flex-wrap justify-center">
             <span>WHAT</span>
             <span className="w-1 h-1 rounded-full bg-primary-500 inline-block" />
             <span>I</span>
@@ -172,7 +172,7 @@ export const NotepadLandingView = () => {
           </div>
 
           {/* Subtle Curved Accent Line */}
-          <svg className="w-44 sm:w-60 h-2.5 text-primary-500/70 mt-1.5" viewBox="0 0 200 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-36 sm:w-60 h-2.5 text-primary-500/70 mt-1.5" viewBox="0 0 200 10" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M3 7C50 2 150 2 197 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
           </svg>
         </div>
@@ -204,18 +204,18 @@ export const NotepadLandingView = () => {
         {/* Minimal Type & Post Box (Pure White, Zero Shadows/Shades) */}
         <form 
           onSubmit={handleOpenModal}
-          className="w-full max-w-2xl mt-4 relative rounded-[28px] sm:rounded-[36px] bg-white border border-slate-300 p-6 sm:p-8 text-left transition-colors focus-within:border-slate-600"
+          className="w-full max-w-2xl mt-4 relative rounded-[24px] sm:rounded-[36px] bg-white border border-slate-300 p-4 sm:p-8 text-left transition-colors focus-within:border-slate-600 box-border"
         >
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Tell us what you have learned Today....."
-            className="w-full h-44 sm:h-52 bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base font-medium leading-relaxed focus:outline-none resize-none"
+            className="w-full h-40 sm:h-52 bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base font-medium leading-relaxed focus:outline-none resize-none pr-10 pb-10 sm:pr-0 sm:pb-0"
           />
 
           {/* Corner Return Button ↳ */}
-          <div className="absolute bottom-5 right-6 flex items-center gap-2">
+          <div className="absolute bottom-3 right-3 sm:bottom-5 sm:right-6 flex items-center gap-2">
             <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
               ⌘ + Enter to post
             </span>
@@ -223,9 +223,9 @@ export const NotepadLandingView = () => {
               type="submit"
               disabled={!text.trim()}
               title="Click to add links & verify source"
-              className="w-9 h-9 rounded-xl bg-primary-600 hover:bg-primary-700 text-white shadow-btn flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer active:scale-95"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-primary-600 hover:bg-primary-700 text-white shadow-btn flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer active:scale-95"
             >
-              <CornerDownLeft className="w-5 h-5" />
+              <CornerDownLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </form>
