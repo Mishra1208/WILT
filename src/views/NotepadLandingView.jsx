@@ -155,26 +155,16 @@ export const NotepadLandingView = () => {
           Hello, Welcome to
         </p>
 
-        {/* ReactBits GradientText + SplitText WILT Title */}
+        {/* Clean, Instant & Ultra-Fast Gradient WILT Title */}
         <div className="relative flex flex-col items-center select-none my-1 w-full max-w-full overflow-hidden">
           <GradientText
             colors={["#5227FF", "#FF9FFC", "#B497CF"]}
             animationSpeed={8}
             showBorder={false}
           >
-            <SplitText
-              text="WILT"
-              className="text-5xl sm:text-8xl md:text-[10.5rem] font-black tracking-tight uppercase leading-none font-display px-2 sm:px-4"
-              delay={50}
-              duration={1.25}
-              ease="power3.out"
-              splitType="chars"
-              from={{ opacity: 0, y: 40 }}
-              to={{ opacity: 1, y: 0 }}
-              threshold={0.1}
-              rootMargin="0px"
-              textAlign="center"
-            />
+            <h1 className="text-5xl sm:text-8xl md:text-[10.5rem] font-black tracking-tight uppercase leading-none font-display px-2 sm:px-4 text-center">
+              WILT
+            </h1>
           </GradientText>
 
           {/* Elegant Expanded Acronym Badge */}
