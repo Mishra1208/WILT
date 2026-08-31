@@ -11,12 +11,14 @@ import {
   Sparkles,
   Layers
 } from 'lucide-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { CATEGORIES } from '../data/seedData';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { validateContent } from '../services/moderation';
 import GradientText from '../components/ui/GradientText';
 import DotPattern from '../components/ui/DotPattern';
+import MaskedLottieText from '../components/ui/MaskedLottieText';
 import DiaTextReveal from '../components/ui/DiaTextReveal';
 import { cn } from '../lib/utils';
 
