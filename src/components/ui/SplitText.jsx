@@ -1,72 +1,81 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { cn } from '../../lib/utils';
 
 export const SplitText = ({
-  text = '',
+  text = 'WILT',
   className = '',
-  delay = 0.035,
-  duration = 0.7,
-  splitType = 'chars', // 'chars' | 'words'
-  from = { opacity: 0, y: 35 },
+  delay = 50,
+  duration = 1.25,
+  ease = 'power3.out',
+  splitType = 'chars',
+  from = { opacity: 0, y: 40 },
   to = { opacity: 1, y: 0 },
-  onAnimationComplete,
-  tag = 'span',
-  style = {}
+  threshold = 0.1,
+  rootMargin = '-100px',
+  textAlign = 'center',
+  tag = 'p',
+  onLetterAnimationComplete,
 }) => {
-  if (!text) return null;
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: rootMargin });
+  const characters = Array.from(text);
 
-  const items = splitType === 'chars' ? Array.from(text) : text.split(' ');
+  // Map power3.out cubic-bezier or custom ease
+  const easeCurve = ease === 'power3.out' ? [0.215, 0.61, 0.355, 1] : ease;
 
   const containerVariants = {
     hidden: {},
     visible: {
       transition: {
-        staggerChildren: delay,
+        staggerChildren: delay / 1000,
         delayChildren: 0.05,
       },
     },
   };
 
-  const childVariants = {
-    hidden: { ...from },
+  const letterVariants = {
+    hidden: { 
+      opacity: from.opacity ?? 0, 
+      y: from.y ?? 40 
+    },
     visible: {
-      ...to,
+      opacity: to.opacity ?? 1,
+      y: to.y ?? 0,
       transition: {
         duration,
-        ease: [0.22, 1, 0.36, 1], // smooth power3.out bezier curve
+        ease: easeCurve,
       },
     },
   };
 
-  const Component = motion[tag] || motion.span;
+  const Tag = motion[tag] || motion.p;
 
   return (
-    <Component
-      className={`inline-block overflow-visible ${className}`}
-      style={{ overflow: 'visible', ...style }}
+    <Tag
+      ref={ref}
+      className={cn('inline-flex items-center justify-center select-none overflow-visible', className)}
+      style={{ textAlign }}
       variants={containerVariants}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
-      onAnimationComplete={onAnimationComplete}
+      animate={isInView ? 'visible' : 'hidden'}
+      onAnimationComplete={onLetterAnimationComplete}
     >
-      {items.map((item, index) => (
-        <motion.span
-          key={index}
-          variants={childVariants}
-          className="inline-block overflow-visible"
-          style={{
-            whiteSpace: item === ' ' ? 'pre' : 'inherit',
-            display: 'inline-block',
-            overflow: 'visible',
-            paddingBottom: '0.08em' // ensures descenders like 'y', 'g', 'p' are 100% visible
-          }}
-        >
-          {item === ' ' ? '\u00A0' : item}
-          {splitType === 'words' && index < items.length - 1 ? '\u00A0' : ''}
-        </motion.span>
-      ))}
-    </Component>
+      {characters.map((char, index) => {
+        // Optical kerning adjustments for visual balance
+        const kerningClass = char === 'T' ? '-ml-2 sm:-ml-4 pr-0.5 sm:pr-1' : 'px-0.5 sm:px-1.5';
+
+        return (
+          <motion.span
+            key={index}
+            variants={letterVariants}
+            className={cn('inline-block', kerningClass)}
+          >
+            {char === ' ' ? '\u00A0' : char}
+          </motion.span>
+        );
+      })}
+    </Tag>
   );
 };
 

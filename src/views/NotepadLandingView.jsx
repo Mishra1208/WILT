@@ -20,6 +20,7 @@ import GradientText from '../components/ui/GradientText';
 import DotPattern from '../components/ui/DotPattern';
 import MaskedLottieText from '../components/ui/MaskedLottieText';
 import DiaTextReveal from '../components/ui/DiaTextReveal';
+import SplitText from '../components/ui/SplitText';
 import { cn } from '../lib/utils';
 
 export const NotepadLandingView = () => {
@@ -154,13 +155,27 @@ export const NotepadLandingView = () => {
           Hello, Welcome to
         </p>
 
-        {/* MagicUI DiaTextReveal Animated WILT Title */}
+        {/* ReactBits GradientText + SplitText WILT Title */}
         <div className="relative flex flex-col items-center select-none my-1 w-full max-w-full overflow-hidden">
-          <DiaTextReveal
-            text="WILT"
-            colors={["#4F46E5", "#6366F1", "#38BDF8", "#00b4db", "#2774ae", "#4338CA", "#818CF8"]}
-            className="text-5xl sm:text-8xl md:text-[10.5rem] font-black tracking-tight uppercase leading-none font-display px-2 sm:px-4"
-          />
+          <GradientText
+            colors={["#5227FF", "#FF9FFC", "#B497CF"]}
+            animationSpeed={8}
+            showBorder={false}
+          >
+            <SplitText
+              text="WILT"
+              className="text-5xl sm:text-8xl md:text-[10.5rem] font-black tracking-tight uppercase leading-none font-display px-2 sm:px-4"
+              delay={50}
+              duration={1.25}
+              ease="power3.out"
+              splitType="chars"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="center"
+            />
+          </GradientText>
 
           {/* Elegant Expanded Acronym Badge */}
           <div className="mt-2 sm:mt-3 flex items-center gap-1 sm:gap-2 text-[9px] sm:text-xs font-extrabold tracking-[0.14em] sm:tracking-[0.22em] text-slate-500 uppercase flex-wrap justify-center">
@@ -206,14 +221,25 @@ export const NotepadLandingView = () => {
         {/* Minimal Type & Post Box (Pure White, Zero Shadows/Shades) */}
         <form 
           onSubmit={handleOpenModal}
-          className="w-full max-w-2xl mt-4 relative rounded-[24px] sm:rounded-[36px] bg-white border border-slate-300 p-4 sm:p-8 text-left transition-colors focus-within:border-slate-600 box-border"
+          className="w-full max-w-2xl mt-4 relative rounded-[24px] sm:rounded-[36px] bg-white border border-slate-300 p-4 sm:p-8 text-left transition-colors focus-within:border-slate-600 box-border overflow-hidden"
         >
+          {/* Location 2: Centered Lottie Watermark Animation Floating Inside Text Box Area */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30 z-0">
+            <div className="w-44 sm:w-56 h-44 sm:h-56">
+              <DotLottieReact
+                src="https://lottie.host/5e442ac2-7c1a-409d-bd82-e0bb29865217/wWauCc4g7H.lottie"
+                loop
+                autoplay
+              />
+            </div>
+          </div>
+
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Tell us what you have learned Today....."
-            className="w-full h-40 sm:h-52 bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base font-medium leading-relaxed focus:outline-none resize-none pr-10 pb-10 sm:pr-0 sm:pb-0"
+            className="w-full h-40 sm:h-52 bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base font-medium leading-relaxed focus:outline-none resize-none pr-10 pb-10 sm:pr-0 sm:pb-0 relative z-10"
           />
 
           {/* Corner Return Button ↳ */}
