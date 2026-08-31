@@ -12,7 +12,7 @@ export const SplitText = ({
   from = { opacity: 0, y: 40 },
   to = { opacity: 1, y: 0 },
   threshold = 0.1,
-  rootMargin = '-100px',
+  rootMargin = '0px',
   textAlign = 'center',
   tag = 'p',
   onLetterAnimationComplete,
