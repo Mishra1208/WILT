@@ -16,6 +16,9 @@ import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { validateContent } from '../services/moderation';
 import GradientText from '../components/ui/GradientText';
+import DotPattern from '../components/ui/DotPattern';
+import DiaTextReveal from '../components/ui/DiaTextReveal';
+import { cn } from '../lib/utils';
 
 export const NotepadLandingView = () => {
   const { createPost, setCurrentView } = useApp();
@@ -129,6 +132,13 @@ export const NotepadLandingView = () => {
 
   return (
     <div className="relative min-h-[calc(100vh-140px)] flex flex-col items-center justify-center px-4 py-12 select-none overflow-hidden bg-white">
+      {/* MagicUI DotPattern Background with Subtle Radial Gradient Mask */}
+      <DotPattern
+        className={cn(
+          "[mask-image:radial-gradient(650px_circle_at_center,white,transparent)] fill-slate-300/70"
+        )}
+      />
+
       <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center text-center space-y-5">
         
         {/* Sleek Floating Pill Tag */}
@@ -142,17 +152,13 @@ export const NotepadLandingView = () => {
           Hello, Welcome to
         </p>
 
-        {/* ReactBits Animated GradientText WILT Title */}
+        {/* MagicUI DiaTextReveal Animated WILT Title */}
         <div className="relative flex flex-col items-center select-none my-1">
-          <GradientText
-            colors={["#4F46E5", "#6366F1", "#8B5CF6", "#EC4899", "#3B82F6", "#4F46E5"]}
-            animationSpeed={6}
-            showBorder={false}
-            direction="horizontal"
-            className="text-7xl sm:text-9xl md:text-[10.5rem] font-black tracking-tighter uppercase leading-none font-sans"
-          >
-            WILT
-          </GradientText>
+          <DiaTextReveal
+            text="WILT"
+            colors={["#4F46E5", "#6366F1", "#38BDF8", "#00b4db", "#2774ae", "#4338CA", "#818CF8", "#4F46E5"]}
+            className="text-7xl sm:text-9xl md:text-[10.5rem] font-black tracking-tight uppercase leading-none font-display px-4"
+          />
 
           {/* Elegant Expanded Acronym Badge */}
           <div className="mt-2.5 sm:mt-3 flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-extrabold tracking-[0.22em] text-slate-500 uppercase">
@@ -195,10 +201,10 @@ export const NotepadLandingView = () => {
           </div>
         )}
 
-        {/* Minimal Type & Post Box */}
+        {/* Minimal Type & Post Box (Pure White, Zero Shadows/Shades) */}
         <form 
           onSubmit={handleOpenModal}
-          className="w-full max-w-2xl mt-4 relative rounded-[28px] sm:rounded-[36px] bg-white border border-slate-200/90 shadow-[0_20px_50px_rgba(79,70,229,0.07)] p-6 sm:p-8 text-left transition-all focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-primary-100/60"
+          className="w-full max-w-2xl mt-4 relative rounded-[28px] sm:rounded-[36px] bg-white border border-slate-300 p-6 sm:p-8 text-left transition-colors focus-within:border-slate-600"
         >
           <textarea
             value={text}

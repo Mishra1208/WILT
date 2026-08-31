@@ -15,6 +15,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.font-display {
+  font-family: 'Outfit', 'Syne', 'Plus Jakarta Sans', sans-serif;
+}
+
 /* Custom Clean Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -42,20 +46,17 @@ body {
   scrollbar-width: none;
 }
 
-/* Aurora Gradient Animation */
+/* Continuous 1-Way Running Gradient Wave Loop (No Back-and-Forth Bouncing) */
 @keyframes auroraGradient {
   0% {
     background-position: 0% 50%;
   }
-  50% {
-    background-position: 100% 50%;
-  }
   100% {
-    background-position: 0% 50%;
+    background-position: 200% 50%;
   }
 }
 
 .animate-aurora {
   background-size: 200% 200%;
-  animation: auroraGradient 6s ease infinite;
+  animation: auroraGradient 7s linear infinite;
 }
