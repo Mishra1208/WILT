@@ -115,24 +115,7 @@ export const Sidebar = () => {
           })}
         </nav>
 
-        {/* CREATE Section */}
-        <div className="flex flex-col gap-2 pt-2">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">
-            Create
-          </div>
-          <button
-            onClick={() => {
-              setIsNewPostModalOpen(true);
-              if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                toggleSidebar();
-              }
-            }}
-            className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 shadow-btn transition-all transform active:scale-95"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>Share What You Learned</span>
-          </button>
-        </div>
+
 
         {/* ACCOUNT Section */}
         <div className="flex flex-col gap-1 pt-2">
