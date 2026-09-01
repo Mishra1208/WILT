@@ -9,59 +9,129 @@ import {
   BookOpen, 
   X, 
   Sparkles,
-  Layers
+  Plus,
+  Trash2,
+  Image as ImageIcon,
+  FileText,
+  Paperclip,
+  Tag as TagIcon
 } from 'lucide-react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { CATEGORIES } from '../data/seedData';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { validateContent } from '../services/moderation';
 import GradientText from '../components/ui/GradientText';
 import DotPattern from '../components/ui/DotPattern';
-import MaskedLottieText from '../components/ui/MaskedLottieText';
-import DiaTextReveal from '../components/ui/DiaTextReveal';
-import SplitText from '../components/ui/SplitText';
 import { cn } from '../lib/utils';
 
 export const NotepadLandingView = () => {
   const { createPost, setCurrentView } = useApp();
   const { user } = useAuth();
 
+  // Layout & Form States
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [title, setTitle] = useState('');
   const [text, setText] = useState('');
+  const [references, setReferences] = useState(['']);
+  const [attachments, setAttachments] = useState([]);
+  
+  // Status & Moderation
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [moderationError, setModerationError] = useState(null);
 
-  // Modal State for Source of Trust & Links
+  // Modal State for Topic / Category Selection
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('Corporate Finance');
+  const [category, setCategory] = useState('Tech & AI');
   const [customCategory, setCustomCategory] = useState('');
-  const [sourceType, setSourceType] = useState('url'); // 'url' | 'context'
-  const [sourceUrl, setSourceUrl] = useState('');
-  const [sourceContext, setSourceContext] = useState('');
-  const [trustError, setTrustError] = useState(null);
   const [isPublishing, setIsPublishing] = useState(false);
 
-  // Step 1: When user clicks ↳ or presses Cmd+Enter on the main box
+  // Dynamic Reference List Handlers
+  const handleAddReference = () => {
+    setReferences(prev => [...prev, '']);
+  };
+
+  const handleReferenceChange = (index, value) => {
+    setReferences(prev => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+  };
+
+  const handleRemoveReference = (index) => {
+    setReferences(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Custom Link Dialog Modal State
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [inputLinkUrl, setInputLinkUrl] = useState('');
+  const [linkError, setLinkError] = useState(null);
+
+  // Attachment Handlers
+  const handleFileUpload = (e, type) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const newAttachment = {
+      id: Date.now(),
+      name: file.name,
+      type: type, // 'image' | 'file'
+      url: URL.createObjectURL(file)
+    };
+    setAttachments(prev => [...prev, newAttachment]);
+  };
+
+  const handleOpenLinkModal = () => {
+    setInputLinkUrl('');
+    setLinkError(null);
+    setIsLinkModalOpen(true);
+  };
+
+  const handleConfirmAddLink = (e) => {
+    if (e) e.preventDefault();
+    const trimmed = inputLinkUrl.trim();
+    if (!trimmed) {
+      setLinkError('Please enter a valid URL link');
+      return;
+    }
+    
+    let formattedUrl = trimmed;
+    if (!/^https?:\/\//i.test(formattedUrl)) {
+      formattedUrl = `https://${formattedUrl}`;
+    }
+
+    const newAttachment = {
+      id: Date.now(),
+      name: formattedUrl.replace(/^https?:\/\//, ''),
+      type: 'link',
+      url: formattedUrl
+    };
+    setAttachments(prev => [...prev, newAttachment]);
+    setIsLinkModalOpen(false);
+  };
+
+  // Step 1: Open Topic / Category Selection Modal
   const handleOpenModal = (e) => {
     if (e) e.preventDefault();
-    if (!text.trim()) return;
+    if (!text.trim() && !title.trim()) return;
 
     setModerationError(null);
 
-    // 1. Moderation Check
-    const check = validateContent(text);
+    // Moderation Check
+    const combinedContent = `${title} ${text}`;
+    const check = validateContent(combinedContent);
     if (check.isAbusive) {
       setModerationError(check.reason);
       return;
     }
 
-    // Infer title from first line
-    const lines = text.trim().split('\n').filter(Boolean);
-    const inferredTitle = lines[0].length > 60 ? lines[0].substring(0, 57) + '...' : lines[0];
-    setTitle(inferredTitle);
+    // Auto-infer title if user didn't specify
+    if (!title.trim()) {
+      const lines = text.trim().split('\n').filter(Boolean);
+      const inferredTitle = lines[0] ? (lines[0].length > 60 ? lines[0].substring(0, 57) + '...' : lines[0]) : 'New Learning Insight';
+      setTitle(inferredTitle);
+    }
 
-    // Open Source Verification Modal
     setIsModalOpen(true);
   };
 
@@ -71,35 +141,27 @@ export const NotepadLandingView = () => {
     }
   };
 
-  // Step 2: Final Publish Submission inside Dialogue Box
+  // Step 2: Final Publish Submission
   const handleFinalPublish = async (e) => {
     e.preventDefault();
-    setTrustError(null);
-
-    // Validate Source of Trust
-    if (sourceType === 'url' && (!sourceUrl.trim() || !sourceUrl.includes('.'))) {
-      setTrustError('Please provide a valid source article or reference link (e.g. investopedia.com).');
-      return;
-    }
-    if (sourceType === 'context' && !sourceContext.trim()) {
-      setTrustError('Please specify course name, lecture, or textbook reference.');
-      return;
-    }
-
     setIsPublishing(true);
 
-    const lines = text.trim().split('\n').filter(Boolean);
     const finalCategory = category === 'Other' ? (customCategory.trim() || 'General Knowledge') : category;
+    const activeReferences = references.filter(r => r.trim() !== '');
+
+    const primarySource = activeReferences[0] || (attachments[0] ? attachments[0].url : 'Self-Learned Insight');
+    const additionalSources = activeReferences.slice(1).join(', ');
 
     await createPost({
-      title: title.trim() || lines[0],
+      title: title.trim() || 'Daily Learning Note',
       category: finalCategory,
-      summary: title.trim() || lines[0],
+      summary: title.trim() || text.trim().substring(0, 80),
       content: text.trim(),
-      takeaways: [title.trim() || lines[0]],
+      takeaways: [title.trim() || 'Key Insight'],
       terms: '',
-      sourceUrl: sourceType === 'url' ? sourceUrl.trim() : 'Classroom / Lecture Source',
-      sourceContext: sourceType === 'context' ? sourceContext.trim() : (sourceUrl.trim() || 'Web Verified Source'),
+      sourceUrl: primarySource,
+      sourceContext: additionalSources || 'Verified Learner Post',
+      attachments: attachments,
       author: {
         name: user?.name || "Student Scholar",
         username: user?.username || "learner",
@@ -124,9 +186,10 @@ export const NotepadLandingView = () => {
     // Reset Form
     setText('');
     setTitle('');
-    setSourceUrl('');
-    setSourceContext('');
+    setReferences(['']);
+    setAttachments([]);
     setCustomCategory('');
+    setIsExpanded(false);
 
     setTimeout(() => {
       setIsSubmitted(false);
@@ -135,10 +198,10 @@ export const NotepadLandingView = () => {
 
   return (
     <div className="relative min-h-[calc(100vh-140px)] flex flex-col items-center justify-center px-4 py-12 select-none overflow-hidden bg-white">
-      {/* MagicUI DotPattern Background with Subtle Radial Gradient Mask */}
+      {/* MagicUI DotPattern Background */}
       <DotPattern
         className={cn(
-          "[mask-image:radial-gradient(650px_circle_at_center,white,transparent)] fill-slate-300/70"
+          "[mask-image:radial-gradient(650px_circle_at_center,white,transparent)]",
         )}
       />
 
@@ -155,7 +218,7 @@ export const NotepadLandingView = () => {
           Hello, Welcome to
         </p>
 
-        {/* Clean, Instant & Ultra-Fast Gradient WILT Title */}
+        {/* Clean, Instant Gradient WILT Title */}
         <div className="relative flex flex-col items-center select-none my-1 w-full max-w-full overflow-hidden">
           <GradientText
             colors={["#5227FF", "#FF9FFC", "#B497CF"]}
@@ -197,7 +260,7 @@ export const NotepadLandingView = () => {
           <div className="w-full max-w-2xl p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-bold flex items-center justify-between animate-fadeIn shadow-sm">
             <div className="flex items-center gap-2.5">
               <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-              <span>Insight & Source of Trust published to Learning Hub! 🎉</span>
+              <span>Insight published to Learning Hub! 🎉</span>
             </div>
             <button 
               onClick={() => setCurrentView('discover')}
@@ -208,59 +271,189 @@ export const NotepadLandingView = () => {
           </div>
         )}
 
-        {/* Minimal Type & Post Box (Pure White, Zero Shadows/Shades) */}
+        {/* DYNAMIC EXPANDABLE TYPE & POST BOX */}
         <form 
           onSubmit={handleOpenModal}
-          className="w-full max-w-2xl mt-4 relative rounded-[24px] sm:rounded-[36px] bg-white border border-slate-300 p-4 sm:p-8 text-left transition-colors focus-within:border-slate-600 box-border overflow-hidden"
+          onClick={() => setIsExpanded(true)}
+          className={cn(
+            "w-full max-w-2xl mt-4 relative rounded-[24px] sm:rounded-[36px] bg-white border transition-all duration-300 p-5 sm:p-7 text-left box-border",
+            isExpanded ? "border-slate-400 shadow-xl" : "border-slate-300 hover:border-slate-400"
+          )}
         >
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Tell us what you have learned Today....."
-            className="w-full h-40 sm:h-52 bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base font-medium leading-relaxed focus:outline-none resize-none pr-10 pb-10 sm:pr-0 sm:pb-0 relative z-10"
-          />
+          {/* 1. TOP TITLE FIELD (Revealed on click/focus) */}
+          {isExpanded && (
+            <div className="mb-3 pb-3 border-b border-slate-100 animate-fadeIn">
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Title / Heading of your insight..."
+                className="w-full text-base sm:text-lg font-extrabold text-slate-900 placeholder-slate-400 focus:outline-none bg-transparent"
+              />
+            </div>
+          )}
 
-          {/* Corner Return Button ↳ */}
-          <div className="absolute bottom-3 right-3 sm:bottom-5 sm:right-6 flex items-center gap-2">
+          {/* 2. MAIN CONTENT TEXTAREA & RIGHT SIDE ATTACHMENTS TOOLBAR */}
+          <div className="flex gap-3 sm:gap-4 items-start relative">
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onFocus={() => setIsExpanded(true)}
+              onKeyDown={handleKeyDown}
+              placeholder={isExpanded ? "Write detailed learning notes content..." : "Tell us what you have learned Today....."}
+              className={cn(
+                "w-full bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base font-medium leading-relaxed focus:outline-none resize-none transition-all",
+                isExpanded ? "h-32 sm:h-44" : "h-28 sm:h-36"
+              )}
+            />
+
+            {/* RIGHT SIDE ATTACHMENT ACTION BAR */}
+            <div className="flex flex-col gap-2 p-1.5 rounded-2xl bg-slate-50 border border-slate-200/80 shrink-0">
+              {/* Photo Upload Button */}
+              <label 
+                title="Attach Photo / Image" 
+                className="w-8 h-8 rounded-xl bg-white hover:bg-primary-50 text-slate-600 hover:text-primary-600 border border-slate-200/60 flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
+              >
+                <ImageIcon className="w-4 h-4" />
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={(e) => handleFileUpload(e, 'image')} 
+                />
+              </label>
+
+              {/* Document File Upload Button */}
+              <label 
+                title="Attach Document / PDF" 
+                className="w-8 h-8 rounded-xl bg-white hover:bg-primary-50 text-slate-600 hover:text-primary-600 border border-slate-200/60 flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
+              >
+                <FileText className="w-4 h-4" />
+                <input 
+                  type="file" 
+                  accept=".pdf,.doc,.docx,.txt" 
+                  className="hidden" 
+                  onChange={(e) => handleFileUpload(e, 'file')} 
+                />
+              </label>
+
+              {/* URL Link Attachment Button */}
+              <button
+                type="button"
+                onClick={handleOpenLinkModal}
+                title="Attach Reference Link"
+                className="w-8 h-8 rounded-xl bg-white hover:bg-primary-50 text-slate-600 hover:text-primary-600 border border-slate-200/60 flex items-center justify-center cursor-pointer transition-colors shadow-2xs"
+              >
+                <LinkIcon className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* ATTACHMENTS PREVIEW CHIPS */}
+          {attachments.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-100">
+              {attachments.map(att => (
+                <div key={att.id} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-primary-50 border border-primary-200 text-primary-800 text-xs font-bold">
+                  {att.type === 'image' && <ImageIcon className="w-3.5 h-3.5 text-primary-600" />}
+                  {att.type === 'file' && <FileText className="w-3.5 h-3.5 text-primary-600" />}
+                  {att.type === 'link' && <LinkIcon className="w-3.5 h-3.5 text-primary-600" />}
+                  <span className="max-w-[150px] truncate">{att.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => setAttachments(prev => prev.filter(a => a.id !== att.id))}
+                    className="w-4 h-4 rounded-full hover:bg-primary-200 text-primary-600 flex items-center justify-center ml-0.5 cursor-pointer"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 3. REFERENCE LIST BOXES SECTION (With + Button) */}
+          {isExpanded && (
+            <div className="mt-4 pt-3 border-t border-slate-100 space-y-2.5 animate-fadeIn">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  Reference List / Sources
+                </span>
+                <button
+                  type="button"
+                  onClick={handleAddReference}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold transition-colors cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5 text-primary-600" />
+                  <span>Add Reference</span>
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                {references.map((refItem, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        value={refItem}
+                        onChange={(e) => handleReferenceChange(idx, e.target.value)}
+                        placeholder={`Reference ${idx + 1} link / book / paper source...`}
+                        className="w-full px-3.5 py-1.5 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-medium focus:outline-none focus:border-primary-500 focus:bg-white transition-all"
+                      />
+                    </div>
+                    {references.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveReference(idx)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* SUBMIT BUTTON & SHORTCUT */}
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
             <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
               ⌘ + Enter to post
             </span>
             <button
               type="submit"
-              disabled={!text.trim()}
-              title="Click to add links & verify source"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-primary-600 hover:bg-primary-700 text-white shadow-btn flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer active:scale-95"
+              disabled={!text.trim() && !title.trim()}
+              className="px-5 py-2 rounded-xl sm:rounded-2xl bg-primary-600 hover:bg-primary-700 text-white shadow-btn flex items-center gap-2 text-xs font-extrabold transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer active:scale-95 ml-auto"
             >
-              <CornerDownLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Post</span>
+              <CornerDownLeft className="w-4 h-4" />
             </button>
           </div>
         </form>
       </div>
 
-      {/* DIALOGUE BOX MODAL: ACQUIRE LINKS & SOURCE OF TRUST */}
+      {/* TOPIC / CATEGORY SELECTION MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 select-none">
-          {/* Backdrop Blur */}
+          {/* Backdrop */}
           <div 
             onClick={() => setIsModalOpen(false)}
             className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity duration-300 animate-fadeIn"
           />
 
-          {/* Modal Container */}
-          <div className="relative w-full max-w-lg rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-7 z-10 animate-in zoom-in-95 duration-200 space-y-5">
+          {/* Modal Content */}
+          <div className="relative w-full max-w-md rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-7 z-10 animate-in zoom-in-95 duration-200 space-y-5">
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-xl bg-primary-100/70 text-primary-600">
-                  <ShieldCheck className="w-5 h-5" />
+                  <TagIcon className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-base font-extrabold text-slate-900 leading-snug">
-                    Publish & Verify Source
+                    Select Topic / Category
                   </h3>
                   <p className="text-[11px] font-semibold text-slate-500">
-                    Add proof/links of where you learned this concept
+                    Choose where to file this insight in the hub
                   </p>
                 </div>
               </div>
@@ -273,39 +466,26 @@ export const NotepadLandingView = () => {
               </button>
             </div>
 
-            {/* Error Banner inside Modal */}
-            {trustError && (
-              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2 animate-fadeIn">
-                <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
-                <span>{trustError}</span>
+            {/* Post Preview Summary */}
+            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+              <div className="text-xs font-bold text-slate-900 line-clamp-1">
+                {title || 'Untitled Insight'}
               </div>
-            )}
+              <div className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                {text}
+              </div>
+            </div>
 
             <form onSubmit={handleFinalPublish} className="space-y-4">
-              {/* Post Title Field */}
-              <div className="space-y-1">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Post Title
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Title for your insight..."
-                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-bold focus:outline-none focus:border-primary-500 focus:bg-white"
-                />
-              </div>
-
-              {/* Topic Category */}
-              <div className="space-y-1">
+              {/* Category Selector */}
+              <div className="space-y-1.5">
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
                   Topic / Category
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-bold focus:outline-none focus:border-primary-500"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-bold focus:outline-none focus:border-primary-500 cursor-pointer"
                 >
                   {CATEGORIES.filter((c) => c !== 'All').map((cat) => (
                     <option key={cat} value={cat}>
@@ -321,60 +501,7 @@ export const NotepadLandingView = () => {
                     value={customCategory}
                     onChange={(e) => setCustomCategory(e.target.value)}
                     placeholder="Type custom topic name..."
-                    className="w-full mt-2 px-3 py-2 text-xs rounded-xl bg-slate-50 border border-primary-400 text-slate-900 font-bold focus:outline-none"
-                  />
-                )}
-              </div>
-
-              {/* Source of Trust Type Toggle */}
-              <div className="space-y-2 pt-1">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Source of Trust (Proof)
-                </label>
-                
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSourceType('url')}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-                      sourceType === 'url'
-                        ? 'bg-primary-50 text-primary-700 border border-primary-300 shadow-2xs'
-                        : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    <LinkIcon className="w-3.5 h-3.5" />
-                    <span>Article / Web Link</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setSourceType('context')}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-                      sourceType === 'context'
-                        ? 'bg-primary-50 text-primary-700 border border-primary-300 shadow-2xs'
-                        : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    <BookOpen className="w-3.5 h-3.5" />
-                    <span>Class / Textbook</span>
-                  </button>
-                </div>
-
-                {sourceType === 'url' ? (
-                  <input
-                    type="url"
-                    value={sourceUrl}
-                    onChange={(e) => setSourceUrl(e.target.value)}
-                    placeholder="Paste reference link (e.g. https://investopedia.com/...)..."
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 font-semibold focus:outline-none focus:border-primary-500 focus:bg-white transition-all"
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={sourceContext}
-                    onChange={(e) => setSourceContext(e.target.value)}
-                    placeholder="e.g. Econ 101 Lecture with Prof. Smith, Ch. 4..."
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 font-semibold focus:outline-none focus:border-primary-500 focus:bg-white transition-all"
+                    className="w-full mt-2 px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-primary-400 text-slate-900 font-bold focus:outline-none"
                   />
                 )}
               </div>
@@ -392,16 +519,99 @@ export const NotepadLandingView = () => {
                 <button
                   type="submit"
                   disabled={isPublishing}
-                  className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-primary-600 hover:bg-primary-700 shadow-btn transition-all flex items-center gap-2 transform active:scale-95 cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-primary-600 hover:bg-primary-700 shadow-btn transition-all flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer disabled:opacity-50"
                 >
                   {isPublishing ? (
                     <span>Publishing...</span>
                   ) : (
-                    <>
-                      <ShieldCheck className="w-4 h-4" />
-                      <span>Publish & Index Insight 🚀</span>
-                    </>
+                    <span>Post</span>
                   )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CUSTOM IN-APP LINK ATTACHMENT DIALOG MODAL */}
+      {isLinkModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 select-none">
+          {/* Backdrop */}
+          <div 
+            onClick={() => setIsLinkModalOpen(false)}
+            className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity duration-300 animate-fadeIn"
+          />
+
+          {/* Modal Card */}
+          <div className="relative w-full max-w-md rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-7 z-10 animate-in zoom-in-95 duration-200 space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-primary-100/70 text-primary-600">
+                  <LinkIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 leading-snug">
+                    Attach Reference Link
+                  </h3>
+                  <p className="text-[11px] font-semibold text-slate-500">
+                    Paste article, repository, or website URL
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsLinkModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Error Message */}
+            {linkError && (
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2 animate-fadeIn">
+                <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                <span>{linkError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleConfirmAddLink} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Reference URL
+                </label>
+                <div className="relative flex items-center">
+                  <LinkIcon className="w-4 h-4 absolute left-3.5 text-slate-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    autoFocus
+                    required
+                    value={inputLinkUrl}
+                    onChange={(e) => setInputLinkUrl(e.target.value)}
+                    placeholder="https://investopedia.com/... or github.com/..."
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-semibold focus:outline-none focus:border-primary-500 focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsLinkModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl text-xs font-extrabold text-white bg-primary-600 hover:bg-primary-700 shadow-btn transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <LinkIcon className="w-3.5 h-3.5" />
+                  <span>Attach Link</span>
                 </button>
               </div>
             </form>
