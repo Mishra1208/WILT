@@ -176,6 +176,48 @@ export const AppProvider = ({ children }) => {
     );
   };
 
+  const addCommentToPost = (postId, commentText, currentUser) => {
+    if (!commentText.trim()) return false;
+
+    let added = false;
+    setPosts(prev =>
+      prev.map(p => {
+        if (p.id === postId) {
+          const currentComments = p.comments || [];
+          if (currentComments.length >= 6) {
+            return p; // Discussion locked at 6 students max
+          }
+          added = true;
+          const newComment = {
+            id: `comment-${Date.now()}`,
+            author: {
+              name: currentUser?.name || 'Student Scholar',
+              username: currentUser?.username || 'learner',
+              avatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+              role: currentUser?.major || 'Student'
+            },
+            text: commentText.trim(),
+            createdAt: 'Just now'
+          };
+          const updatedPost = {
+            ...p,
+            comments: [...currentComments, newComment]
+          };
+
+          if (selectedPost && selectedPost.id === postId) {
+            setSelectedPost(updatedPost);
+          }
+
+          storageSavePost(updatedPost);
+          return updatedPost;
+        }
+        return p;
+      })
+    );
+
+    return added;
+  };
+
   const openPostDetail = (post, snippet = null) => {
     setSelectedPost(post);
     setHighlightSnippet(snippet);
@@ -214,7 +256,8 @@ export const AppProvider = ({ children }) => {
         closePostDetail,
         createPost,
         createConcept,
-        toggleLike
+        toggleLike,
+        addCommentToPost
       }}
     >
       {children}
