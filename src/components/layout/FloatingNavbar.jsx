@@ -34,12 +34,12 @@ export const FloatingNavbar = () => {
       {/* Desktop Navigation Links */}
       <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-xs font-bold tracking-[0.12em] text-slate-700 uppercase">
         <button
-          onClick={() => handleNavClick('dictionary')}
+          onClick={() => handleNavClick('discover')}
           className={`hover:text-primary-600 transition-colors ${
-            currentView === 'dictionary' ? 'text-primary-600 font-extrabold' : ''
+            currentView === 'discover' ? 'text-primary-600 font-extrabold' : ''
           }`}
         >
-          PEER DICTIONARY
+          DISCOVER
         </button>
 
         <button
@@ -83,12 +83,12 @@ export const FloatingNavbar = () => {
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white border-b border-slate-200 shadow-xl py-4 px-6 flex flex-col gap-4 md:hidden z-50 animate-in fade-in slide-in-from-top-2">
           <button
-            onClick={() => handleNavClick('dictionary')}
+            onClick={() => handleNavClick('discover')}
             className={`text-left text-xs font-extrabold tracking-wider uppercase py-2 border-b border-slate-100 ${
-              currentView === 'dictionary' ? 'text-primary-600' : 'text-slate-700'
+              currentView === 'discover' ? 'text-primary-600' : 'text-slate-700'
             }`}
           >
-            PEER DICTIONARY
+            DISCOVER
           </button>
 
           <button
