@@ -7,10 +7,13 @@ import {
   Twitter, 
   Github, 
   Globe, 
-  Heart, 
   ShieldCheck, 
   Check, 
-  Send 
+  Send,
+  FileText,
+  Lock,
+  Scale,
+  Info
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -39,8 +42,8 @@ export const Footer = () => {
         {/* Top Grid Section */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-slate-100">
           
-          {/* Brand Info & Mission */}
-          <div className="md:col-span-5 space-y-4">
+          {/* Brand Info & Mission (4 cols) */}
+          <div className="md:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-primary-600 via-indigo-600 to-purple-600 text-white flex items-center justify-center font-black text-lg shadow-md">
                 W
@@ -66,10 +69,10 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="md:col-span-3 space-y-3">
+          {/* Platform Navigation (2 cols) */}
+          <div className="md:col-span-2 space-y-3">
             <h4 className="text-[11px] font-extrabold uppercase tracking-widest text-slate-900">
-              Platform Navigation
+              Navigation
             </h4>
             <ul className="space-y-2 text-xs font-semibold text-slate-600">
               <li>
@@ -91,26 +94,78 @@ export const Footer = () => {
                 </button>
               </li>
               <li>
-                <a href="#topics" className="hover:text-primary-600 transition-colors flex items-center gap-1">
-                  <span>Knowledge Categories</span>
-                </a>
+                <button 
+                  onClick={() => setCurrentView('dictionary')} 
+                  className="hover:text-primary-600 transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Dictionary</span>
+                </button>
               </li>
               <li>
-                <a href="#leaderboard" className="hover:text-primary-600 transition-colors flex items-center gap-1">
+                <button 
+                  onClick={() => setCurrentView('leaderboard')} 
+                  className="hover:text-primary-600 transition-colors flex items-center gap-1 cursor-pointer"
+                >
                   <span>Top Scholars</span>
-                </a>
+                </button>
               </li>
             </ul>
           </div>
 
-          {/* Daily Digest Newsletter */}
-          <div className="md:col-span-4 space-y-3">
+          {/* Trust & Legal Policies (3 cols) */}
+          <div className="md:col-span-3 space-y-3">
+            <h4 className="text-[11px] font-extrabold uppercase tracking-widest text-slate-900 flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-primary-600" />
+              <span>Trust & Governance</span>
+            </h4>
+            <ul className="space-y-2 text-xs font-semibold text-slate-600">
+              <li>
+                <button 
+                  onClick={() => setCurrentView('about')} 
+                  className="hover:text-primary-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Info className="w-3.5 h-3.5 text-slate-400" />
+                  <span>About WILT</span>
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => setCurrentView('privacy')} 
+                  className="hover:text-primary-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Privacy Policy</span>
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => setCurrentView('terms')} 
+                  className="hover:text-primary-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Scale className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Terms of Service</span>
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => setCurrentView('standards')} 
+                  className="hover:text-primary-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileText className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Community Standards</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Daily Digest Newsletter (3 cols) */}
+          <div className="md:col-span-3 space-y-3">
             <h4 className="text-[11px] font-extrabold uppercase tracking-widest text-slate-900 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-primary-600" />
-              <span>Daily Knowledge Digest</span>
+              <span>Knowledge Digest</span>
             </h4>
             <p className="text-xs text-slate-500 font-medium">
-              Receive top verified student insights and weekly academic recaps directly in your inbox.
+              Top verified insights & weekly recaps delivered to your inbox.
             </p>
 
             <form onSubmit={handleSubscribe} className="relative mt-2">
@@ -126,7 +181,7 @@ export const Footer = () => {
                 />
                 <button
                   type="submit"
-                  className="absolute right-1.5 px-3.5 py-1.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer"
+                  className="absolute right-1.5 px-3 py-1.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer"
                 >
                   {subscribed ? (
                     <>
@@ -146,8 +201,8 @@ export const Footer = () => {
 
         </div>
 
-        {/* Bottom Social & Attribution Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left pt-2">
+        {/* Bottom Social, Legal Links & Attribution Bar */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left pt-2">
           
           {/* Social Links */}
           <div className="flex items-center gap-3">
@@ -187,17 +242,28 @@ export const Footer = () => {
             </a>
           </div>
 
-          {/* Support Email Badge */}
-          <div className="text-[11px] text-slate-500 font-mono flex items-center gap-1.5">
-            <Globe className="w-3.5 h-3.5 text-slate-400" />
-            <a href="mailto:info.wilt@gmail.com" className="hover:text-primary-600 font-semibold transition-colors">
-              info.wilt@gmail.com
-            </a>
+          {/* Quick Legal Horizontal Links */}
+          <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-500 flex-wrap justify-center">
+            <button onClick={() => setCurrentView('privacy')} className="hover:text-primary-600 transition-colors cursor-pointer">
+              Privacy Policy
+            </button>
+            <span className="text-slate-300">·</span>
+            <button onClick={() => setCurrentView('terms')} className="hover:text-primary-600 transition-colors cursor-pointer">
+              Terms of Service
+            </button>
+            <span className="text-slate-300">·</span>
+            <button onClick={() => setCurrentView('standards')} className="hover:text-primary-600 transition-colors cursor-pointer">
+              Community Standards
+            </button>
+            <span className="text-slate-300">·</span>
+            <button onClick={() => setCurrentView('about')} className="hover:text-primary-600 transition-colors cursor-pointer">
+              About Us
+            </button>
           </div>
 
           {/* Developer Attribution */}
           <div className="text-xs text-slate-500 font-semibold flex items-center gap-1">
-            <span>© {new Date().getFullYear()} WILT. Designed & Built by</span>
+            <span>© {new Date().getFullYear()} WILT. Built by</span>
             <strong className="text-slate-900 font-extrabold hover:text-primary-600 transition-colors">
               Narendra Mishra
             </strong>
