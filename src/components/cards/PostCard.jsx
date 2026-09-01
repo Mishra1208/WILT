@@ -49,11 +49,8 @@ export const PostCard = ({ post }) => {
               className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-100"
             />
             <div className="leading-tight">
-              <div className="text-xs font-bold text-slate-900 group-hover:text-primary-700 transition-colors">
-                {post.author?.name}
-              </div>
-              <div className="text-[11px] text-slate-400 font-mono">
-                @{post.author?.username}
+              <div className="text-xs font-extrabold text-slate-900 font-mono group-hover:text-primary-700 transition-colors">
+                @{post.author?.username || 'learner'}
               </div>
             </div>
           </div>

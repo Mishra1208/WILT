@@ -178,11 +178,8 @@ export const PostDetailModal = () => {
                 className="w-12 h-12 rounded-2xl object-cover border border-slate-200 shadow-2xs"
               />
               <div>
-                <div className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                  <span>{selectedPost.author?.name}</span>
-                  <span className="text-xs text-slate-400 font-mono font-normal">
-                    @{selectedPost.author?.username}
-                  </span>
+                <div className="text-sm font-extrabold text-slate-900 font-mono">
+                  @{selectedPost.author?.username || 'learner'}
                 </div>
                 <div className="text-xs text-slate-500 font-medium">
                   {selectedPost.author?.role || 'Student Scholar'}
@@ -335,8 +332,7 @@ export const PostDetailModal = () => {
                         className="w-7 h-7 rounded-full object-cover border border-slate-200"
                       />
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-extrabold text-slate-900">{comment.author?.name}</span>
-                        <span className="text-[11px] text-slate-400 font-mono">@{comment.author?.username}</span>
+                        <span className="text-xs font-extrabold text-slate-900 font-mono">@{comment.author?.username || 'learner'}</span>
                       </div>
                     </div>
                     <span className="text-[10px] text-slate-400 font-mono">{comment.createdAt || 'Just now'}</span>
