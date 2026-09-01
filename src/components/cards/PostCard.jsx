@@ -70,6 +70,17 @@ export const PostCard = ({ post }) => {
           {post.summary}
         </p>
 
+        {/* Attached Image Thumbnail Preview */}
+        {post.attachments && post.attachments.some(a => a.type === 'image' || a.url?.startsWith('blob:') || a.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)) && (
+          <div className="rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-50">
+            <img
+              src={post.attachments.find(a => a.type === 'image' || a.url?.startsWith('blob:') || a.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i))?.url}
+              alt="Attached photo"
+              className="w-full h-36 object-cover hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        )}
+
         {/* Minimalist Core Takeaway (Clean hairline accent) */}
         {post.keyTakeaways && post.keyTakeaways.length > 0 && (
           <div className="py-1 px-3 rounded-xl bg-slate-50/80 border-l-2 border-primary-500 text-xs text-slate-700">

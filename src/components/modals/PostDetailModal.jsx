@@ -14,7 +14,11 @@ import {
   Send, 
   ShieldCheck, 
   User,
-  ExternalLink
+  ExternalLink,
+  Paperclip,
+  FileText,
+  Image as ImageIcon,
+  Link as LinkIcon
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -198,6 +202,50 @@ export const PostDetailModal = () => {
           <div className="prose prose-slate max-w-none text-sm sm:text-base text-slate-800 leading-relaxed whitespace-pre-line font-sans">
             {selectedPost.content}
           </div>
+
+          {/* Attached Media / Photos / Files Gallery */}
+          {selectedPost.attachments && selectedPost.attachments.length > 0 && (
+            <div className="space-y-3 pt-3 border-t border-slate-100">
+              <div className="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                <Paperclip className="w-4 h-4 text-primary-600" />
+                <span>Attached Photos & Files ({selectedPost.attachments.length})</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {selectedPost.attachments.map((att, idx) => (
+                  <div key={idx} className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 p-2.5">
+                    {att.type === 'image' || att.url?.startsWith('blob:') || att.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                      <div className="space-y-2">
+                        <img
+                          src={att.url}
+                          alt={att.name || 'Uploaded photo'}
+                          className="w-full max-h-96 object-contain rounded-xl bg-white border border-slate-200/80 shadow-2xs"
+                        />
+                        <span className="text-[11px] font-bold text-slate-700 block px-1 truncate">
+                          📷 {att.name || 'Photo Attachment'}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="p-2 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 truncate">
+                          {att.type === 'file' ? <FileText className="w-4 h-4 text-primary-600 shrink-0" /> : <LinkIcon className="w-4 h-4 text-primary-600 shrink-0" />}
+                          <span className="text-xs font-bold text-slate-800 truncate">{att.name}</span>
+                        </div>
+                        <a
+                          href={att.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1 rounded-lg bg-primary-600 text-white font-bold text-xs hover:bg-primary-700 transition-colors"
+                        >
+                          View
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Source of Trust & Verification Block */}
           {(selectedPost.sourceUrl || selectedPost.sourceContext) && (

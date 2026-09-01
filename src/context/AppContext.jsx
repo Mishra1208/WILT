@@ -104,6 +104,9 @@ export const AppProvider = ({ children }) => {
       savedCount: 0,
       summary: newPostData.summary,
       content: newPostData.content,
+      sourceUrl: newPostData.sourceUrl || "",
+      sourceContext: newPostData.sourceContext || "",
+      attachments: newPostData.attachments || [],
       keyTakeaways: newPostData.keyTakeaways || [],
       terms: newPostData.terms || []
     };
