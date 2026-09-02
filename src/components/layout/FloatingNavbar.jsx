@@ -34,12 +34,13 @@ export const FloatingNavbar = () => {
       {/* Desktop Navigation Links */}
       <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-xs font-bold tracking-[0.12em] text-slate-700 uppercase">
         <button
-          onClick={() => handleNavClick('discover')}
-          className={`hover:text-primary-600 transition-colors ${
-            currentView === 'discover' ? 'text-primary-600 font-extrabold' : ''
+          onClick={() => handleNavClick('knowledge-quest')}
+          className={`hover:text-primary-600 transition-colors flex items-center gap-1.5 ${
+            currentView === 'knowledge-quest' ? 'text-primary-600 font-extrabold' : ''
           }`}
         >
-          DISCOVER
+          <span>KNOWLEDGE QUEST</span>
+          <span className="px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[9px] font-black tracking-normal">TOI</span>
         </button>
 
         <button

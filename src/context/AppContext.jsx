@@ -70,16 +70,20 @@ export const AppProvider = ({ children }) => {
     try {
       const path = window.location.pathname.replace(/^\//, '').toLowerCase().trim();
       const validViews = [
-        'notepad', 'discover', 'dictionary', 'quiz',
+        'notepad', 'discover', 'dictionary', 'quiz', 'knowledge-quest', 'quest',
         'leaderboard', 'revision', 'saved', 'about',
         'notifications', 'settings', 'privacy', 'terms', 'standards'
       ];
+      if (path === 'knowledge-quest' || path === 'quest') return 'knowledge-quest';
       if (validViews.includes(path)) {
         return path;
       }
       const params = new URLSearchParams(window.location.search);
       const page = params.get('page');
-      if (page && validViews.includes(page)) return page;
+      if (page) {
+        if (page === 'knowledge-quest' || page === 'quest') return 'knowledge-quest';
+        if (validViews.includes(page)) return page;
+      }
     } catch (e) {}
     return 'notepad';
   };
@@ -87,14 +91,15 @@ export const AppProvider = ({ children }) => {
   const [currentView, setCurrentViewState] = useState(getViewFromPath);
 
   const setCurrentView = (newView, replace = false) => {
-    setCurrentViewState(newView);
+    const normalizedView = (newView === 'quest' || newView === 'knowledge-quest') ? 'knowledge-quest' : newView;
+    setCurrentViewState(normalizedView);
     try {
-      const targetPath = newView === 'notepad' ? '/' : `/${newView}`;
+      const targetPath = normalizedView === 'notepad' ? '/' : `/${normalizedView}`;
       if (window.location.pathname !== targetPath) {
         if (replace) {
-          window.history.replaceState({ view: newView }, '', targetPath);
+          window.history.replaceState({ view: normalizedView }, '', targetPath);
         } else {
-          window.history.pushState({ view: newView }, '', targetPath);
+          window.history.pushState({ view: normalizedView }, '', targetPath);
         }
       }
     } catch (e) {}

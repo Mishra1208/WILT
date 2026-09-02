@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Compass,
   BookOpen,
@@ -11,6 +10,7 @@ import {
   Trophy,
   PenTool,
   Info,
+  Globe,
   PanelLeftClose
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -22,6 +22,7 @@ export const Sidebar = () => {
 
   const learningNav = [
     { id: 'notepad', label: 'Notepad Slate', icon: PenTool, badge: 'Landing' },
+    { id: 'knowledge-quest', label: 'Knowledge Quest', icon: Globe, badge: 'TOI News' },
     { id: 'discover', label: 'Discover', icon: Compass },
     { id: 'dictionary', label: 'Dictionary', icon: BookOpen },
   ];

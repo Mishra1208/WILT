@@ -20,7 +20,7 @@ import { LeaderboardView } from './views/LeaderboardView';
 import { RevisionView } from './views/RevisionView';
 import { SavedView } from './views/SavedView';
 import { NotificationsView } from './views/NotificationsView';
-import { SettingsView } from './views/SettingsView';
+import { KnowledgeQuestView } from './views/KnowledgeQuestView';
 
 // Modals
 import { NewPostModal } from './components/modals/NewPostModal';
@@ -52,6 +52,9 @@ export function App() {
 
   const renderLandingView = () => {
     switch (currentView) {
+      case 'knowledge-quest':
+      case 'quest':
+        return <KnowledgeQuestView />;
       case 'about':
         return <AboutView />;
       case 'privacy':
@@ -68,6 +71,9 @@ export function App() {
 
   const renderDashboardView = () => {
     switch (currentView) {
+      case 'knowledge-quest':
+      case 'quest':
+        return <KnowledgeQuestView />;
       case 'home':
         return <HomeView />;
       case 'discover':
