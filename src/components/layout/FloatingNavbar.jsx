@@ -35,12 +35,11 @@ export const FloatingNavbar = () => {
       <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-xs font-bold tracking-[0.12em] text-slate-700 uppercase">
         <button
           onClick={() => handleNavClick('knowledge-quest')}
-          className={`hover:text-primary-600 transition-colors flex items-center gap-1.5 ${
+          className={`hover:text-primary-600 transition-colors ${
             currentView === 'knowledge-quest' ? 'text-primary-600 font-extrabold' : ''
           }`}
         >
           <span>KNOWLEDGE QUEST</span>
-          <span className="px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[9px] font-black tracking-normal">TOI</span>
         </button>
 
         <button

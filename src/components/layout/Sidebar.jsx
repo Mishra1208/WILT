@@ -21,14 +21,14 @@ export const Sidebar = () => {
   const { user, isLoggedIn, setIsAuthModalOpen } = useAuth();
 
   const learningNav = [
-    { id: 'notepad', label: 'Notepad Slate', icon: PenTool, badge: 'Landing' },
-    { id: 'knowledge-quest', label: 'Knowledge Quest', icon: Globe, badge: 'TOI News' },
+    { id: 'notepad', label: 'Notepad Slate', icon: PenTool },
+    { id: 'knowledge-quest', label: 'Knowledge Quest', icon: Globe },
     { id: 'discover', label: 'Discover', icon: Compass },
     { id: 'dictionary', label: 'Dictionary', icon: BookOpen },
   ];
 
   const recallNav = [
-    { id: 'quiz', label: 'Quiz', icon: HelpCircle, badge: 'Weekly' },
+    { id: 'quiz', label: 'Quiz', icon: HelpCircle },
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
     { id: 'revision', label: 'Revision', icon: Brain },
     { id: 'saved', label: 'Saved', icon: Bookmark },
