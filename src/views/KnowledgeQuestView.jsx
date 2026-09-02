@@ -104,44 +104,39 @@ export const KnowledgeQuestView = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn pb-16 px-4 sm:px-6">
       
-      {/* Light Aesthetic Hero Header Section */}
-      <div className="relative rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-8 overflow-hidden shadow-sm">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-primary-100/40 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-100/40 rounded-full blur-3xl pointer-events-none" />
+      {/* Uncarded Clean Page Header Section */}
+      <div className="space-y-3 pt-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 border border-primary-200/60 text-primary-700 text-xs font-bold uppercase tracking-wider">
+          <Compass className="w-3.5 h-3.5 text-primary-600" />
+          <span>Inshorts Business & Global Digest</span>
+        </div>
 
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 border border-primary-200/60 text-primary-700 text-xs font-bold uppercase tracking-wider">
-            <Compass className="w-3.5 h-3.5 text-primary-600" />
-            <span>Inshorts Business & Global Digest</span>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight font-display">
+          Knowledge <span className="text-primary-600">Quest</span>
+        </h1>
+
+        <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-3xl">
+          Master current business affairs for campus placement interviews. 60-second condensed summaries from top business news sources with ready-to-use interview talking points.
+        </p>
+
+        {/* Action Badges & Quick Quiz Button */}
+        <div className="pt-1 flex flex-wrap items-center gap-3 text-xs font-semibold">
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-slate-200/80 text-slate-700 flex items-center gap-2 shadow-xs">
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span>Recruiter-Ready Summaries</span>
           </div>
-
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight font-display">
-            Knowledge <span className="text-primary-600">Quest</span>
-          </h1>
-
-          <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-            Master current business affairs for campus placement interviews. 60-second condensed summaries from top business news sources with ready-to-use interview talking points.
-          </p>
-
-          {/* Stats Bar & Quick Quiz Button */}
-          <div className="pt-1 flex flex-wrap items-center gap-3 text-xs font-semibold">
-            <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-700 flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>Recruiter-Ready Summaries</span>
-            </div>
-            <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-700 flex items-center gap-2">
-              <Globe2 className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Real-Time Inshorts Stream</span>
-            </div>
-            <button
-              onClick={() => setIsQuizModalOpen(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer text-xs"
-            >
-              <HelpCircle className="w-3.5 h-3.5" />
-              <span>Test Interview Retention</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-slate-200/80 text-slate-700 flex items-center gap-2 shadow-xs">
+            <Globe2 className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Real-Time Inshorts Stream</span>
           </div>
+          <button
+            onClick={() => setIsQuizModalOpen(true)}
+            className="px-3.5 py-1.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer text-xs"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>Test Interview Retention</span>
+            <ArrowRight className="w-3 h-3" />
+          </button>
         </div>
       </div>
 
