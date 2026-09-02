@@ -38,6 +38,7 @@ export const NotepadLandingView = () => {
   // Status & Moderation
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [moderationError, setModerationError] = useState(null);
+  const [referenceError, setReferenceError] = useState(null);
 
   // Modal State for Topic / Category Selection
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,6 +52,7 @@ export const NotepadLandingView = () => {
   };
 
   const handleReferenceChange = (index, value) => {
+    if (referenceError) setReferenceError(null);
     setReferences(prev => {
       const next = [...prev];
       next[index] = value;
@@ -116,6 +118,15 @@ export const NotepadLandingView = () => {
     if (!text.trim() && !title.trim()) return;
 
     setModerationError(null);
+    setReferenceError(null);
+
+    // Reference Check: Ensure at least one reference is provided
+    const activeReferences = references.filter(r => r && r.trim() !== "");
+    if (activeReferences.length === 0) {
+      setReferenceError("A reference/source is required to post. Please provide at least one link, book, or paper source.");
+      setIsExpanded(true);
+      return;
+    }
 
     // Moderation Check
     const combinedContent = `${title} ${text}`;
@@ -144,10 +155,18 @@ export const NotepadLandingView = () => {
   // Step 2: Final Publish Submission
   const handleFinalPublish = async (e) => {
     e.preventDefault();
+
+    const activeReferences = references.filter(r => r && r.trim() !== "");
+    if (activeReferences.length === 0) {
+      setReferenceError("A reference/source is required to post.");
+      setIsModalOpen(false);
+      setIsExpanded(true);
+      return;
+    }
+
     setIsPublishing(true);
 
     const finalCategory = category === 'Other' ? (customCategory.trim() || 'General Knowledge') : category;
-    const activeReferences = references.filter(r => r.trim() !== '');
 
     const primarySource = activeReferences[0] || (attachments[0] ? attachments[0].url : 'Self-Learned Insight');
     const additionalSources = activeReferences.slice(1).join(', ');
@@ -190,6 +209,7 @@ export const NotepadLandingView = () => {
     setAttachments([]);
     setCustomCategory('');
     setIsExpanded(false);
+    setReferenceError(null);
 
     setTimeout(() => {
       setIsSubmitted(false);
@@ -374,8 +394,11 @@ export const NotepadLandingView = () => {
           {isExpanded && (
             <div className="mt-4 pt-3 border-t border-slate-100 space-y-2.5 animate-fadeIn">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  Reference List / Sources
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>Reference List / Sources</span>
+                  <span className="text-rose-500 font-bold text-[10px] bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">
+                    * Required
+                  </span>
                 </span>
                 <button
                   type="button"
@@ -387,6 +410,14 @@ export const NotepadLandingView = () => {
                 </button>
               </div>
 
+              {/* Reference Error Warning */}
+              {referenceError && (
+                <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2 animate-fadeIn">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{referenceError}</span>
+                </div>
+              )}
+
               <div className="space-y-2">
                 {references.map((refItem, idx) => (
                   <div key={idx} className="flex items-center gap-2">
@@ -396,7 +427,12 @@ export const NotepadLandingView = () => {
                         value={refItem}
                         onChange={(e) => handleReferenceChange(idx, e.target.value)}
                         placeholder={`Reference ${idx + 1} link / book / paper source...`}
-                        className="w-full px-3.5 py-1.5 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-medium focus:outline-none focus:border-primary-500 focus:bg-white transition-all"
+                        className={cn(
+                          "w-full px-3.5 py-1.5 text-xs rounded-xl border text-slate-900 font-medium focus:outline-none transition-all",
+                          referenceError && !refItem.trim()
+                            ? "bg-rose-50/60 border-rose-300 focus:border-rose-500 focus:bg-white"
+                            : "bg-slate-50 border-slate-200 focus:border-primary-500 focus:bg-white"
+                        )}
                       />
                     </div>
                     {references.length > 1 && (
