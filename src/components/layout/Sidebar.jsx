@@ -28,8 +28,12 @@ export const Sidebar = () => {
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
     { id: 'revision', label: 'Revision', icon: Brain },
     { id: 'saved', label: 'Saved', icon: Bookmark },
+  ];
+
+  const accountNav = [
     { id: 'about', label: 'About WILT', icon: Info },
     { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   if (!isSidebarOpen) {
@@ -118,21 +122,32 @@ export const Sidebar = () => {
 
 
         {/* ACCOUNT Section */}
-        <div className="flex flex-col gap-1 pt-2">
+        <div className="flex flex-col gap-1 pt-2 border-t border-slate-100/80">
           <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">
             Account
           </div>
-          <button
-            onClick={() => handleNavClick('settings')}
-            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-              currentView === 'settings'
-                ? 'bg-primary-50 text-primary-700'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-            }`}
-          >
-            <Settings className="w-4 h-4 text-slate-400" />
-            <span>Settings</span>
-          </button>
+          {accountNav.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentView === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  isActive
+                    ? 'bg-primary-50 text-primary-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <Icon
+                  className={`w-4 h-4 ${
+                    isActive ? 'text-primary-600' : 'text-slate-400'
+                  }`}
+                />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
