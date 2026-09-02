@@ -96,14 +96,6 @@ export const AuthProvider = ({ children }) => {
         updateLeaderboardUser(authenticatedUser);
         saveUserProfileToSupabase(authenticatedUser);
         setIsAuthModalOpen(false);
-
-        try {
-          confetti({
-            particleCount: 70,
-            spread: 60,
-            origin: { y: 0.6 }
-          });
-        } catch (e) {}
       } else {
         const guest = getOrCreateGuestUser();
         setUser(guest);
