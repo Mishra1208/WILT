@@ -15,6 +15,7 @@ import {
   saveCommentToSupabase,
   saveAttachmentToSupabase
 } from '../services/supabase';
+import { getOrCreateGuestUser } from '../context/AuthContext';
 
 const AppContext = createContext();
 
@@ -226,6 +227,7 @@ export const AppProvider = ({ children }) => {
   const addCommentToPost = (postId, commentText, currentUser) => {
     if (!commentText.trim()) return false;
 
+    const activeUser = currentUser || getOrCreateGuestUser();
     let targetUpdatedPost = null;
 
     setPosts(prev =>
@@ -235,10 +237,10 @@ export const AppProvider = ({ children }) => {
           const newComment = {
             id: `comment-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
             author: {
-              name: currentUser?.username ? `@${currentUser.username}` : (currentUser?.name || '@learner'),
-              username: currentUser?.username || 'learner',
-              avatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-              role: currentUser?.major || 'Student'
+              name: `@${activeUser.username}`,
+              username: activeUser.username,
+              avatar: activeUser.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+              role: activeUser.major || 'Student Scholar'
             },
             text: commentText.trim(),
             createdAt: 'Just now'

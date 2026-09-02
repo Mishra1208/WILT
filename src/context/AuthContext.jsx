@@ -4,10 +4,54 @@ import confetti from 'canvas-confetti';
 import { getStoredUser, saveStoredUser, updateLeaderboardUser } from '../services/storage';
 import { saveUserProfileToSupabase } from '../services/supabase';
 
+export const getOrCreateGuestUser = () => {
+  try {
+    const key = 'wilt_guest_identity_v3';
+    const saved = localStorage.getItem(key);
+    if (saved) return JSON.parse(saved);
+
+    const prefixes = ['quantum', 'stellar', 'curious', 'apex', 'matrix', 'cipher', 'nexus', 'orbit', 'vector', 'cosmic', 'zenith', 'hyper'];
+    const roles = ['scholar', 'thinker', 'learner', 'mind', 'seeker', 'builder', 'fellow', 'explorer'];
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const role = roles[Math.floor(Math.random() * roles.length)];
+    const username = `${prefix}_${role}_${randomNum}`;
+
+    const guestUser = {
+      id: `guest-${Date.now()}-${randomNum}`,
+      name: `@${username}`,
+      username: username,
+      avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`,
+      university: 'Anonymous Campus',
+      major: 'Guest Scholar',
+      rank: 25,
+      tier: 'Curious Scholar',
+      xp: 100,
+      isGuest: true
+    };
+
+    localStorage.setItem(key, JSON.stringify(guestUser));
+    return guestUser;
+  } catch (e) {
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    return {
+      id: `guest-${Date.now()}`,
+      name: `@scholar_${randomNum}`,
+      username: `scholar_${randomNum}`,
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+      university: 'Anonymous Campus',
+      major: 'Guest Scholar',
+      xp: 100,
+      isGuest: true
+    };
+  }
+};
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => getStoredUser());
+  const [user, setUser] = useState(() => getStoredUser() || getOrCreateGuestUser());
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Real Clerk User & Hooks
@@ -61,9 +105,8 @@ export const AuthProvider = ({ children }) => {
           });
         } catch (e) {}
       } else {
-        // When not signed in with Clerk, keep state clean
-        setUser(null);
-        saveStoredUser(null);
+        const guest = getOrCreateGuestUser();
+        setUser(guest);
       }
     }
   }, [isClerkLoaded, isSignedIn, clerkUser]);

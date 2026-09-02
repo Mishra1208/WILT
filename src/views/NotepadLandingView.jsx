@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { CATEGORIES } from '../data/seedData';
 import { useApp } from '../context/AppContext';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, getOrCreateGuestUser } from '../context/AuthContext';
 import { validateContent } from '../services/moderation';
 import GradientText from '../components/ui/GradientText';
 import DotPattern from '../components/ui/DotPattern';
@@ -176,6 +176,8 @@ export const NotepadLandingView = () => {
     const primarySource = activeReferences[0] || (attachments[0] ? attachments[0].url : 'Self-Learned Insight');
     const additionalSources = activeReferences.slice(1).join(', ');
 
+    const activeUser = user || getOrCreateGuestUser();
+
     await createPost({
       title: title.trim() || 'Daily Learning Note',
       category: finalCategory,
@@ -187,10 +189,10 @@ export const NotepadLandingView = () => {
       sourceContext: additionalSources || 'Verified Learner Post',
       attachments: attachments,
       author: {
-        name: user?.name || "Student Scholar",
-        username: user?.username || "learner",
-        avatar: user?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
-        role: user?.major || "Student",
+        name: `@${activeUser.username}`,
+        username: activeUser.username,
+        avatar: activeUser.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+        role: activeUser.major || "Student Scholar",
         badge: "🌱 Daily Learner"
       }
     });
