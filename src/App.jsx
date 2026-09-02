@@ -48,13 +48,7 @@ export function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toggleSidebar]);
 
-  const isLandingMode = [
-    'notepad',
-    'about',
-    'privacy',
-    'terms',
-    'standards'
-  ].includes(currentView);
+  const isLandingMode = currentView === 'notepad';
 
   const renderLandingView = () => {
     switch (currentView) {
