@@ -54,13 +54,19 @@ export const KnowledgeQuestView = () => {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
 
   // Filter Articles
-  const filteredArticles = articles.filter((article) => {
+  const filteredArticles = (articles || []).filter((article) => {
+    if (!article) return false;
     const matchesCategory = activeCategory === 'all' || article.category === activeCategory;
+    const q = (searchQuery || '').toLowerCase();
+    
+    const whatHappened = typeof article.summary === 'object' ? (article.summary?.whatHappened || '') : (article.summary || '');
+    const whyItMatters = typeof article.summary === 'object' ? (article.summary?.whyItMatters || '') : '';
+    
     const matchesSearch = 
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.summary.whatHappened.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.summary.whyItMatters.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (article.keyTerms && article.keyTerms.some(term => term.toLowerCase().includes(searchQuery.toLowerCase())));
+      (article.title || '').toLowerCase().includes(q) ||
+      whatHappened.toLowerCase().includes(q) ||
+      whyItMatters.toLowerCase().includes(q) ||
+      (article.keyTerms && article.keyTerms.some(term => (term || '').toLowerCase().includes(q)));
     
     return matchesCategory && matchesSearch;
   });
@@ -240,15 +246,15 @@ export const KnowledgeQuestView = () => {
                     <ul className="space-y-2 text-xs text-slate-700 font-medium leading-relaxed">
                       <li className="flex items-start gap-2">
                         <span className="font-extrabold text-primary-600 shrink-0">·</span>
-                        <span><strong className="text-slate-900 font-bold">What Happened:</strong> {article.summary.whatHappened}</span>
+                        <span><strong className="text-slate-900 font-bold">What Happened:</strong> {typeof article.summary === 'object' ? (article.summary?.whatHappened || article.title) : (article.summary || article.title)}</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-extrabold text-indigo-600 shrink-0">·</span>
-                        <span><strong className="text-slate-900 font-bold">Why It Matters:</strong> {article.summary.whyItMatters}</span>
+                        <span><strong className="text-slate-900 font-bold">Why It Matters:</strong> {typeof article.summary === 'object' ? (article.summary?.whyItMatters || 'Key market development.') : 'Key market development.'}</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-extrabold text-emerald-600 shrink-0">·</span>
-                        <span><strong className="text-slate-900 font-bold">Key Metric:</strong> <code className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono text-[11px] font-bold">{article.summary.keyMetric}</code></span>
+                        <span><strong className="text-slate-900 font-bold">Key Metric:</strong> <code className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono text-[11px] font-bold">{typeof article.summary === 'object' ? (article.summary?.keyMetric || `Source: ${article.source || 'News'}`) : `Source: ${article.source || 'News'}`}</code></span>
                       </li>
                     </ul>
                   </div>
