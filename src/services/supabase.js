@@ -102,10 +102,6 @@ export const savePostToSupabase = async (post) => {
           author_avatar: post.author?.avatar || '',
           key_takeaways: post.keyTakeaways || [],
           terms: post.terms || [],
-          source_url: post.sourceUrl || '',
-          source_context: post.sourceContext || '',
-          attachments: post.attachments || [],
-          comments: post.comments || [],
           created_at: new Date().toISOString()
         }
       ])
@@ -438,7 +434,7 @@ export const fetchConceptsFromSupabase = async () => {
     }
 
     return (data || [])
-      .filter((row) => row.category !== 'post_comment')
+      .filter((row) => row.category !== 'post_comment' && row.category !== 'post_attachment' && !row.term.startsWith('post-'))
       .map((row) => ({
         id: row.id,
         term: row.term,
