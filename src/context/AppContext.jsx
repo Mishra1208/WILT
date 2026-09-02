@@ -52,22 +52,48 @@ export const AppProvider = ({ children }) => {
     });
   }, []);
 
-  const getInitialView = () => {
+  const getViewFromPath = () => {
     try {
+      const path = window.location.pathname.replace(/^\//, '').toLowerCase().trim();
+      const validViews = [
+        'notepad', 'discover', 'dictionary', 'quiz',
+        'leaderboard', 'revision', 'saved', 'about',
+        'notifications', 'settings', 'privacy', 'terms', 'standards'
+      ];
+      if (validViews.includes(path)) {
+        return path;
+      }
       const params = new URLSearchParams(window.location.search);
       const page = params.get('page');
-      if (page && ['privacy', 'terms', 'standards', 'about', 'discover', 'notepad', 'quiz', 'dictionary', 'leaderboard'].includes(page)) {
-        return page;
-      }
-      const hash = window.location.hash.replace('#', '');
-      if (hash && ['privacy', 'terms', 'standards', 'about', 'discover', 'notepad', 'quiz', 'dictionary', 'leaderboard'].includes(hash)) {
-        return hash;
-      }
+      if (page && validViews.includes(page)) return page;
     } catch (e) {}
     return 'notepad';
   };
 
-  const [currentView, setCurrentView] = useState(getInitialView);
+  const [currentView, setCurrentViewState] = useState(getViewFromPath);
+
+  const setCurrentView = (newView, replace = false) => {
+    setCurrentViewState(newView);
+    try {
+      const targetPath = newView === 'notepad' ? '/' : `/${newView}`;
+      if (window.location.pathname !== targetPath) {
+        if (replace) {
+          window.history.replaceState({ view: newView }, '', targetPath);
+        } else {
+          window.history.pushState({ view: newView }, '', targetPath);
+        }
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const view = getViewFromPath();
+      setCurrentViewState(view);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
