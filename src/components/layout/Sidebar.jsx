@@ -11,13 +11,14 @@ import {
   PenTool,
   Info,
   Globe,
+  AlertTriangle,
   PanelLeftClose
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const Sidebar = () => {
-  const { currentView, setCurrentView, setIsNewPostModalOpen, isSidebarOpen, toggleSidebar } = useApp();
+  const { currentView, setCurrentView, setIsNewPostModalOpen, isSidebarOpen, toggleSidebar, openReportBugModal } = useApp();
   const { user, isLoggedIn, setIsAuthModalOpen } = useAuth();
 
   const learningNav = [
@@ -36,6 +37,7 @@ export const Sidebar = () => {
 
   const accountNav = [
     { id: 'about', label: 'About WILT', icon: Info },
+    { id: 'report-bug', label: 'Report a Bug', icon: AlertTriangle, action: openReportBugModal },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
@@ -173,8 +175,14 @@ export const Sidebar = () => {
             return (
               <button
                 key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                onClick={() => {
+                  if (item.action) {
+                    item.action();
+                  } else {
+                    handleNavClick(item.id);
+                  }
+                }}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                   isActive
                     ? 'bg-primary-50 text-primary-700 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'

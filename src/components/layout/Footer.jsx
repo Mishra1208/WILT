@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { 
   Sparkles, 
   ArrowUpRight, 
@@ -13,13 +12,14 @@ import {
   FileText,
   Lock,
   Scale,
-  Info
+  Info,
+  AlertTriangle
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { subscribeNewsletterToSupabase } from '../../services/supabase';
 
 export const Footer = () => {
-  const { setCurrentView } = useApp();
+  const { setCurrentView, openReportBugModal } = useApp();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -155,6 +155,15 @@ export const Footer = () => {
               </li>
               <li>
                 <button 
+                  onClick={openReportBugModal} 
+                  className="hover:text-amber-600 font-bold transition-colors flex items-center gap-1.5 cursor-pointer text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80"
+                >
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Report a Bug</span>
+                </button>
+              </li>
+              <li>
+                <button 
                   onClick={() => setCurrentView('standards')} 
                   className="hover:text-primary-600 transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
@@ -265,6 +274,10 @@ export const Footer = () => {
             <span className="text-slate-300">·</span>
             <button onClick={() => setCurrentView('about')} className="hover:text-primary-600 transition-colors cursor-pointer">
               About Us
+            </button>
+            <span className="text-slate-300">·</span>
+            <button onClick={openReportBugModal} className="hover:text-amber-600 font-bold transition-colors cursor-pointer text-amber-700">
+              Report a Bug
             </button>
           </div>
 

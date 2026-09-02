@@ -496,3 +496,41 @@ export const subscribeNewsletterToSupabase = async (email, source = 'wilt_footer
     return { success: true };
   }
 };
+
+/**
+ * Report a bug in Supabase bug_reports table
+ */
+export const reportBugToSupabase = async (bugData) => {
+  try {
+    const { data, error } = await supabase
+      .from('bug_reports')
+      .insert([
+        {
+          page: bugData.page || 'Not Specified',
+          issue_type: bugData.issueType || 'General Bug',
+          description: bugData.description || '',
+          email: bugData.email || null,
+          created_at: new Date().toISOString()
+        }
+      ]);
+
+    if (error) {
+      console.warn('Supabase bug_reports notice:', error.message);
+      // Fallback save to localStorage
+      try {
+        const local = JSON.parse(localStorage.getItem('wilt_bug_reports_v1') || '[]');
+        local.push({ ...bugData, timestamp: new Date().toISOString() });
+        localStorage.setItem('wilt_bug_reports_v1', JSON.stringify(local));
+      } catch (e) {}
+    }
+    return { success: true };
+  } catch (err) {
+    console.warn('Supabase bug report catch:', err.message);
+    try {
+      const local = JSON.parse(localStorage.getItem('wilt_bug_reports_v1') || '[]');
+      local.push({ ...bugData, timestamp: new Date().toISOString() });
+      localStorage.setItem('wilt_bug_reports_v1', JSON.stringify(local));
+    } catch (e) {}
+    return { success: true };
+  }
+};

@@ -27,6 +27,7 @@ import { NewPostModal } from './components/modals/NewPostModal';
 import { PostDetailModal } from './components/modals/PostDetailModal';
 import { NewConceptModal } from './components/modals/NewConceptModal';
 import { AuthModal } from './components/modals/AuthModal';
+import { ReportBugModal } from './components/modals/ReportBugModal';
 
 export function App() {
   const { currentView, toggleSidebar } = useApp();
@@ -142,6 +143,7 @@ export function App() {
       <PostDetailModal />
       <NewConceptModal />
       <AuthModal />
+      <ReportBugModal />
 
       {/* Vercel Web Traffic Analytics */}
       <Analytics />

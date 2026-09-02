@@ -392,6 +392,10 @@ export const AppProvider = ({ children }) => {
 
   const isNewsSaved = (articleId) => savedNewsArticles.some((a) => a.id === articleId);
 
+  const [isReportBugModalOpen, setIsReportBugModalOpen] = useState(false);
+  const openReportBugModal = () => setIsReportBugModalOpen(true);
+  const closeReportBugModal = () => setIsReportBugModalOpen(false);
+
   return (
     <AppContext.Provider
       value={{
@@ -427,7 +431,11 @@ export const AppProvider = ({ children }) => {
         toggleSavePost,
         isPostSaved,
         toggleSaveNews,
-        isNewsSaved
+        isNewsSaved,
+        isReportBugModalOpen,
+        setIsReportBugModalOpen,
+        openReportBugModal,
+        closeReportBugModal
       }}
     >
       {children}
