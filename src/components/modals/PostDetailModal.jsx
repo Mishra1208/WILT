@@ -35,7 +35,6 @@ export const PostDetailModal = () => {
   const isSaved = user?.savedPosts?.includes(selectedPost.id);
 
   const comments = selectedPost.comments || [];
-  const isDiscussionClosed = comments.length >= 6;
 
   const handleLike = () => {
     if (!user) return;
@@ -63,20 +62,10 @@ export const PostDetailModal = () => {
   const handleAddComment = (e) => {
     e.preventDefault();
     setCommentError(null);
-
-    if (isDiscussionClosed) {
-      setCommentError('Discussion capacity reached (6/6 students max).');
-      return;
-    }
-
     if (!commentInput.trim()) return;
 
-    const added = addCommentToPost(selectedPost.id, commentInput, user);
-    if (added) {
-      setCommentInput('');
-    } else {
-      setCommentError('Discussion is locked as 6 students have already commented.');
-    }
+    addCommentToPost(selectedPost.id, commentInput, user);
+    setCommentInput('');
   };
 
   return (
@@ -328,10 +317,10 @@ export const PostDetailModal = () => {
           )}
         </article>
 
-        {/* 6-STUDENT CAPPED DISCUSSION FORUM SECTION */}
+        {/* PEER DISCUSSION FORUM SECTION */}
         <section className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
           
-          {/* Discussion Header & Capacity Badge */}
+          {/* Discussion Header */}
           <div className="flex items-center justify-between pb-4 border-b border-slate-100 flex-wrap gap-3">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-xl bg-primary-100/70 text-primary-600">
@@ -342,23 +331,16 @@ export const PostDetailModal = () => {
                   Peer Discussion Forum
                 </h3>
                 <p className="text-xs font-medium text-slate-500">
-                  Capped at maximum 6 student contributors per post
+                  Open community dialogue & peer responses
                 </p>
               </div>
             </div>
 
-            {/* Status Capacity Badge */}
-            {isDiscussionClosed ? (
-              <span className="px-3.5 py-1.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-xs font-extrabold flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-rose-600" />
-                <span>Discussion Closed (6/6 Capacity Reached)</span>
-              </span>
-            ) : (
-              <span className="px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-extrabold flex items-center gap-1.5">
-                <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{comments.length}/6 Student Slots Used ({6 - comments.length} remaining)</span>
-              </span>
-            )}
+            {/* Comment Count Badge */}
+            <span className="px-3.5 py-1.5 rounded-full bg-primary-50 text-primary-800 border border-primary-200 text-xs font-extrabold flex items-center gap-1.5">
+              <MessageSquare className="w-3.5 h-3.5 text-primary-600" />
+              <span>{comments.length} {comments.length === 1 ? 'Comment' : 'Comments'}</span>
+            </span>
           </div>
 
           {/* Comment List */}
@@ -367,7 +349,7 @@ export const PostDetailModal = () => {
               <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
                 <MessageSquare className="w-8 h-8 text-slate-300 mx-auto" />
                 <p className="text-xs font-bold text-slate-700">No peer comments yet</p>
-                <p className="text-[11px] text-slate-400">Be one of the 6 students to start the discussion for this insight!</p>
+                <p className="text-[11px] text-slate-400">Be the first student to start the discussion for this insight!</p>
               </div>
             ) : (
               comments.map((comment) => (
@@ -393,40 +375,33 @@ export const PostDetailModal = () => {
             )}
           </div>
 
-          {/* Comment Input or Closed Banner */}
-          {isDiscussionClosed ? (
-            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-bold flex items-center gap-2.5">
-              <Lock className="w-4 h-4 text-rose-600 flex-shrink-0" />
-              <span>🔒 This peer discussion has reached its max capacity of 6 student contributors and is now closed.</span>
-            </div>
-          ) : (
-            <form onSubmit={handleAddComment} className="space-y-3 pt-2 border-t border-slate-100">
-              {commentError && (
-                <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
-                  <span>{commentError}</span>
-                </div>
-              )}
-
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={commentInput}
-                  onChange={(e) => setCommentInput(e.target.value)}
-                  placeholder={`Join the discussion (Slot ${comments.length + 1} of 6)...`}
-                  className="flex-1 px-4 py-2.5 text-xs rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 font-medium focus:outline-none focus:border-primary-500 focus:bg-white transition-all"
-                />
-                <button
-                  type="submit"
-                  disabled={!commentInput.trim()}
-                  className="px-4 py-2.5 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-xs disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  <span>Comment</span>
-                  <Send className="w-3.5 h-3.5" />
-                </button>
+          {/* Comment Input */}
+          <form onSubmit={handleAddComment} className="space-y-3 pt-2 border-t border-slate-100">
+            {commentError && (
+              <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                <span>{commentError}</span>
               </div>
-            </form>
-          )}
+            )}
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={commentInput}
+                onChange={(e) => setCommentInput(e.target.value)}
+                placeholder="Join the peer discussion..."
+                className="flex-1 px-4 py-2.5 text-xs rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 font-medium focus:outline-none focus:border-primary-500 focus:bg-white transition-all"
+              />
+              <button
+                type="submit"
+                disabled={!commentInput.trim()}
+                className="px-4 py-2.5 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-xs disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+              >
+                <span>Comment</span>
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </form>
 
         </section>
 

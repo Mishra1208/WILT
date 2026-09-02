@@ -34,10 +34,19 @@ export const getStoredPosts = () => {
 
 export const savePost = (post) => {
   const posts = getStoredPosts();
-  const newPosts = [post, ...posts];
+  const index = posts.findIndex((p) => p.id === post.id);
+  let newPosts;
+  if (index >= 0) {
+    newPosts = [...posts];
+    newPosts[index] = post;
+  } else {
+    newPosts = [post, ...posts];
+  }
   localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(newPosts));
   return newPosts;
 };
+
+export const updatePostInStorage = savePost;
 
 export const getStoredConcepts = () => {
   try {

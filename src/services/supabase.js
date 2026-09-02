@@ -102,6 +102,10 @@ export const savePostToSupabase = async (post) => {
           author_avatar: post.author?.avatar || '',
           key_takeaways: post.keyTakeaways || [],
           terms: post.terms || [],
+          source_url: post.sourceUrl || '',
+          source_context: post.sourceContext || '',
+          attachments: post.attachments || [],
+          comments: post.comments || [],
           created_at: new Date().toISOString()
         }
       ])
@@ -152,7 +156,11 @@ export const fetchPostsFromSupabase = async () => {
         major: 'Finance & Tech'
       },
       keyTakeaways: row.key_takeaways || [],
-      terms: row.terms || []
+      terms: row.terms || [],
+      sourceUrl: row.source_url || '',
+      sourceContext: row.source_context || '',
+      attachments: row.attachments || [],
+      comments: row.comments || []
     }));
   } catch (err) {
     console.warn('Supabase fetch posts catch:', err);
