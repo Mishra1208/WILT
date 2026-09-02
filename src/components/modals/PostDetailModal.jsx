@@ -193,55 +193,60 @@ export const PostDetailModal = () => {
           </div>
 
           {/* Attached Media / Photos / Files Gallery */}
-          {selectedPost.attachments && selectedPost.attachments.length > 0 && (
-            <div className="space-y-3 pt-3 border-t border-slate-100">
-              <div className="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                <Paperclip className="w-4 h-4 text-primary-600" />
-                <span>Attached Photos & Files ({selectedPost.attachments.length})</span>
-              </div>
+          {(() => {
+            const mediaAttachments = (selectedPost.attachments || []).filter((a) => a.type !== 'link');
+            if (mediaAttachments.length === 0) return null;
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {selectedPost.attachments.map((att, idx) => (
-                  <div key={idx} className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 p-2.5">
-                    {att.type === 'image' || att.url?.startsWith('blob:') || att.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                      <div className="space-y-2">
-                        <img
-                          src={att.url}
-                          alt={att.name || 'Uploaded photo'}
-                          className="w-full max-h-96 object-contain rounded-xl bg-white border border-slate-200/80 shadow-2xs"
-                        />
-                        <span className="text-[11px] font-bold text-slate-700 block px-1 truncate">
-                          📷 {att.name || 'Photo Attachment'}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="p-2 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 truncate">
-                          {att.type === 'file' ? <FileText className="w-4 h-4 text-primary-600 shrink-0" /> : <LinkIcon className="w-4 h-4 text-primary-600 shrink-0" />}
-                          <span className="text-xs font-bold text-slate-800 truncate">{att.name}</span>
+            return (
+              <div className="space-y-3 pt-3 border-t border-slate-100">
+                <div className="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <Paperclip className="w-4 h-4 text-primary-600" />
+                  <span>Attached Photos & Files ({mediaAttachments.length})</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {mediaAttachments.map((att, idx) => (
+                    <div key={idx} className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 p-2.5">
+                      {att.type === 'image' || att.url?.startsWith('data:image/') || att.url?.startsWith('blob:') || att.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                        <div className="space-y-2">
+                          <img
+                            src={att.url}
+                            alt={att.name || 'Uploaded photo'}
+                            className="w-full max-h-96 object-contain rounded-xl bg-white border border-slate-200/80 shadow-2xs"
+                          />
+                          <span className="text-[11px] font-bold text-slate-700 block px-1 truncate">
+                            📷 {att.name || 'Photo Attachment'}
+                          </span>
                         </div>
-                        <a
-                          href={att.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-2.5 py-1 rounded-lg bg-primary-600 text-white font-bold text-xs hover:bg-primary-700 transition-colors"
-                        >
-                          View
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      ) : (
+                        <div className="p-2 flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 truncate">
+                            <FileText className="w-4 h-4 text-primary-600 shrink-0" />
+                            <span className="text-xs font-bold text-slate-800 truncate">{att.name}</span>
+                          </div>
+                          <a
+                            href={att.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-2.5 py-1 rounded-lg bg-primary-600 text-white font-bold text-xs hover:bg-primary-700 transition-colors"
+                          >
+                            View
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Source of Trust & Verification Block */}
           {(() => {
             const linkAttachment = selectedPost.attachments?.find((a) => a.type === 'link');
             const effectiveSourceUrl = selectedPost.sourceUrl || linkAttachment?.url || linkAttachment?.name;
 
-            if (!effectiveSourceUrl && !selectedPost.sourceContext) return null;
+            if (!effectiveSourceUrl) return null;
 
             return (
               <div className="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
@@ -250,36 +255,22 @@ export const PostDetailModal = () => {
                   <span>Source of Trust & Verification</span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  {effectiveSourceUrl && (
-                    <div className="p-3 rounded-xl bg-white border border-emerald-100 flex items-center justify-between gap-2">
-                      <div className="truncate">
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Reference Source</span>
-                        <span className="font-mono text-emerald-700 truncate block text-xs font-bold uppercase">
-                          {effectiveSourceUrl.replace(/^https?:\/\/(www\.)?/i, '')}
-                        </span>
-                      </div>
-                      <a
-                        href={effectiveSourceUrl.startsWith('http') ? effectiveSourceUrl : `https://${effectiveSourceUrl}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 whitespace-nowrap cursor-pointer"
-                      >
-                        <span>Open</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    </div>
-                  )}
-
-                  <div className="p-3 rounded-xl bg-white border border-emerald-100 flex items-center gap-2">
-                    <div className="truncate">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Learning Location / Context</span>
-                      <span className="font-medium text-slate-700 text-xs flex items-center gap-1 mt-0.5">
-                        <span>📍</span>
-                        <span>{selectedPost.sourceContext || 'Verified Learner Post'}</span>
-                      </span>
-                    </div>
+                <div className="p-3.5 rounded-xl bg-white border border-emerald-100 flex items-center justify-between gap-3">
+                  <div className="truncate">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Reference Source</span>
+                    <span className="font-mono text-emerald-700 truncate block text-xs sm:text-sm font-bold uppercase mt-0.5">
+                      {effectiveSourceUrl.replace(/^https?:\/\/(www\.)?/i, '')}
+                    </span>
                   </div>
+                  <a
+                    href={effectiveSourceUrl.startsWith('http') ? effectiveSourceUrl : `https://${effectiveSourceUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 whitespace-nowrap shadow-2xs transition-all cursor-pointer"
+                  >
+                    <span>Open</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
                 </div>
               </div>
             );

@@ -130,16 +130,6 @@ export const AppProvider = ({ children }) => {
   }, []);
 
   const createPost = (newPostData) => {
-    let postAttachments = [...(newPostData.attachments || [])];
-    if (newPostData.sourceUrl && !postAttachments.some((a) => a.type === 'link' || a.url === newPostData.sourceUrl)) {
-      postAttachments.push({
-        id: `att-link-${Date.now()}`,
-        name: newPostData.sourceUrl.replace(/^https?:\/\/(www\.)?/i, ''),
-        type: 'link',
-        url: newPostData.sourceUrl.startsWith('http') ? newPostData.sourceUrl : `https://${newPostData.sourceUrl}`
-      });
-    }
-
     const post = {
       id: `post-${Date.now()}`,
       title: newPostData.title,
@@ -155,7 +145,7 @@ export const AppProvider = ({ children }) => {
       content: newPostData.content,
       sourceUrl: newPostData.sourceUrl || "",
       sourceContext: newPostData.sourceContext || "",
-      attachments: postAttachments,
+      attachments: newPostData.attachments || [],
       keyTakeaways: newPostData.keyTakeaways || [],
       terms: newPostData.terms || []
     };
@@ -166,8 +156,8 @@ export const AppProvider = ({ children }) => {
 
     // Save directly to Supabase cloud database
     savePostToSupabase(post);
-    if (postAttachments.length > 0) {
-      postAttachments.forEach((att) => {
+    if (newPostData.attachments && newPostData.attachments.length > 0) {
+      newPostData.attachments.forEach((att) => {
         saveAttachmentToSupabase(post.id, att);
       });
     }
