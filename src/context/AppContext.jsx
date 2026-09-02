@@ -11,7 +11,8 @@ import {
   savePostToSupabase, 
   fetchPostsFromSupabase,
   saveConceptToSupabase,
-  fetchConceptsFromSupabase
+  fetchConceptsFromSupabase,
+  saveCommentToSupabase
 } from '../services/supabase';
 
 const AppContext = createContext();
@@ -239,6 +240,7 @@ export const AppProvider = ({ children }) => {
 
           storageSavePost(updatedPost);
           savePostToSupabase(updatedPost);
+          saveCommentToSupabase(postId, newComment);
 
           return updatedPost;
         }

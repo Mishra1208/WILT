@@ -122,6 +122,75 @@ export const savePostToSupabase = async (post) => {
   }
 };
 
+export const saveCommentToSupabase = async (postId, comment) => {
+  if (!postId || !comment) return { success: false };
+
+  try {
+    const payload = {
+      id: comment.id || `comment-${Date.now()}`,
+      term: postId,
+      category: 'post_comment',
+      definition: JSON.stringify(comment),
+      plain_explanation: comment.text || '',
+      contributor: comment.author?.username || 'learner',
+      created_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabase
+      .from('concepts')
+      .upsert([payload])
+      .select();
+
+    if (error) {
+      console.warn('Supabase save comment error:', error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true, data };
+  } catch (err) {
+    console.warn('Supabase save comment catch:', err);
+    return { success: false, error: err.message };
+  }
+};
+
+/**
+ * Fetch all post comments from Supabase
+ */
+export const fetchCommentsFromSupabase = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('concepts')
+      .select('*')
+      .eq('category', 'post_comment')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.warn('Supabase fetch comments error:', error.message);
+      return [];
+    }
+
+    return (data || []).map((row) => {
+      try {
+        const parsed = JSON.parse(row.definition);
+        return {
+          postId: row.term,
+          ...parsed
+        };
+      } catch (e) {
+        return {
+          id: row.id,
+          postId: row.term,
+          text: row.plain_explanation,
+          author: { username: row.contributor || 'learner', name: `@${row.contributor || 'learner'}` },
+          createdAt: 'Recently'
+        };
+      }
+    });
+  } catch (err) {
+    console.warn('Supabase fetch comments catch:', err);
+    return [];
+  }
+};
+
 /**
  * 3. Fetch all posts from Supabase
  */
@@ -137,31 +206,36 @@ export const fetchPostsFromSupabase = async () => {
       return [];
     }
 
-    return (data || []).map((row) => ({
-      id: row.id,
-      title: row.title,
-      category: row.category,
-      tags: row.tags || [row.category],
-      summary: row.summary,
-      content: row.content,
-      readTime: '2 min read',
-      createdAt: 'Recently',
-      likes: 0,
-      savedCount: 0,
-      author: {
-        name: row.author_name,
-        username: row.author_handle,
-        avatar: row.author_avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-        university: 'University Student',
-        major: 'Finance & Tech'
-      },
-      keyTakeaways: row.key_takeaways || [],
-      terms: row.terms || [],
-      sourceUrl: row.source_url || '',
-      sourceContext: row.source_context || '',
-      attachments: row.attachments || [],
-      comments: row.comments || []
-    }));
+    const allComments = await fetchCommentsFromSupabase();
+
+    return (data || []).map((row) => {
+      const postComments = allComments.filter((c) => c.postId === row.id);
+      return {
+        id: row.id,
+        title: row.title,
+        category: row.category,
+        tags: row.tags || [row.category],
+        summary: row.summary,
+        content: row.content,
+        readTime: '2 min read',
+        createdAt: 'Recently',
+        likes: 0,
+        savedCount: 0,
+        author: {
+          name: row.author_name,
+          username: row.author_handle,
+          avatar: row.author_avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+          university: 'University Student',
+          major: 'Finance & Tech'
+        },
+        keyTakeaways: row.key_takeaways || [],
+        terms: row.terms || [],
+        sourceUrl: row.source_url || '',
+        sourceContext: row.source_context || '',
+        attachments: row.attachments || [],
+        comments: postComments.length > 0 ? postComments : (row.comments || [])
+      };
+    });
   } catch (err) {
     console.warn('Supabase fetch posts catch:', err);
     return [];
@@ -289,16 +363,18 @@ export const fetchConceptsFromSupabase = async () => {
       return [];
     }
 
-    return (data || []).map((row) => ({
-      id: row.id,
-      term: row.term,
-      category: row.category,
-      definition: row.definition,
-      plainExplanation: row.plain_explanation,
-      formula: row.formula || '',
-      examples: row.examples || '',
-      contributor: row.contributor || 'peer'
-    }));
+    return (data || [])
+      .filter((row) => row.category !== 'post_comment')
+      .map((row) => ({
+        id: row.id,
+        term: row.term,
+        category: row.category,
+        definition: row.definition,
+        plainExplanation: row.plain_explanation,
+        formula: row.formula || '',
+        examples: row.examples || '',
+        contributor: row.contributor || 'peer'
+      }));
   } catch (err) {
     console.warn('Supabase fetch concepts catch:', err);
     return [];
