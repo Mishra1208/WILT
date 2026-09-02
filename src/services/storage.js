@@ -1,26 +1,25 @@
 import { INITIAL_POSTS, INITIAL_CONCEPTS, INITIAL_LEADERBOARD_USERS } from '../data/seedData';
 
 const STORAGE_KEYS = {
-  POSTS: 'wilt_posts_v4',
-  CONCEPTS: 'wilt_concepts_v4',
-  LEADERBOARD: 'wilt_leaderboard_v4',
-  USER: 'wilt_current_user_v5', // upgraded to v5 for clean logged-out state
-  SAVED_POSTS: 'wilt_saved_posts_v4',
-  QUIZ_HISTORY: 'wilt_quiz_history_v4',
+  POSTS: 'wilt_posts_v6',
+  CONCEPTS: 'wilt_concepts_v6',
+  LEADERBOARD: 'wilt_leaderboard_v6',
+  USER: 'wilt_current_user_v6',
+  SAVED_POSTS: 'wilt_saved_posts_v6',
+  QUIZ_HISTORY: 'wilt_quiz_history_v6',
 };
 
 // Initialize Storage with clean real user data
 export const initStorage = () => {
   if (!localStorage.getItem(STORAGE_KEYS.POSTS)) {
-    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(INITIAL_POSTS));
+    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify([]));
   }
   if (!localStorage.getItem(STORAGE_KEYS.CONCEPTS)) {
-    localStorage.setItem(STORAGE_KEYS.CONCEPTS, JSON.stringify(INITIAL_CONCEPTS));
+    localStorage.setItem(STORAGE_KEYS.CONCEPTS, JSON.stringify([]));
   }
   if (!localStorage.getItem(STORAGE_KEYS.LEADERBOARD)) {
     localStorage.setItem(STORAGE_KEYS.LEADERBOARD, JSON.stringify(INITIAL_LEADERBOARD_USERS));
   }
-  // User starts as null (Logged Out) so they can sign in with Clerk
 };
 
 export const getStoredPosts = () => {

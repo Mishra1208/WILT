@@ -267,6 +267,7 @@ export const fetchPostsFromSupabase = async () => {
     const { data, error } = await supabase
       .from('posts')
       .select('*')
+      .gt('created_at', '2026-09-02T22:18:00.000Z')
       .order('created_at', { ascending: false });
 
     if (error) {
