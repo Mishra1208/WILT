@@ -30,8 +30,10 @@ export const PostCard = ({ post }) => {
   };
 
   // Clean trust source text
-  const trustDomain = post.sourceUrl 
-    ? post.sourceUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]
+  const linkAtt = post.attachments?.find((a) => a.type === 'link');
+  const effectiveUrl = post.sourceUrl || linkAtt?.url || linkAtt?.name;
+  const trustDomain = effectiveUrl 
+    ? effectiveUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]
     : null;
 
   return (

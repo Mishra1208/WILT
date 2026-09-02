@@ -237,45 +237,53 @@ export const PostDetailModal = () => {
           )}
 
           {/* Source of Trust & Verification Block */}
-          {(selectedPost.sourceUrl || selectedPost.sourceContext) && (
-            <div className="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
-              <div className="flex items-center gap-2 text-xs font-extrabold text-emerald-950 uppercase tracking-wider">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Source of Trust & Verification</span>
-              </div>
+          {(() => {
+            const linkAttachment = selectedPost.attachments?.find((a) => a.type === 'link');
+            const effectiveSourceUrl = selectedPost.sourceUrl || linkAttachment?.url || linkAttachment?.name;
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                {selectedPost.sourceUrl && (
-                  <div className="p-3 rounded-xl bg-white border border-emerald-100 flex items-center justify-between gap-2">
+            if (!effectiveSourceUrl && !selectedPost.sourceContext) return null;
+
+            return (
+              <div className="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+                <div className="flex items-center gap-2 text-xs font-extrabold text-emerald-950 uppercase tracking-wider">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <span>Source of Trust & Verification</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {effectiveSourceUrl && (
+                    <div className="p-3 rounded-xl bg-white border border-emerald-100 flex items-center justify-between gap-2">
+                      <div className="truncate">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Reference Source</span>
+                        <span className="font-mono text-emerald-700 truncate block text-xs font-bold uppercase">
+                          {effectiveSourceUrl.replace(/^https?:\/\/(www\.)?/i, '')}
+                        </span>
+                      </div>
+                      <a
+                        href={effectiveSourceUrl.startsWith('http') ? effectiveSourceUrl : `https://${effectiveSourceUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 whitespace-nowrap cursor-pointer"
+                      >
+                        <span>Open</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  )}
+
+                  <div className="p-3 rounded-xl bg-white border border-emerald-100 flex items-center gap-2">
                     <div className="truncate">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Reference Source</span>
-                      <span className="font-mono text-emerald-700 truncate block text-xs">
-                        {selectedPost.sourceUrl}
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Learning Location / Context</span>
+                      <span className="font-medium text-slate-700 text-xs flex items-center gap-1 mt-0.5">
+                        <span>📍</span>
+                        <span>{selectedPost.sourceContext || 'Verified Learner Post'}</span>
                       </span>
                     </div>
-                    <a
-                      href={selectedPost.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 whitespace-nowrap cursor-pointer"
-                    >
-                      <span>Open</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
                   </div>
-                )}
-
-                {selectedPost.sourceContext && (
-                  <div className="p-3 rounded-xl bg-white border border-emerald-100">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Learning Location / Context</span>
-                    <span className="font-semibold text-slate-800 text-xs">
-                      📍 {selectedPost.sourceContext}
-                    </span>
-                  </div>
-                )}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Key Takeaways */}
           {selectedPost.keyTakeaways && selectedPost.keyTakeaways.length > 0 && (
