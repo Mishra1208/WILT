@@ -14,6 +14,7 @@ import {
   Coins, 
   Landmark, 
   ArrowRight,
+  ArrowUp,
   Zap,
   Check,
   X
@@ -30,6 +31,7 @@ export const KnowledgeQuestView = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     fetchLiveBusinessNews().then((liveNews) => {
@@ -39,6 +41,22 @@ export const KnowledgeQuestView = () => {
       setIsLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 120) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Quiz Modal State
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
@@ -422,6 +440,17 @@ export const KnowledgeQuestView = () => {
 
           </div>
         </div>
+      )}
+      {/* Floating Back to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-50 p-3.5 rounded-full bg-primary-600 hover:bg-primary-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center border border-white/20 cursor-pointer animate-fadeIn"
+          aria-label="Back to top"
+          title="Back to Top"
+        >
+          <ArrowUp className="w-5 h-5 stroke-[2.5]" />
+        </button>
       )}
 
     </div>
