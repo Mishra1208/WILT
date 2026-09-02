@@ -192,6 +192,78 @@ export const fetchCommentsFromSupabase = async () => {
 };
 
 /**
+ * Save post attachment (photo, document, link) to Supabase
+ */
+export const saveAttachmentToSupabase = async (postId, attachment) => {
+  if (!postId || !attachment) return { success: false };
+
+  try {
+    const payload = {
+      id: attachment.id || `att-${Date.now()}`,
+      term: postId,
+      category: 'post_attachment',
+      definition: JSON.stringify(attachment),
+      plain_explanation: attachment.name || '',
+      contributor: 'scholar',
+      created_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabase
+      .from('concepts')
+      .upsert([payload])
+      .select();
+
+    if (error) {
+      console.warn('Supabase save attachment error:', error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true, data };
+  } catch (err) {
+    console.warn('Supabase save attachment catch:', err);
+    return { success: false, error: err.message };
+  }
+};
+
+/**
+ * Fetch all post attachments from Supabase
+ */
+export const fetchAttachmentsFromSupabase = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('concepts')
+      .select('*')
+      .eq('category', 'post_attachment')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.warn('Supabase fetch attachments error:', error.message);
+      return [];
+    }
+
+    return (data || []).map((row) => {
+      try {
+        const parsed = JSON.parse(row.definition);
+        return {
+          postId: row.term,
+          ...parsed
+        };
+      } catch (e) {
+        return {
+          id: row.id,
+          postId: row.term,
+          name: row.plain_explanation,
+          type: 'file',
+          url: ''
+        };
+      }
+    });
+  } catch (err) {
+    console.warn('Supabase fetch attachments catch:', err);
+    return [];
+  }
+};
+
+/**
  * 3. Fetch all posts from Supabase
  */
 export const fetchPostsFromSupabase = async () => {
@@ -207,9 +279,11 @@ export const fetchPostsFromSupabase = async () => {
     }
 
     const allComments = await fetchCommentsFromSupabase();
+    const allAttachments = await fetchAttachmentsFromSupabase();
 
     return (data || []).map((row) => {
       const postComments = allComments.filter((c) => c.postId === row.id);
+      const postAttachments = allAttachments.filter((a) => a.postId === row.id);
       return {
         id: row.id,
         title: row.title,
@@ -232,7 +306,7 @@ export const fetchPostsFromSupabase = async () => {
         terms: row.terms || [],
         sourceUrl: row.source_url || '',
         sourceContext: row.source_context || '',
-        attachments: row.attachments || [],
+        attachments: postAttachments.length > 0 ? postAttachments : (row.attachments || []),
         comments: postComments.length > 0 ? postComments : (row.comments || [])
       };
     });

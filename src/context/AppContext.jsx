@@ -12,7 +12,8 @@ import {
   fetchPostsFromSupabase,
   saveConceptToSupabase,
   fetchConceptsFromSupabase,
-  saveCommentToSupabase
+  saveCommentToSupabase,
+  saveAttachmentToSupabase
 } from '../services/supabase';
 
 const AppContext = createContext();
@@ -144,6 +145,11 @@ export const AppProvider = ({ children }) => {
 
     // Save directly to Supabase cloud database
     savePostToSupabase(post);
+    if (newPostData.attachments && newPostData.attachments.length > 0) {
+      newPostData.attachments.forEach(att => {
+        saveAttachmentToSupabase(post.id, att);
+      });
+    }
 
     // If terms were extracted, ensure they exist in peer dictionary
     if (newPostData.terms && newPostData.terms.length > 0) {

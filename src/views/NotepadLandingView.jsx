@@ -73,14 +73,19 @@ export const NotepadLandingView = () => {
   const handleFileUpload = (e, type) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
-    const newAttachment = {
-      id: Date.now(),
-      name: file.name,
-      type: type, // 'image' | 'file'
-      url: URL.createObjectURL(file)
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Url = event.target.result;
+      const newAttachment = {
+        id: `att-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        name: file.name,
+        type: type, // 'image' | 'file'
+        url: base64Url
+      };
+      setAttachments(prev => [...prev, newAttachment]);
     };
-    setAttachments(prev => [...prev, newAttachment]);
+    reader.readAsDataURL(file);
   };
 
   const handleOpenLinkModal = () => {
