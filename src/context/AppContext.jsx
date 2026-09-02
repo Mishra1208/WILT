@@ -27,12 +27,23 @@ export const AppProvider = ({ children }) => {
     fetchPostsFromSupabase().then((remotePosts) => {
       if (remotePosts && remotePosts.length > 0) {
         setPosts((current) => {
-          const merged = [...remotePosts];
-          current.forEach((p) => {
-            if (!merged.some((m) => m.id === p.id)) {
-              merged.push(p);
+          const merged = current.map((local) => {
+            const remote = remotePosts.find((r) => r.id === local.id);
+            if (!remote) return local;
+            return {
+              ...local,
+              ...remote,
+              attachments: (remote.attachments && remote.attachments.length > 0) ? remote.attachments : (local.attachments || []),
+              comments: (remote.comments && remote.comments.length >= (local.comments || []).length) ? remote.comments : (local.comments || [])
+            };
+          });
+
+          remotePosts.forEach((remote) => {
+            if (!merged.some((m) => m.id === remote.id)) {
+              merged.push(remote);
             }
           });
+
           return merged;
         });
       }
@@ -291,11 +302,19 @@ export const AppProvider = ({ children }) => {
             let hasChanges = false;
             const updatedList = current.map((localPost) => {
               const remote = remotePosts.find((r) => r.id === localPost.id);
-              if (remote && remote.comments) {
+              if (remote) {
                 const localCommentsCount = (localPost.comments || []).length;
-                if (remote.comments.length > localCommentsCount) {
+                const remoteComments = remote.comments || [];
+                const mergedAttachments = (remote.attachments && remote.attachments.length > 0) ? remote.attachments : (localPost.attachments || []);
+
+                if (remoteComments.length > localCommentsCount || (remote.attachments && remote.attachments.length > (localPost.attachments || []).length)) {
                   hasChanges = true;
-                  const mergedPost = { ...localPost, comments: remote.comments };
+                  const mergedPost = {
+                    ...localPost,
+                    ...remote,
+                    attachments: mergedAttachments,
+                    comments: remoteComments.length >= localCommentsCount ? remoteComments : (localPost.comments || [])
+                  };
                   if (selectedPost && selectedPost.id === localPost.id) {
                     setSelectedPost(mergedPost);
                   }
