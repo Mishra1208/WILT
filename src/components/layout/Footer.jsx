@@ -16,16 +16,23 @@ import {
   Info
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { subscribeNewsletterToSupabase } from '../../services/supabase';
 
 export const Footer = () => {
   const { setCurrentView } = useApp();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email.trim()) return;
+
+    setLoading(true);
+    await subscribeNewsletterToSupabase(email, 'wilt_footer_digest');
+    setLoading(false);
     setSubscribed(true);
+
     setTimeout(() => {
       setEmail('');
       setSubscribed(false);

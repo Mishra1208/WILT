@@ -463,3 +463,36 @@ const saveLocalNewsletter = (email) => {
     }
   } catch (e) {}
 };
+
+/**
+ * Subscribe email to newsletter_subscribers table in Supabase
+ */
+export const subscribeNewsletterToSupabase = async (email, source = 'wilt_footer_digest') => {
+  const cleanEmail = email.trim().toLowerCase();
+  if (!cleanEmail) return { success: false, message: 'Invalid email' };
+
+  // Save to local backup
+  saveLocalNewsletter(cleanEmail);
+
+  try {
+    const { data, error } = await supabase
+      .from('newsletter_subscribers')
+      .insert([
+        {
+          email: cleanEmail,
+          source: source
+        }
+      ])
+      .select();
+
+    if (error) {
+      console.warn('Supabase newsletter insert info:', error.message);
+      return { success: true, message: error.message };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.warn('Supabase newsletter catch:', err.message);
+    return { success: true };
+  }
+};
