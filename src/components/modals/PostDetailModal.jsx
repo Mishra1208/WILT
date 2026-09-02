@@ -24,7 +24,7 @@ import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const PostDetailModal = () => {
-  const { selectedPost, closePostDetail, highlightSnippet, toggleLike, setCurrentView, setSearchQuery, addCommentToPost } = useApp();
+  const { selectedPost, closePostDetail, highlightSnippet, toggleLike, setCurrentView, setSearchQuery, addCommentToPost, isPostSaved, toggleSavePost } = useApp();
   const { user, setUser } = useAuth();
   const [commentInput, setCommentInput] = useState('');
   const [commentError, setCommentError] = useState(null);
@@ -32,7 +32,7 @@ export const PostDetailModal = () => {
   if (!selectedPost) return null;
 
   const isLiked = user?.likedPosts?.includes(selectedPost.id);
-  const isSaved = user?.savedPosts?.includes(selectedPost.id);
+  const isSaved = isPostSaved(selectedPost.id) || (user?.savedPosts && user.savedPosts.includes(selectedPost.id));
 
   const comments = selectedPost.comments || [];
 
@@ -46,11 +46,13 @@ export const PostDetailModal = () => {
   };
 
   const handleSave = () => {
-    if (!user) return;
-    const updatedSaved = isSaved
-      ? user.savedPosts.filter((id) => id !== selectedPost.id)
-      : [...(user.savedPosts || []), selectedPost.id];
-    setUser({ ...user, savedPosts: updatedSaved });
+    toggleSavePost(selectedPost.id);
+    if (user) {
+      const updatedSaved = isSaved
+        ? (user.savedPosts || []).filter((id) => id !== selectedPost.id)
+        : [...(user.savedPosts || []), selectedPost.id];
+      setUser({ ...user, savedPosts: updatedSaved });
+    }
   };
 
   const handleTermClick = (term) => {

@@ -352,6 +352,46 @@ export const AppProvider = ({ children }) => {
     setHighlightSnippet(null);
   };
 
+  // Saved Items Management (Posts & News)
+  const [savedPostIds, setSavedPostIds] = useState(() => {
+    try {
+      const raw = localStorage.getItem('wilt_saved_posts_v6');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const [savedNewsArticles, setSavedNewsArticles] = useState(() => {
+    try {
+      const raw = localStorage.getItem('wilt_saved_news_v6');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const toggleSavePost = (postId) => {
+    setSavedPostIds((prev) => {
+      const updated = prev.includes(postId) ? prev.filter((id) => id !== postId) : [...prev, postId];
+      localStorage.setItem('wilt_saved_posts_v6', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const isPostSaved = (postId) => savedPostIds.includes(postId);
+
+  const toggleSaveNews = (article) => {
+    setSavedNewsArticles((prev) => {
+      const exists = prev.some((a) => a.id === article.id);
+      const updated = exists ? prev.filter((a) => a.id !== article.id) : [...prev, article];
+      localStorage.setItem('wilt_saved_news_v6', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const isNewsSaved = (articleId) => savedNewsArticles.some((a) => a.id === articleId);
+
   return (
     <AppContext.Provider
       value={{
@@ -381,7 +421,13 @@ export const AppProvider = ({ children }) => {
         createPost,
         createConcept,
         toggleLike,
-        addCommentToPost
+        addCommentToPost,
+        savedPostIds,
+        savedNewsArticles,
+        toggleSavePost,
+        isPostSaved,
+        toggleSaveNews,
+        isNewsSaved
       }}
     >
       {children}

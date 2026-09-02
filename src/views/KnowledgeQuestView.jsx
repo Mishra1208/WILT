@@ -24,9 +24,9 @@ import { useApp } from '../context/AppContext';
 import { cn } from '../lib/utils';
 
 export const KnowledgeQuestView = () => {
+  const { toggleSaveNews, isNewsSaved } = useApp();
   const [articles, setArticles] = useState(KNOWLEDGE_QUEST_ARTICLES);
   const [isLoading, setIsLoading] = useState(true);
-  const [savedArticleIds, setSavedArticleIds] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState(null);
@@ -40,12 +40,6 @@ export const KnowledgeQuestView = () => {
     });
   }, []);
 
-  const toggleSaveArticle = (id) => {
-    setSavedArticleIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
-  
   // Quiz Modal State
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [quizIndex, setQuizIndex] = useState(0);
@@ -108,44 +102,44 @@ export const KnowledgeQuestView = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-fadeIn pb-16 px-4 sm:px-6">
+    <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn pb-16 px-4 sm:px-6">
       
-      {/* Hero Header Section */}
-      <div className="relative rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-10 overflow-hidden border border-slate-800 shadow-2xl">
-        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Light Aesthetic Hero Header Section */}
+      <div className="relative rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-8 overflow-hidden shadow-sm">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-primary-100/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-100/40 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-500/20 border border-primary-400/30 text-primary-300 text-xs font-bold uppercase tracking-wider">
-            <Compass className="w-4 h-4 text-primary-400 animate-spin-slow" />
-            <span>Times of India Business & Global Digest</span>
+        <div className="relative z-10 max-w-3xl space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 border border-primary-200/60 text-primary-700 text-xs font-bold uppercase tracking-wider">
+            <Compass className="w-3.5 h-3.5 text-primary-600" />
+            <span>Inshorts Business & Global Digest</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight font-display">
-            Knowledge <span className="bg-gradient-to-r from-primary-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">Quest</span>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight font-display">
+            Knowledge <span className="text-primary-600">Quest</span>
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-300 font-medium leading-relaxed">
-            Master current business affairs for campus placements. Condensed top headlines from Times of India with 30-second executive summaries and ready-to-use placement interview talking points.
+          <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+            Master current business affairs for campus placement interviews. 60-second condensed summaries from top business news sources with ready-to-use interview talking points.
           </p>
 
           {/* Stats Bar & Quick Quiz Button */}
-          <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-semibold">
-            <div className="px-3.5 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Recruiter-Ready Insights</span>
+          <div className="pt-1 flex flex-wrap items-center gap-3 text-xs font-semibold">
+            <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-700 flex items-center gap-2">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Recruiter-Ready Summaries</span>
             </div>
-            <div className="px-3.5 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center gap-2">
-              <Globe2 className="w-4 h-4 text-emerald-400" />
-              <span>International & India News</span>
+            <div className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-700 flex items-center gap-2">
+              <Globe2 className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Real-Time Inshorts Stream</span>
             </div>
             <button
               onClick={() => setIsQuizModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-indigo-600 hover:from-primary-600 hover:to-indigo-700 text-white font-bold flex items-center gap-2 shadow-lg shadow-primary-500/25 transition-all cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer text-xs"
             >
-              <HelpCircle className="w-4 h-4" />
+              <HelpCircle className="w-3.5 h-3.5" />
               <span>Test Interview Retention</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>
@@ -199,7 +193,7 @@ export const KnowledgeQuestView = () => {
       {/* News Articles Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredArticles.map((article) => {
-          const isSaved = savedArticleIds.includes(article.id);
+          const isSaved = isNewsSaved(article.id);
           const isCopied = copiedId === article.id;
 
           return (
@@ -302,7 +296,7 @@ export const KnowledgeQuestView = () => {
               {/* Card Footer Action Bar */}
               <div className="p-5 sm:p-6 pt-0 flex items-center justify-between gap-3 border-t border-slate-100 mt-4">
                 <button
-                  onClick={() => toggleSaveArticle(article.id)}
+                  onClick={() => toggleSaveNews(article)}
                   className={cn(
                     "px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border",
                     isSaved

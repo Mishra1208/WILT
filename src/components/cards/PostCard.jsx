@@ -4,11 +4,11 @@ import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const PostCard = ({ post }) => {
-  const { openPostDetail, toggleLike } = useApp();
+  const { openPostDetail, toggleLike, isPostSaved, toggleSavePost } = useApp();
   const { user, setUser } = useAuth();
 
   const isLiked = user?.likedPosts?.includes(post.id);
-  const isSaved = user?.savedPosts?.includes(post.id);
+  const isSaved = isPostSaved(post.id) || (user?.savedPosts && user.savedPosts.includes(post.id));
 
   const handleLike = (e) => {
     e.stopPropagation();
@@ -22,11 +22,13 @@ export const PostCard = ({ post }) => {
 
   const handleSave = (e) => {
     e.stopPropagation();
-    if (!user) return;
-    const updatedSaved = isSaved
-      ? user.savedPosts.filter((id) => id !== post.id)
-      : [...(user.savedPosts || []), post.id];
-    setUser({ ...user, savedPosts: updatedSaved });
+    toggleSavePost(post.id);
+    if (user) {
+      const updatedSaved = isSaved
+        ? (user.savedPosts || []).filter((id) => id !== post.id)
+        : [...(user.savedPosts || []), post.id];
+      setUser({ ...user, savedPosts: updatedSaved });
+    }
   };
 
   // Clean trust source text
