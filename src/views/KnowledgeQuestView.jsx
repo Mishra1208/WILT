@@ -23,10 +23,16 @@ import { useApp } from '../context/AppContext';
 import { cn } from '../lib/utils';
 
 export const KnowledgeQuestView = () => {
-  const { toggleSavePost, isPostSaved } = useApp();
+  const [savedArticleIds, setSavedArticleIds] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState(null);
+
+  const toggleSaveArticle = (id) => {
+    setSavedArticleIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
   
   // Quiz Modal State
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
@@ -161,7 +167,7 @@ export const KnowledgeQuestView = () => {
       {/* News Articles Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredArticles.map((article) => {
-          const isSaved = isPostSaved(article.id);
+          const isSaved = savedArticleIds.includes(article.id);
           const isCopied = copiedId === article.id;
 
           return (
@@ -264,7 +270,7 @@ export const KnowledgeQuestView = () => {
               {/* Card Footer Action Bar */}
               <div className="p-5 sm:p-6 pt-0 flex items-center justify-between gap-3 border-t border-slate-100 mt-4">
                 <button
-                  onClick={() => toggleSavePost(article.id)}
+                  onClick={() => toggleSaveArticle(article.id)}
                   className={cn(
                     "px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border",
                     isSaved
