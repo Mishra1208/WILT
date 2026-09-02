@@ -86,11 +86,39 @@ export const QuizView = () => {
     }
   };
 
-  const handleReadSourcePost = (postId, snippet) => {
-    const sourcePost = posts.find((p) => p.id === postId);
-    if (sourcePost) {
-      openPostDetail(sourcePost, snippet);
+  const handleReadSourcePost = (question) => {
+    if (!question) return;
+
+    let matchedPost = posts.find(
+      (p) =>
+        p.id === question.postId ||
+        (p.title && question.postTitle && p.title.toLowerCase() === question.postTitle.toLowerCase()) ||
+        (p.title && question.postTitle && p.title.toLowerCase().includes(question.postTitle.toLowerCase())) ||
+        (p.title && question.postTitle && question.postTitle.toLowerCase().includes(p.title.toLowerCase()))
+    );
+
+    if (!matchedPost) {
+      matchedPost = {
+        id: question.postId || `virtual-post-${Date.now()}`,
+        title: question.postTitle || "Active Recall Study Guide",
+        category: question.category || "General Knowledge",
+        tags: [question.category || "Study Guide"],
+        author: {
+          name: "@learner",
+          username: "learner",
+          avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+          role: "Verified Scholar"
+        },
+        readTime: "1 min read",
+        createdAt: "Recently",
+        summary: question.sourceSnippet || question.explanation || question.postTitle,
+        content: `${question.explanation}\n\n💡 Core Takeaway & Active Recall Snippet:\n${question.sourceSnippet || question.explanation}`,
+        keyTakeaways: [question.sourceSnippet || question.explanation],
+        comments: []
+      };
     }
+
+    openPostDetail(matchedPost, question.sourceSnippet);
   };
 
   // Auth Gate
@@ -357,8 +385,8 @@ export const QuizView = () => {
 
             <div className="pt-1">
               <button
-                onClick={() => handleReadSourcePost(currentQ.postId, currentQ.sourceSnippet)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn transition-all transform active:scale-95"
+                onClick={() => handleReadSourcePost(currentQ)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn transition-all transform active:scale-95 cursor-pointer"
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>Open Source: "{currentQ.postTitle}"</span>
