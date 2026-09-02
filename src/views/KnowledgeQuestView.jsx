@@ -19,14 +19,26 @@ import {
   X
 } from 'lucide-react';
 import { KNOWLEDGE_QUEST_CATEGORIES, KNOWLEDGE_QUEST_ARTICLES, KNOWLEDGE_QUEST_QUIZ } from '../data/knowledgeQuestData';
+import { fetchLiveBusinessNews } from '../services/newsService';
 import { useApp } from '../context/AppContext';
 import { cn } from '../lib/utils';
 
 export const KnowledgeQuestView = () => {
+  const [articles, setArticles] = useState(KNOWLEDGE_QUEST_ARTICLES);
+  const [isLoading, setIsLoading] = useState(true);
   const [savedArticleIds, setSavedArticleIds] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState(null);
+
+  useEffect(() => {
+    fetchLiveBusinessNews().then((liveNews) => {
+      if (liveNews && liveNews.length > 0) {
+        setArticles([...liveNews, ...KNOWLEDGE_QUEST_ARTICLES]);
+      }
+      setIsLoading(false);
+    });
+  }, []);
 
   const toggleSaveArticle = (id) => {
     setSavedArticleIds((prev) =>
@@ -42,16 +54,21 @@ export const KnowledgeQuestView = () => {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
 
   // Filter Articles
-  const filteredArticles = KNOWLEDGE_QUEST_ARTICLES.filter((article) => {
+  const filteredArticles = articles.filter((article) => {
     const matchesCategory = activeCategory === 'all' || article.category === activeCategory;
     const matchesSearch = 
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       article.summary.whatHappened.toLowerCase().includes(searchQuery.toLowerCase()) ||
       article.summary.whyItMatters.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.keyTerms.some(term => term.toLowerCase().includes(searchQuery.toLowerCase()));
+      (article.keyTerms && article.keyTerms.some(term => term.toLowerCase().includes(searchQuery.toLowerCase())));
     
     return matchesCategory && matchesSearch;
   });
+
+  const getCategoryCount = (catId) => {
+    if (catId === 'all') return articles.length;
+    return articles.filter((a) => a.category === catId).length;
+  };
 
   const handleCopyTalkingPoint = (text, id) => {
     navigator.clipboard.writeText(text);
@@ -134,20 +151,29 @@ export const KnowledgeQuestView = () => {
           
           {/* Sub-Hub Tabs */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-            {KNOWLEDGE_QUEST_CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={cn(
-                  "px-4 py-2.5 rounded-2xl font-bold text-xs whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer border",
-                  activeCategory === cat.id
-                    ? "bg-primary-600 text-white border-primary-600 shadow-md shadow-primary-500/20 scale-102"
-                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
-                )}
-              >
-                <span>{cat.label}</span>
-              </button>
-            ))}
+            {KNOWLEDGE_QUEST_CATEGORIES.map((cat) => {
+              const count = getCategoryCount(cat.id);
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={cn(
+                    "px-4 py-2.5 rounded-2xl font-bold text-xs whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer border",
+                    activeCategory === cat.id
+                      ? "bg-primary-600 text-white border-primary-600 shadow-md shadow-primary-500/20 scale-102"
+                      : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
+                  )}
+                >
+                  <span>{cat.label}</span>
+                  <span className={cn(
+                    "px-2 py-0.5 rounded-full text-[10px] font-black",
+                    activeCategory === cat.id ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                  )}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Search Input */}
