@@ -20,10 +20,13 @@ export const Sidebar = () => {
   const { currentView, setCurrentView, setIsNewPostModalOpen, isSidebarOpen, toggleSidebar } = useApp();
   const { user, isLoggedIn, setIsAuthModalOpen } = useAuth();
 
-  const mainNav = [
+  const learningNav = [
     { id: 'notepad', label: 'Notepad Slate', icon: PenTool, badge: 'Landing' },
     { id: 'discover', label: 'Discover', icon: Compass },
     { id: 'dictionary', label: 'Dictionary', icon: BookOpen },
+  ];
+
+  const recallNav = [
     { id: 'quiz', label: 'Quiz', icon: HelpCircle, badge: 'Weekly' },
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
     { id: 'revision', label: 'Revision', icon: Brain },
@@ -86,9 +89,12 @@ export const Sidebar = () => {
           </button>
         </div>
 
-        {/* Main Navigation List */}
-        <nav className="flex flex-col gap-1">
-          {mainNav.map((item) => {
+        {/* LEARNING & DISCOVERY Section */}
+        <div className="flex flex-col gap-1">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">
+            Learning & Discovery
+          </div>
+          {learningNav.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
             return (
@@ -117,9 +123,43 @@ export const Sidebar = () => {
               </button>
             );
           })}
-        </nav>
+        </div>
 
-
+        {/* RECALL & PERFORMANCE Section */}
+        <div className="flex flex-col gap-1 pt-2 border-t border-slate-100/80">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">
+            Recall & Performance
+          </div>
+          {recallNav.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentView === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  isActive
+                    ? 'bg-primary-50 text-primary-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon
+                    className={`w-4 h-4 ${
+                      isActive ? 'text-primary-600' : 'text-slate-400'
+                    }`}
+                  />
+                  <span>{item.label}</span>
+                </div>
+                {item.badge && (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-coral-50 text-coral-600 border border-coral-100">
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
 
         {/* ACCOUNT Section */}
         <div className="flex flex-col gap-1 pt-2 border-t border-slate-100/80">
