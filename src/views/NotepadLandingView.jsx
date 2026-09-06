@@ -18,7 +18,8 @@ import {
 } from 'lucide-react';
 import { CATEGORIES } from '../data/seedData';
 import { useApp } from '../context/AppContext';
-import { useAuth, getOrCreateGuestUser } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
+import { getOrCreateGuestUser } from '../services/storage';
 import { validateContent } from '../services/moderation';
 import GradientText from '../components/ui/GradientText';
 import DotPattern from '../components/ui/DotPattern';

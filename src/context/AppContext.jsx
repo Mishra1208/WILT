@@ -15,7 +15,7 @@ import {
   saveCommentToSupabase,
   saveAttachmentToSupabase
 } from '../services/supabase';
-import { getOrCreateGuestUser } from '../context/AuthContext';
+import { getOrCreateGuestUser } from '../services/storage';
 
 const AppContext = createContext();
 
