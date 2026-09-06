@@ -66,15 +66,17 @@ export const AboutView = () => {
     {
       name: "Narendra Mishra",
       role: "Lead Architect",
-      university: "Symbiosis School of Banking & Finance",
+      university: "Concordia University, Canada",
+      cohort: "Concordia '26",
       avatar: narendraImg,
-      quote: "Knowledge grows when shared. WILT makes continuous peer learning seamless, high-yield, and accessible to every banking and tech student.",
+      quote: "Knowledge grows when shared. WILT makes continuous peer learning seamless, high-yield, and accessible to every engineering, finance, and tech student.",
       focus: "Full-Stack System Architecture & Cloud Infrastructure"
     },
     {
       name: "Avinendra Pratap Singh",
       role: "Concept Architect",
       university: "Symbiosis School of Banking & Finance",
+      cohort: "SSBF '26",
       avatar: avinendraImg,
       quote: "Students shouldn't have to reread 500-page finance textbooks for one formula. WILT is built so SSBF peers can teach each other in 30 seconds.",
       focus: "Banking & Financial Services (SSBF)"
@@ -83,6 +85,7 @@ export const AboutView = () => {
       name: "Kumar",
       role: "Platform Lead",
       university: "Symbiosis School of Banking & Finance",
+      cohort: "SSBF '26",
       avatar: kumarImg,
       quote: "The secret to acing banking exams isn't cramming—it's active recall. We engineered WILT to turn financial revision into a fast, gamified habit.",
       focus: "Banking & FinTech Systems (SSBF)"
@@ -237,7 +240,7 @@ export const AboutView = () => {
             Meet the Creators
           </h2>
           <p className="text-xs text-slate-500">
-            WILT was envisioned and created by <strong>Narendra Mishra</strong>, <strong>Avinendra Pratap Singh</strong>, and <strong>Kumar</strong> at <strong>Symbiosis School of Banking & Finance (SSBF)</strong>.
+            WILT was envisioned and created by <strong>Narendra Mishra</strong> (Concordia University, Canada), <strong>Avinendra Pratap Singh</strong>, and <strong>Kumar</strong> (Symbiosis School of Banking & Finance).
           </p>
         </div>
 
@@ -290,7 +293,7 @@ export const AboutView = () => {
                   <Award className="w-3.5 h-3.5 text-primary-600 flex-shrink-0" />
                   <span className="truncate">{creator.focus}</span>
                 </span>
-                <span className="font-mono text-slate-600 text-[10px] font-extrabold bg-slate-100 px-2 py-0.5 rounded-md flex-shrink-0">SSBF '26</span>
+                <span className="font-mono text-slate-600 text-[10px] font-extrabold bg-slate-100 px-2 py-0.5 rounded-md flex-shrink-0">{creator.cohort}</span>
               </div>
             </div>
           ))}

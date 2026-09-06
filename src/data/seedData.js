@@ -94,7 +94,7 @@ export const INITIAL_LEADERBOARD_USERS = [
     name: "Narendra Mishra",
     username: "narendramishra",
     avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-    university: "Symbiosis School of Banking and Finance",
+    university: "Concordia University, Canada",
     major: "Software Engineering & Cloud Architecture",
     rank: 1,
     tier: "Master Fellow",
