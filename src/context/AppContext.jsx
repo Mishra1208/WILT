@@ -357,7 +357,7 @@ export const AppProvider = ({ children }) => {
   // Saved Items Management (Posts & News)
   const [savedPostIds, setSavedPostIds] = useState(() => {
     try {
-      const raw = localStorage.getItem('wilt_saved_posts_v6');
+      const raw = localStorage.getItem('wilt_saved_posts_v7');
       return raw ? JSON.parse(raw) : [];
     } catch (e) {
       return [];
@@ -366,7 +366,7 @@ export const AppProvider = ({ children }) => {
 
   const [savedNewsArticles, setSavedNewsArticles] = useState(() => {
     try {
-      const raw = localStorage.getItem('wilt_saved_news_v6');
+      const raw = localStorage.getItem('wilt_saved_news_v7');
       return raw ? JSON.parse(raw) : [];
     } catch (e) {
       return [];
@@ -376,7 +376,7 @@ export const AppProvider = ({ children }) => {
   const toggleSavePost = (postId) => {
     setSavedPostIds((prev) => {
       const updated = prev.includes(postId) ? prev.filter((id) => id !== postId) : [...prev, postId];
-      localStorage.setItem('wilt_saved_posts_v6', JSON.stringify(updated));
+      localStorage.setItem('wilt_saved_posts_v7', JSON.stringify(updated));
       return updated;
     });
   };
@@ -387,7 +387,7 @@ export const AppProvider = ({ children }) => {
     setSavedNewsArticles((prev) => {
       const exists = prev.some((a) => a.id === article.id);
       const updated = exists ? prev.filter((a) => a.id !== article.id) : [...prev, article];
-      localStorage.setItem('wilt_saved_news_v6', JSON.stringify(updated));
+      localStorage.setItem('wilt_saved_news_v7', JSON.stringify(updated));
       return updated;
     });
   };
