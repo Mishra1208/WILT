@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { DrawCircleHeading } from '../components/ui/DrawCircleHeading';
+import avinendraImg from '../avinendra.JPG';
+import kumarImg from '../kumar.JPG';
 
 export const AboutView = () => {
   const { setCurrentView } = useApp();
@@ -65,7 +67,7 @@ export const AboutView = () => {
       role: "Co-Creator & Lead Architect",
       badge: "⚡ Co-Founder",
       university: "Symbiosis School of Banking & Finance",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=250&auto=format&fit=crop&q=80",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=80",
       quote: "Knowledge grows when shared. WILT makes continuous peer learning seamless, high-yield, and accessible to every banking and tech student.",
       focus: "Full-Stack System Architecture & Cloud Infrastructure"
     },
@@ -74,7 +76,7 @@ export const AboutView = () => {
       role: "Co-Creator & Concept Architect",
       badge: "🎓 Co-Founder",
       university: "Symbiosis School of Banking & Finance",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=250&auto=format&fit=crop&q=80",
+      avatar: avinendraImg,
       quote: "Students shouldn't have to reread 500-page finance textbooks for one formula. WILT is built so SSBF peers can teach each other in 30 seconds.",
       focus: "Banking & Financial Services (SSBF)"
     },
@@ -83,7 +85,7 @@ export const AboutView = () => {
       role: "Co-Creator & Platform Lead",
       badge: "🚀 Co-Founder",
       university: "Symbiosis School of Banking & Finance",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=250&auto=format&fit=crop&q=80",
+      avatar: kumarImg,
       quote: "The secret to acing banking exams isn't cramming—it's active recall. We engineered WILT to turn financial revision into a fast, gamified habit.",
       focus: "Banking & FinTech Systems (SSBF)"
     }
@@ -241,51 +243,63 @@ export const AboutView = () => {
           </p>
         </div>
 
-        {/* 3 Founders Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {/* 3 Founders Cards with Large Stylish Photos */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {creators.map((creator, idx) => (
             <div
               key={idx}
-              className="p-5 sm:p-6 rounded-3xl bg-slate-50/70 hover:bg-white border border-slate-200/80 hover:border-primary-300 shadow-soft hover:shadow-hover transition-all duration-300 flex flex-col justify-between group"
+              className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-soft hover:shadow-hover hover:border-primary-300 transition-all duration-300 flex flex-col justify-between group relative text-center"
             >
-              <div className="space-y-3.5">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={creator.avatar}
-                      alt={creator.name}
-                      className="w-12 h-12 rounded-2xl object-cover ring-2 ring-primary-100 group-hover:ring-primary-400 transition-all shadow-xs flex-shrink-0"
-                    />
-                    <div className="min-w-0">
-                      <h3 className="text-sm font-bold text-slate-900 group-hover:text-primary-700 transition-colors truncate">
-                        {creator.name}
-                      </h3>
-                      <p className="text-[11px] text-primary-600 font-semibold font-mono truncate">
-                        {creator.role}
-                      </p>
-                    </div>
-                  </div>
-
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-white border border-slate-200 text-slate-700 shadow-2xs whitespace-nowrap flex-shrink-0">
+              <div>
+                {/* Top Badge */}
+                <div className="flex justify-end mb-1">
+                  <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs">
                     {creator.badge}
                   </span>
                 </div>
 
-                <div className="px-2.5 py-1 rounded-xl bg-indigo-50/80 border border-indigo-100 text-[10px] font-extrabold text-indigo-900 truncate">
-                  🏫 {creator.university}
+                {/* Stylish Large Profile Photo Container */}
+                <div className="relative mx-auto my-2 w-24 h-24 sm:w-28 sm:h-28">
+                  <img
+                    src={creator.avatar}
+                    alt={creator.name}
+                    className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover ring-4 ring-primary-100 group-hover:ring-primary-400 group-hover:scale-105 shadow-md transition-all duration-300"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 ring-2 ring-white flex items-center justify-center text-[10px] text-white font-bold" title="Co-Founder Active">
+                    ✓
+                  </div>
                 </div>
 
-                <p className="text-xs text-slate-600 leading-relaxed italic bg-white p-3 rounded-2xl border border-slate-100 font-serif">
+                {/* Creator Details */}
+                <div className="space-y-1 mt-3">
+                  <h3 className="text-base sm:text-lg font-extrabold text-slate-900 group-hover:text-primary-700 transition-colors leading-tight">
+                    {creator.name}
+                  </h3>
+                  <p className="text-xs font-extrabold text-primary-600 font-mono">
+                    {creator.role}
+                  </p>
+                </div>
+
+                {/* University Badge */}
+                <div className="mt-2.5 inline-block">
+                  <span className="px-3 py-1 rounded-xl bg-indigo-50/90 border border-indigo-100 text-[10px] font-extrabold text-indigo-950 inline-flex items-center gap-1 shadow-2xs">
+                    🏫 {creator.university}
+                  </span>
+                </div>
+
+                {/* Personal Quote */}
+                <p className="text-xs text-slate-600 leading-relaxed italic bg-slate-50/80 p-3.5 rounded-2xl border border-slate-100 font-serif mt-3.5 text-left">
                   "{creator.quote}"
                 </p>
               </div>
 
-              <div className="pt-3 mt-3 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500 font-medium gap-2">
+              {/* Card Footer */}
+              <div className="pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium gap-2 text-left">
                 <span className="flex items-center gap-1 text-primary-700 font-bold truncate">
                   <Award className="w-3.5 h-3.5 text-primary-600 flex-shrink-0" />
                   <span className="truncate">{creator.focus}</span>
                 </span>
-                <span className="font-mono text-slate-500 text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded-md flex-shrink-0">SSBF '26</span>
+                <span className="font-mono text-slate-600 text-[10px] font-extrabold bg-slate-100 px-2 py-0.5 rounded-md flex-shrink-0">SSBF '26</span>
               </div>
             </div>
           ))}
