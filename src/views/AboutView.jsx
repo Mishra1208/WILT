@@ -65,8 +65,7 @@ export const AboutView = () => {
   const creators = [
     {
       name: "Narendra Mishra",
-      role: "Co-Creator & Lead Architect",
-      badge: "⚡ Co-Founder",
+      role: "Lead Architect",
       university: "Symbiosis School of Banking & Finance",
       avatar: narendraImg,
       quote: "Knowledge grows when shared. WILT makes continuous peer learning seamless, high-yield, and accessible to every banking and tech student.",
@@ -74,8 +73,7 @@ export const AboutView = () => {
     },
     {
       name: "Avinendra Pratap Singh",
-      role: "Co-Creator & Concept Architect",
-      badge: "🎓 Co-Founder",
+      role: "Concept Architect",
       university: "Symbiosis School of Banking & Finance",
       avatar: avinendraImg,
       quote: "Students shouldn't have to reread 500-page finance textbooks for one formula. WILT is built so SSBF peers can teach each other in 30 seconds.",
@@ -83,8 +81,7 @@ export const AboutView = () => {
     },
     {
       name: "Kumar",
-      role: "Co-Creator & Platform Lead",
-      badge: "🚀 Co-Founder",
+      role: "Platform Lead",
       university: "Symbiosis School of Banking & Finance",
       avatar: kumarImg,
       quote: "The secret to acing banking exams isn't cramming—it's active recall. We engineered WILT to turn financial revision into a fast, gamified habit.",
@@ -252,13 +249,6 @@ export const AboutView = () => {
               className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-soft hover:shadow-hover hover:border-primary-300 transition-all duration-300 flex flex-col justify-between group relative text-center"
             >
               <div>
-                {/* Top Badge */}
-                <div className="flex justify-end mb-1">
-                  <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs">
-                    {creator.badge}
-                  </span>
-                </div>
-
                 {/* Stylish Large Profile Photo Container */}
                 <div className="relative mx-auto my-2 w-24 h-24 sm:w-28 sm:h-28">
                   <img

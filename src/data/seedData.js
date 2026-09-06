@@ -106,7 +106,7 @@ export const INITIAL_LEADERBOARD_USERS = [
     quizzesCompleted: 0,
     streakDays: 1,
     trophy: "🥇 Gold Podium",
-    badges: ["👑 Co-Founder", "⚡ System Architect"]
+    badges: ["⚡ System Architect"]
   },
   {
     id: "user-2",
@@ -125,7 +125,7 @@ export const INITIAL_LEADERBOARD_USERS = [
     quizzesCompleted: 0,
     streakDays: 1,
     trophy: "🥈 Silver Podium",
-    badges: ["👑 Co-Founder", "📊 Banking Architect"]
+    badges: ["📊 Banking Architect"]
   },
   {
     id: "user-3",
@@ -144,6 +144,6 @@ export const INITIAL_LEADERBOARD_USERS = [
     quizzesCompleted: 0,
     streakDays: 1,
     trophy: "🥉 Bronze Podium",
-    badges: ["⚡ Co-Founder", "🧠 FinTech Lead"]
+    badges: ["🧠 FinTech Lead"]
   }
 ];
