@@ -14,6 +14,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { PostCard } from '../components/cards/PostCard';
 import { getNewsFallbackSvg } from '../services/newsService';
+import { SECONDARY_FALLBACK_IMAGES } from '../data/knowledgeQuestData';
 import { cn } from '../lib/utils';
 
 export const SavedView = () => {
@@ -157,8 +158,13 @@ export const SavedView = () => {
                           src={article.imageUrl}
                           alt={article.title}
                           onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = getNewsFallbackSvg(article.categoryLabel || article.category);
+                            if (!e.currentTarget.dataset.retried) {
+                              e.currentTarget.dataset.retried = "true";
+                              e.currentTarget.src = SECONDARY_FALLBACK_IMAGES[article.category] || SECONDARY_FALLBACK_IMAGES.india_business;
+                            } else {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = getNewsFallbackSvg(article.categoryLabel || article.category);
+                            }
                           }}
                           className="w-full h-full object-cover"
                         />

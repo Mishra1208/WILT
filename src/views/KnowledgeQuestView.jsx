@@ -8,18 +8,15 @@ import {
   Sparkles, 
   HelpCircle, 
   MessageSquareQuote, 
-  TrendingUp, 
   Globe2, 
-  Building2, 
-  Coins, 
-  Landmark, 
   ArrowRight,
   ArrowUp,
+  ArrowDown,
   Zap,
   Check,
   X
 } from 'lucide-react';
-import { KNOWLEDGE_QUEST_CATEGORIES, KNOWLEDGE_QUEST_ARTICLES, KNOWLEDGE_QUEST_QUIZ } from '../data/knowledgeQuestData';
+import { KNOWLEDGE_QUEST_CATEGORIES, KNOWLEDGE_QUEST_ARTICLES, KNOWLEDGE_QUEST_QUIZ, SECONDARY_FALLBACK_IMAGES } from '../data/knowledgeQuestData';
 import { fetchLiveBusinessNews, getNewsFallbackSvg } from '../services/newsService';
 import { useApp } from '../context/AppContext';
 import { cn } from '../lib/utils';
@@ -27,20 +24,24 @@ import { cn } from '../lib/utils';
 export const KnowledgeQuestView = () => {
   const { toggleSaveNews, isNewsSaved } = useApp();
   const [articles, setArticles] = useState(KNOWLEDGE_QUEST_ARTICLES);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [visibleCount, setVisibleCount] = useState(10);
   const [copiedId, setCopiedId] = useState(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     fetchLiveBusinessNews().then((liveNews) => {
       if (liveNews && liveNews.length > 0) {
-        setArticles([...liveNews, ...KNOWLEDGE_QUEST_ARTICLES]);
+        setArticles(liveNews);
       }
-      setIsLoading(false);
     });
   }, []);
+
+  // Reset pagination when category or search query changes
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [activeCategory, searchQuery]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,6 +84,8 @@ export const KnowledgeQuestView = () => {
     return matchesCategory && matchesSearch;
   });
 
+  const displayedArticles = filteredArticles.slice(0, visibleCount);
+
   const getCategoryCount = (catId) => {
     if (catId === 'all') return articles.length;
     return articles.filter((a) => a.category === catId).length;
@@ -122,11 +125,11 @@ export const KnowledgeQuestView = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn pb-16 px-4 sm:px-6">
       
-      {/* Uncarded Clean Page Header Section */}
+      {/* Page Header Section */}
       <div className="space-y-3 pt-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 border border-primary-200/60 text-primary-700 text-xs font-bold uppercase tracking-wider">
           <Compass className="w-3.5 h-3.5 text-primary-600" />
-          <span>Inshorts Business & Global Digest</span>
+          <span>Times of India Business Digest</span>
         </div>
 
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight font-display">
@@ -134,7 +137,7 @@ export const KnowledgeQuestView = () => {
         </h1>
 
         <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-3xl">
-          Master current business affairs for campus placement interviews. 60-second condensed summaries from top business news sources with ready-to-use interview talking points.
+          Master current business affairs for campus placement interviews. 60-second condensed summaries from top Times of India business news categories with ready-to-use interview talking points.
         </p>
 
         {/* Action Badges & Quick Quiz Button */}
@@ -145,7 +148,7 @@ export const KnowledgeQuestView = () => {
           </div>
           <div className="px-3 py-1.5 rounded-xl bg-white border border-slate-200/80 text-slate-700 flex items-center gap-2 shadow-xs">
             <Globe2 className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Real-Time Inshorts Stream</span>
+            <span>Times of India Business Feed</span>
           </div>
           <button
             onClick={() => setIsQuizModalOpen(true)}
@@ -205,7 +208,7 @@ export const KnowledgeQuestView = () => {
 
       {/* News Articles Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredArticles.map((article) => {
+        {displayedArticles.map((article) => {
           const isSaved = isNewsSaved(article.id);
           const isCopied = copiedId === article.id;
 
@@ -222,8 +225,13 @@ export const KnowledgeQuestView = () => {
                     src={article.imageUrl}
                     alt={article.title}
                     onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = getNewsFallbackSvg(article.categoryLabel || article.category);
+                      if (!e.currentTarget.dataset.retried) {
+                        e.currentTarget.dataset.retried = "true";
+                        e.currentTarget.src = SECONDARY_FALLBACK_IMAGES[article.category] || SECONDARY_FALLBACK_IMAGES.india_business;
+                      } else {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = getNewsFallbackSvg(article.categoryLabel || article.category);
+                      }
                     }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -340,6 +348,19 @@ export const KnowledgeQuestView = () => {
           );
         })}
       </div>
+
+      {/* Load More News Button */}
+      {filteredArticles.length > visibleCount && (
+        <div className="flex justify-center pt-6 pb-4">
+          <button
+            onClick={() => setVisibleCount((prev) => prev + 10)}
+            className="px-8 py-3.5 rounded-2xl bg-white border border-slate-200/90 text-slate-800 font-extrabold text-xs shadow-md hover:shadow-xl hover:border-primary-300 hover:text-primary-600 transition-all flex items-center gap-2 cursor-pointer group"
+          >
+            <span>Load More Business News ({filteredArticles.length - visibleCount} remaining)</span>
+            <ArrowDown className="w-4 h-4 text-primary-600 group-hover:translate-y-0.5 transition-transform" />
+          </button>
+        </div>
+      )}
 
       {/* Placement Interview Retention Quiz Modal */}
       {isQuizModalOpen && (
