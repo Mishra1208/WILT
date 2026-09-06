@@ -14,7 +14,8 @@ import {
   fetchConceptsFromSupabase,
   saveCommentToSupabase,
   saveAttachmentToSupabase,
-  fetchLeaderboardFromSupabase
+  fetchLeaderboardFromSupabase,
+  supabase
 } from '../services/supabase';
 import { getOrCreateGuestUser } from '../services/storage';
 
@@ -90,9 +91,23 @@ export const AppProvider = ({ children }) => {
     loadLiveLeaderboard();
     const leaderboardInterval = setInterval(loadLiveLeaderboard, 10000);
 
+    // 4. Supabase Realtime listener for instant cross-tab / cross-browser post push
+    let postsChannel;
+    try {
+      postsChannel = supabase
+        .channel('realtime:posts')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+          loadLivePosts();
+        })
+        .subscribe();
+    } catch (e) {}
+
     return () => {
       clearInterval(postsInterval);
       clearInterval(leaderboardInterval);
+      if (postsChannel && supabase.removeChannel) {
+        supabase.removeChannel(postsChannel);
+      }
     };
   }, []);
 
