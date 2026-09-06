@@ -7,14 +7,39 @@ const RSS_BUSINESS = 'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2
 const RSS_WORLD = 'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnews.google.com%2Frss%2Fheadlines%2Fsection%2Ftopic%2FWORLD%3Fhl%3Den-IN%26gl%3DIN%26ceid%3DIN%3Aen';
 const RSS_TECH = 'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnews.google.com%2Frss%2Fheadlines%2Fsection%2Ftopic%2FTECHNOLOGY%3Fhl%3Den-IN%26gl%3DIN%26ceid%3DIN%3Aen';
 
-// High-resolution Unsplash images for news categories
-const DYNAMIC_IMAGES = [
-  'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
-];
+// High-resolution reliable Unsplash CDN images categorized for ultra-fast loading worldwide & in India
+const CATEGORY_IMAGES = {
+  international: [
+    'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+  ],
+  markets: [
+    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=800&auto=format&fit=crop&q=80'
+  ],
+  banking: [
+    'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&auto=format&fit=crop&q=80'
+  ],
+  mutual_funds: [
+    'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1565372195458-9de0b320ef04?w=800&auto=format&fit=crop&q=80'
+  ],
+  india_business: [
+    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&auto=format&fit=crop&q=80'
+  ]
+};
+
+const getReliableImage = (catId, idx) => {
+  const list = CATEGORY_IMAGES[catId] || CATEGORY_IMAGES.india_business;
+  return list[idx % list.length];
+};
 
 // Helper to generate dynamic placement interview talking point based on title and content
 const generateInterviewTalkingPoint = (title, source) => {
@@ -102,7 +127,6 @@ export const fetchLiveBusinessNews = async () => {
       const catObj = categorizeArticle(cleanTitle, cleanSource);
       const terms = extractKeyTerms(cleanTitle);
       const talkingPoint = generateInterviewTalkingPoint(cleanTitle, cleanSource);
-      const randomImg = DYNAMIC_IMAGES[idx % DYNAMIC_IMAGES.length];
 
       // Format date to Today / Yesterday / Recent date
       let formattedDate = 'Today';
@@ -122,6 +146,9 @@ export const fetchLiveBusinessNews = async () => {
         ? item.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim()
         : cleanTitle;
 
+      // Assign high-resolution reliable CDN image
+      const categoryImg = getReliableImage(catObj.id, idx);
+
       return {
         id: `live-rss-${idx}-${Date.now()}`,
         title: cleanTitle,
@@ -131,7 +158,7 @@ export const fetchLiveBusinessNews = async () => {
         readTime: '60 sec read',
         source: cleanSource,
         toiUrl: item.link || 'https://news.google.com',
-        imageUrl: item.thumbnail || randomImg,
+        imageUrl: categoryImg,
         summary: {
           whatHappened: cleanDescription.length > 15 ? cleanDescription : cleanTitle,
           whyItMatters: `Key recent development reported by ${cleanSource} impacting sector valuations and business outlook.`,
