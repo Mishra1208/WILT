@@ -20,7 +20,7 @@ import {
   X
 } from 'lucide-react';
 import { KNOWLEDGE_QUEST_CATEGORIES, KNOWLEDGE_QUEST_ARTICLES, KNOWLEDGE_QUEST_QUIZ } from '../data/knowledgeQuestData';
-import { fetchLiveBusinessNews } from '../services/newsService';
+import { fetchLiveBusinessNews, getNewsFallbackSvg } from '../services/newsService';
 import { useApp } from '../context/AppContext';
 import { cn } from '../lib/utils';
 
@@ -223,7 +223,7 @@ export const KnowledgeQuestView = () => {
                     alt={article.title}
                     onError={(e) => {
                       e.currentTarget.onerror = null;
-                      e.currentTarget.src = 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80';
+                      e.currentTarget.src = getNewsFallbackSvg(article.categoryLabel || article.category);
                     }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />

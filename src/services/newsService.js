@@ -10,30 +10,52 @@ const RSS_TECH = 'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnew
 // High-resolution reliable Unsplash CDN images categorized for ultra-fast loading worldwide & in India
 const CATEGORY_IMAGES = {
   international: [
-    'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+    'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&fm=jpg&q=80',
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&fm=jpg&q=80',
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&fm=jpg&q=80'
   ],
   markets: [
-    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=800&auto=format&fit=crop&q=80'
+    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&fm=jpg&q=80',
+    'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&fm=jpg&q=80',
+    'https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=800&fm=jpg&q=80'
   ],
   banking: [
-    'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=800&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?w=800&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&auto=format&fit=crop&q=80'
+    'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=800&fm=jpg&q=80',
+    'https://images.unsplash.com/photo-1601597111158-2fceff292ceff292cdc?w=800&fm=jpg&q=80',
+    'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&fm=jpg&q=80'
   ],
   mutual_funds: [
-    'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=800&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=800&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1565372195458-9de0b320ef04?w=800&auto=format&fit=crop&q=80'
+    'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=800&fm=jpg&q=80',
+    'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=800&fm=jpg&q=80',
+    'https://images.unsplash.com/photo-1565372195458-9de0b320ef04?w=800&fm=jpg&q=80'
   ],
   india_business: [
-    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&auto=format&fit=crop&q=80'
+    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&fm=jpg&q=80',
+    'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&fm=jpg&q=80',
+    'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&fm=jpg&q=80'
   ]
+};
+
+// 100% Fail-Safe Inline SVG Data URL Generator when external CDN/Unsplash is blocked by ISP or AdBlockers
+export const getNewsFallbackSvg = (categoryLabel = 'BUSINESS NEWS') => {
+  const cleanLabel = (categoryLabel || 'BUSINESS NEWS').replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+  const encoded = encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+      <defs>
+        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#312E81"/>
+          <stop offset="50%" stop-color="#4F46E5"/>
+          <stop offset="100%" stop-color="#0F172A"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="400" fill="url(#g)"/>
+      <circle cx="700" cy="80" r="150" fill="white" opacity="0.06"/>
+      <circle cx="100" cy="320" r="180" fill="white" opacity="0.06"/>
+      <text x="50%" y="42%" dominant-baseline="middle" text-anchor="middle" fill="#FFFFFF" font-family="sans-serif" font-size="28" font-weight="900" letter-spacing="2">WILT RECRUITER NEWS</text>
+      <text x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" fill="#A5B4FC" font-family="sans-serif" font-size="18" font-weight="700">${cleanLabel.toUpperCase()}</text>
+    </svg>
+  `);
+  return `data:image/svg+xml;utf8,${encoded}`;
 };
 
 const getReliableImage = (catId, idx) => {

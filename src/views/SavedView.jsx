@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { PostCard } from '../components/cards/PostCard';
+import { getNewsFallbackSvg } from '../services/newsService';
 import { cn } from '../lib/utils';
 
 export const SavedView = () => {
@@ -157,7 +158,7 @@ export const SavedView = () => {
                           alt={article.title}
                           onError={(e) => {
                             e.currentTarget.onerror = null;
-                            e.currentTarget.src = 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80';
+                            e.currentTarget.src = getNewsFallbackSvg(article.categoryLabel || article.category);
                           }}
                           className="w-full h-full object-cover"
                         />
