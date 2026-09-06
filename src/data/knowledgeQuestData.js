@@ -7,12 +7,13 @@ export const KNOWLEDGE_QUEST_CATEGORIES = [
   { id: 'banking', label: '🏦 Banking & Policy', icon: '🏦' }
 ];
 
+// Local high-reliability image fallbacks served directly from Vercel domain
 export const SECONDARY_FALLBACK_IMAGES = {
-  international: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&fm=jpg&q=80',
-  india_business: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&fm=jpg&q=80',
-  markets: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&fm=jpg&q=80',
-  mutual_funds: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&fm=jpg&q=80',
-  banking: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=800&fm=jpg&q=80'
+  international: '/news/toi-int-1.jpg',
+  india_business: '/news/toi-ind-1.jpg',
+  markets: '/news/toi-mkt-1.jpg',
+  mutual_funds: '/news/toi-mf-1.jpg',
+  banking: '/news/toi-bnk-1.jpg'
 };
 
 export const KNOWLEDGE_QUEST_ARTICLES = [
@@ -26,7 +27,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Business',
     toiUrl: 'https://timesofindia.indiatimes.com/business/international-business',
-    imageUrl: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-int-1.jpg',
     summary: {
       whatHappened: 'The Federal Reserve signaled a potential interest rate reduction following stabilizing US inflation metrics and shifting labor market indicators.',
       whyItMatters: 'Lower US interest rates generally drive global capital into emerging markets like India, easing borrowing costs for tech firms and boosting global stock liquidity.',
@@ -44,7 +45,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Business',
     toiUrl: 'https://timesofindia.indiatimes.com/business/international-business',
-    imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-int-2.jpg',
     summary: {
       whatHappened: 'Major international technology conglomerates announced multi-billion-dollar commitments to set up advanced chip packaging units and AI data centers in Gujarat and Tamil Nadu.',
       whyItMatters: 'Positions India as a major global hub in semiconductor hardware, creating thousands of high-tech engineering jobs and lowering reliance on foreign chip imports.',
@@ -62,7 +63,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India International',
     toiUrl: 'https://timesofindia.indiatimes.com/business/international-business',
-    imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-int-3.jpg',
     summary: {
       whatHappened: 'Global crude benchmarks settled near $78 per barrel as OPEC+ producers balanced production quotas against non-OPEC output increases.',
       whyItMatters: 'As a major crude importer, moderate oil prices directly reduce India’s Current Account Deficit (CAD) and mitigate domestic inflationary pressure.',
@@ -80,7 +81,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Tech & World',
     toiUrl: 'https://timesofindia.indiatimes.com/business/international-business',
-    imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-int-4.jpg',
     summary: {
       whatHappened: 'Enterprise technology giants reported quarterly revenue beats driven by hyperscaler AI chip demand and enterprise cloud infrastructure deployment.',
       whyItMatters: 'Accelerating AI capex signals sustained long-term digital transformation spending, driving Indian IT service providers into AI implementation contracts.',
@@ -98,7 +99,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Global Economy',
     toiUrl: 'https://timesofindia.indiatimes.com/business/international-business',
-    imageUrl: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-int-5.jpg',
     summary: {
       whatHappened: 'The US Dollar Index weakened slightly as international trade partners expanded local currency trade settlements in Asia and Europe.',
       whyItMatters: 'A softer US dollar strengthens emerging market currencies like the Indian Rupee (INR) and reduces external debt servicing costs for domestic corporates.',
@@ -116,7 +117,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India International',
     toiUrl: 'https://timesofindia.indiatimes.com/business/international-business',
-    imageUrl: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-int-6.jpg',
     summary: {
       whatHappened: 'The ECB reduced key deposit facility rates by 25 basis points to support industrial production across Germany, France, and northern Europe.',
       whyItMatters: 'Lower European interest rates stimulate consumer demand in the EU, benefiting Indian textile, auto component, and IT service exporters.',
@@ -136,7 +137,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Business',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-ind-1.jpg',
     summary: {
       whatHappened: 'India’s Purchasing Managers’ Index (PMI) for manufacturing accelerated sharply, reflecting strong factory orders and expanding export shipments.',
       whyItMatters: 'Strong manufacturing signals robust corporate capex, job growth, and sustained GDP expansion, strengthening India’s positioning in global supply chain diversification.',
@@ -154,7 +155,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Business',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-ind-2.jpg',
     summary: {
       whatHappened: 'Electronics manufacturing under the Production Linked Incentive (PLI) program propelled total mobile and hardware exports past $30 billion.',
       whyItMatters: 'Reduces trade deficit, boosts domestic component ecosystem, and attracts global contract manufacturers like Foxconn and Pegatron to expand Indian plants.',
@@ -172,7 +173,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Auto & Business',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-ind-3.jpg',
     summary: {
       whatHappened: 'Electric vehicle registrations across two-wheelers, three-wheelers, and commercial delivery fleets reached record monthly totals across tier-1 and tier-2 cities.',
       whyItMatters: 'Accelerates clean mobility transition, reduces fossil fuel import bills, and creates high growth in battery manufacturing and charging infrastructure startups.',
@@ -190,7 +191,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Business',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-ind-4.jpg',
     summary: {
       whatHappened: 'India’s premier industrial conglomerates announced multi-phase capital expenditure plans for gigafactories producing green hydrogen electrolyzers and solar PV modules.',
       whyItMatters: 'Supports India’s net-zero carbon goals by 2070 while positioning domestic industry to export clean energy equipment to Europe and Asia.',
@@ -208,7 +209,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Tech & Business',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-ind-5.jpg',
     summary: {
       whatHappened: 'Venture capital and private equity funding into Indian startups rebounded sharply, focused on sustainable unit economics in B2B SaaS, fintech, and deeptech.',
       whyItMatters: 'Marks a transition from cash-burn customer acquisition models toward disciplined, profitable enterprise tech solutions with global recurring revenue.',
@@ -226,7 +227,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Infrastructure',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-ind-6.jpg',
     summary: {
       whatHappened: 'Accelerated highway construction and expressways expansion pushed domestic cement consumption and commercial vehicle sales to fresh multi-year highs.',
       whyItMatters: 'Public capital expenditure creates a multiplier effect across core steel, cement, logistics, and rural employment sectors.',
@@ -246,7 +247,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Markets',
     toiUrl: 'https://timesofindia.indiatimes.com/business/markets',
-    imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mkt-1.jpg',
     summary: {
       whatHappened: 'Indian benchmark indices Sensex and Nifty rallied to fresh all-time highs led by heavy buying in banking, IT, and auto heavyweights.',
       whyItMatters: 'Combined domestic retail SIP inflows and returning foreign capital provide strong structural support to Indian market valuations despite global geopolitical headwinds.',
@@ -264,7 +265,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Markets',
     toiUrl: 'https://timesofindia.indiatimes.com/business/markets',
-    imageUrl: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mkt-2.jpg',
     summary: {
       whatHappened: 'The Securities and Exchange Board of India (SEBI) reduced the post-issue IPO listing timeline from 6 days (T+6) to 3 days (T+3) across mainboard exchanges.',
       whyItMatters: 'Unlocks capital faster for issuers, reduces opportunity costs for retail applicants, and enhances secondary market liquidity for new listings.',
@@ -282,7 +283,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Economy',
     toiUrl: 'https://timesofindia.indiatimes.com/business/markets',
-    imageUrl: 'https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mkt-3.jpg',
     summary: {
       whatHappened: 'National Statistical Office (NSO) data confirmed India’s real GDP growth rate at 7.2% for the fiscal year, retaining its position as the world’s fastest-growing major economy.',
       whyItMatters: 'Robust economic growth provides corporate earnings visibility, supporting elevated equity valuations and attracting foreign direct investment (FDI).',
@@ -300,7 +301,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Markets',
     toiUrl: 'https://timesofindia.indiatimes.com/business/markets',
-    imageUrl: 'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mkt-4.jpg',
     summary: {
       whatHappened: 'The phased weightage increase of Indian Fully Accessible Route (FAR) sovereign bonds in global debt indices drove billions in passive bond fund inflows.',
       whyItMatters: 'Lowers government borrowing yields, stabilizes foreign currency reserves, and deepens sovereign debt market liquidity without triggering domestic inflation.',
@@ -318,7 +319,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Markets',
     toiUrl: 'https://timesofindia.indiatimes.com/business/markets',
-    imageUrl: 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mkt-5.jpg',
     summary: {
       whatHappened: 'Quarterly Nifty 50 earnings summaries exceeded consensus forecasts, driven by strong Net Interest Margins (NIM) in banking and order execution in capital goods.',
       whyItMatters: 'Earnings growth justifies current P/E multiples, giving equity investors confidence to remain invested across large-cap and mid-cap categories.',
@@ -336,7 +337,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Markets',
     toiUrl: 'https://timesofindia.indiatimes.com/business/markets',
-    imageUrl: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mkt-6.jpg',
     summary: {
       whatHappened: 'Precious metals touched multi-month highs as global central banks increased gold allocations to hedge against currency fluctuations and geopolitical risks.',
       whyItMatters: 'Demonstrates a macro flight to safe-haven assets while benefiting domestic bullion demand and gold loan NBFC loan-to-value (LTV) ratios.',
@@ -356,7 +357,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Mutual Funds',
     toiUrl: 'https://timesofindia.indiatimes.com/business/mutual-funds',
-    imageUrl: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mf-1.jpg',
     summary: {
       whatHappened: 'Systematic Investment Plan (SIP) contributions hit an all-time record, reflecting widespread retail investor participation in equity mutual funds.',
       whyItMatters: 'Retail financialization lowers India’s dependence on speculative foreign capital and provides predictable long-term capital for Indian infrastructure and corporates.',
@@ -374,7 +375,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Mutual Funds',
     toiUrl: 'https://timesofindia.indiatimes.com/business/mutual-funds',
-    imageUrl: 'https://images.unsplash.com/photo-1565372195458-9de0b320ef04?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mf-2.jpg',
     summary: {
       whatHappened: 'SEBI approved a new investment vehicle with a minimum ticket size of ₹10 lakh, bridging the gap between retail Mutual Funds and Portfolio Management Services (PMS).',
       whyItMatters: 'Allows affluent investors access to long-short strategies and derivative hedging with regulated safeguards and lower entry barriers than traditional PMS (₹50 lakh).',
@@ -392,7 +393,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Personal Finance',
     toiUrl: 'https://timesofindia.indiatimes.com/business/mutual-funds',
-    imageUrl: 'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mf-3.jpg',
     summary: {
       whatHappened: 'AMFI monthly data revealed strong net inflows into Flexi Cap, Large Cap, and Multi-Asset Allocation funds following small-cap valuation consolidation.',
       whyItMatters: 'Reflects growing investor maturity and prudent asset allocation toward steady, lower-volatility large-cap blue-chip equities.',
@@ -410,7 +411,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Mutual Funds',
     toiUrl: 'https://timesofindia.indiatimes.com/business/mutual-funds',
-    imageUrl: 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mf-4.jpg',
     summary: {
       whatHappened: 'Total Assets Under Management (AUM) across Indian Asset Management Companies (AMCs) surpassed ₹65 lakh crore for the first time in history.',
       whyItMatters: 'Demonstrates deep structural expansion of India’s capital markets, driving fee income for asset managers and generating employment in wealth tech.',
@@ -428,7 +429,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Personal Finance',
     toiUrl: 'https://timesofindia.indiatimes.com/business/mutual-funds',
-    imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mf-5.jpg',
     summary: {
       whatHappened: 'Direct mutual fund plans registered higher net unit creation compared to regular plans, driven by tech-savvy retail investors using zero-commission platforms.',
       whyItMatters: 'Lower Total Expense Ratios (TER) in direct plans save investors 0.5%–1.5% annually, compounding significantly higher wealth over 15-20 year investment horizons.',
@@ -446,7 +447,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Wealth',
     toiUrl: 'https://timesofindia.indiatimes.com/business/mutual-funds',
-    imageUrl: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-mf-6.jpg',
     summary: {
       whatHappened: 'Equity Linked Savings Schemes (ELSS) recorded heavy inflows as salaried professionals capitalized on Section 80C tax deductions combined with 3-year equity lock-ins.',
       whyItMatters: 'ELSS lock-ins prevent emotional panic selling during market downturns, delivering superior long-term compounded CAGR compared to traditional PPF or tax FDs.',
@@ -466,7 +467,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Banking',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-bnk-1.jpg',
     summary: {
       whatHappened: 'The RBI Monetary Policy Committee (MPC) voted to keep the policy Repo Rate unchanged at 6.50%, emphasizing withdrawal of accommodation to keep CPI inflation anchored at 4%.',
       whyItMatters: 'Stable interest rates maintain bank Net Interest Margins (NIM) while ensuring commercial lending rates remain predictable for housing, automotive, and corporate loans.',
@@ -484,7 +485,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Banking',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-bnk-2.jpg',
     summary: {
       whatHappened: 'Public Sector Banks (PSBs) reported a historic reduction in Gross Non-Performing Assets (NPAs), supported by robust resolution under the Insolvency and Bankruptcy Code (IBC).',
       whyItMatters: 'Clean commercial bank balance sheets allow lenders to aggressively extend credit to corporate expansion and retail housing without systemic default risks.',
@@ -502,7 +503,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Banking & Policy',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-bnk-3.jpg',
     summary: {
       whatHappened: 'NPCI confirmed Unified Payments Interface (UPI) processed over 15 billion monthly digital transactions, with cross-border linkages active in Singapore, UAE, and Europe.',
       whyItMatters: 'Solidifies India’s position as a global leader in real-time digital payments architecture, lowering cash handling costs for merchants and boosting tax compliance.',
@@ -520,7 +521,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Policy',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-bnk-4.jpg',
     summary: {
       whatHappened: 'The Reserve Bank of India expanded wholesale and retail Central Bank Digital Currency (CBDC) trials to settle government bond trades and international remittances.',
       whyItMatters: 'Reduces interbank settlement latency, eliminates counterparty clearing risks, and provides a programmable digital alternative to physical currency notes.',
@@ -538,7 +539,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Banking',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-bnk-5.jpg',
     summary: {
       whatHappened: 'Bi-weekly RBI lending data showed bank credit off-take expanding across retail mortgages, vehicle loans, and working capital lines for MSMEs.',
       whyItMatters: 'Sustained double-digit credit expansion indicates healthy borrowing demand across businesses and households, supporting bank net interest income.',
@@ -556,7 +557,7 @@ export const KNOWLEDGE_QUEST_ARTICLES = [
     readTime: '60 sec read',
     source: 'Times of India Banking Policy',
     toiUrl: 'https://timesofindia.indiatimes.com/business/india-business',
-    imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&fm=jpg&q=80',
+    imageUrl: '/news/toi-bnk-6.jpg',
     summary: {
       whatHappened: 'Regulators released joint guidelines requiring 24/7 Security Operations Centers (SOC) and zero-trust cloud architecture across all scheduled commercial banks.',
       whyItMatters: 'Protects core banking solutions (CBS) against cyber threats, ransomware, and unauthorized transactional access as digital banking volume surges.',
