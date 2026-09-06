@@ -1,19 +1,19 @@
 import { INITIAL_POSTS, INITIAL_CONCEPTS, INITIAL_LEADERBOARD_USERS } from '../data/seedData';
 
 const STORAGE_KEYS = {
-  POSTS: 'wilt_posts_v10',
-  CONCEPTS: 'wilt_concepts_v10',
-  LEADERBOARD: 'wilt_leaderboard_v10',
-  USER: 'wilt_current_user_v10',
-  SAVED_POSTS: 'wilt_saved_posts_v10',
-  QUIZ_HISTORY: 'wilt_quiz_history_v10',
+  POSTS: 'wilt_posts_v11',
+  CONCEPTS: 'wilt_concepts_v11',
+  LEADERBOARD: 'wilt_leaderboard_v11',
+  USER: 'wilt_current_user_v11',
+  SAVED_POSTS: 'wilt_saved_posts_v11',
+  QUIZ_HISTORY: 'wilt_quiz_history_v11',
 };
 
 // Initialize Storage with clean real user data
 export const initStorage = () => {
   // Clear any old storage keys
   try {
-    ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9'].forEach(v => {
+    ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10'].forEach(v => {
       localStorage.removeItem(`wilt_posts_${v}`);
       localStorage.removeItem(`wilt_saved_posts_${v}`);
       localStorage.removeItem(`wilt_concepts_${v}`);

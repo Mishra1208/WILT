@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, Search, Sparkles, UserCheck, ArrowDown, Award } from 'lucide-react';
+import { Trophy, Search, Sparkles, UserCheck, ArrowDown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
 
 export const LeaderboardView = () => {
-  const { leaderboard } = useApp();
+  const { leaderboard, setCurrentView } = useApp();
   const { user } = useAuth();
   const [filterQuery, setFilterQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(10);
@@ -31,7 +31,7 @@ export const LeaderboardView = () => {
     return (user && user.id === u.id) || (activeUserHandle && h === activeUserHandle.toLowerCase());
   });
 
-  const activeUserRank = activeUserRankItem ? activeUserRankItem.rank : (user?.rank || 12);
+  const activeUserRank = activeUserRankItem ? activeUserRankItem.rank : (user?.rank || 1);
   const activeUserXP = activeUserRankItem ? activeUserRankItem.xp : (user?.xp || 150);
 
   // Filter Users across handle, rank number (#1, 1), university, or tier
@@ -72,12 +72,13 @@ export const LeaderboardView = () => {
             Campus Hierarchy
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
-            Weekly peer rankings based on quiz accuracy, contributions, and streaks.
+            Live peer rankings based on real Supabase quiz attempts and active recall accuracy.
           </p>
         </div>
 
-        <div className="px-4 py-2 rounded-xl bg-primary-50 border border-primary-100 text-xs font-bold text-primary-700 font-mono self-start sm:self-auto shadow-xs">
-          Fall Semester 2026
+        <div className="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 font-mono self-start sm:self-auto shadow-xs flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Live Audience Feed</span>
         </div>
       </div>
 
@@ -90,7 +91,7 @@ export const LeaderboardView = () => {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-extrabold text-amber-900 uppercase tracking-wider">Your Campus Standing</span>
+                <span className="text-xs font-extrabold text-amber-900 uppercase tracking-wider">Your Live Standing</span>
                 <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black uppercase">Active Player</span>
               </div>
               <h3 className="text-sm sm:text-base font-extrabold font-mono text-slate-900 mt-0.5">
@@ -112,7 +113,7 @@ export const LeaderboardView = () => {
       {/* Top 3 Clean Podium Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Rank 2 (Silver) */}
-        {top2 && (
+        {top2 ? (
           <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-soft flex flex-col justify-between order-2 md:order-1">
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -131,7 +132,7 @@ export const LeaderboardView = () => {
                   <h4 className="text-base font-bold font-mono text-slate-900">
                     {getCleanHandle(top2)}
                   </h4>
-                  <span className="text-[11px] text-slate-500 font-medium">University Student</span>
+                  <span className="text-[11px] text-slate-500 font-medium">Live Audience Scholar</span>
                 </div>
               </div>
               <p className="text-xs text-slate-500 truncate">{top2.university}</p>
@@ -141,10 +142,19 @@ export const LeaderboardView = () => {
               <span className="text-base font-extrabold font-mono text-slate-900">{top2.xp} XP</span>
             </div>
           </div>
+        ) : (
+          <div className="p-6 rounded-3xl bg-slate-50/70 border border-dashed border-slate-200 shadow-xs flex flex-col justify-between order-2 md:order-1 text-center py-8">
+            <div className="space-y-2">
+              <span className="text-2xl">🥈</span>
+              <h4 className="text-sm font-bold text-slate-700">Open #2 Rank Slot</h4>
+              <p className="text-xs text-slate-500 max-w-xs mx-auto">Attempt today's weekly quiz to claim the #2 spot!</p>
+            </div>
+            <button onClick={() => setCurrentView('quiz')} className="mt-4 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold shadow-xs cursor-pointer">Take Quiz Now</button>
+          </div>
         )}
 
         {/* Rank 1 (Gold Champion) */}
-        {top1 && (
+        {top1 ? (
           <div className="p-7 rounded-3xl bg-gradient-to-b from-amber-500/10 via-amber-500/5 to-white border-2 border-amber-400 shadow-hover flex flex-col justify-between order-1 md:order-2">
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -164,7 +174,7 @@ export const LeaderboardView = () => {
                   <h4 className="text-lg font-extrabold font-mono text-amber-700">
                     {getCleanHandle(top1)}
                   </h4>
-                  <span className="text-[11px] text-amber-800/80 font-medium">University Student</span>
+                  <span className="text-[11px] text-amber-800/80 font-medium">Live Audience Scholar</span>
                 </div>
               </div>
               <p className="text-xs text-slate-600 font-medium truncate">{top1.university}</p>
@@ -174,10 +184,19 @@ export const LeaderboardView = () => {
               <span className="text-xl font-black font-mono text-amber-600">{top1.xp} XP</span>
             </div>
           </div>
+        ) : (
+          <div className="p-7 rounded-3xl bg-gradient-to-b from-amber-500/10 to-white border-2 border-amber-300 shadow-sm flex flex-col justify-between order-1 md:order-2 text-center py-8">
+            <div className="space-y-2">
+              <span className="text-3xl">🥇</span>
+              <h4 className="text-base font-bold text-amber-950">Open #1 Champion Slot</h4>
+              <p className="text-xs text-amber-900/80 max-w-xs mx-auto">Be the first live audience member to attempt the quiz and claim #1!</p>
+            </div>
+            <button onClick={() => setCurrentView('quiz')} className="mt-4 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-sm cursor-pointer">Claim #1 Spot 🏆</button>
+          </div>
         )}
 
         {/* Rank 3 (Bronze) */}
-        {top3 && (
+        {top3 ? (
           <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-soft flex flex-col justify-between order-3 md:order-3">
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -196,7 +215,7 @@ export const LeaderboardView = () => {
                   <h4 className="text-base font-bold font-mono text-slate-900">
                     {getCleanHandle(top3)}
                   </h4>
-                  <span className="text-[11px] text-slate-500 font-medium">University Student</span>
+                  <span className="text-[11px] text-slate-500 font-medium">Live Audience Scholar</span>
                 </div>
               </div>
               <p className="text-xs text-slate-500 truncate">{top3.university}</p>
@@ -205,6 +224,15 @@ export const LeaderboardView = () => {
               <span className="text-xs text-slate-500 font-bold">{top3.tier}</span>
               <span className="text-base font-extrabold font-mono text-slate-900">{top3.xp} XP</span>
             </div>
+          </div>
+        ) : (
+          <div className="p-6 rounded-3xl bg-slate-50/70 border border-dashed border-slate-200 shadow-xs flex flex-col justify-between order-3 md:order-3 text-center py-8">
+            <div className="space-y-2">
+              <span className="text-2xl">🥉</span>
+              <h4 className="text-sm font-bold text-slate-700">Open #3 Rank Slot</h4>
+              <p className="text-xs text-slate-500 max-w-xs mx-auto">Attempt today's weekly quiz to claim the #3 spot!</p>
+            </div>
+            <button onClick={() => setCurrentView('quiz')} className="mt-4 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold shadow-xs cursor-pointer">Take Quiz Now</button>
           </div>
         )}
       </div>
@@ -215,7 +243,7 @@ export const LeaderboardView = () => {
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-primary-600" />
             <h3 className="text-base font-bold text-slate-900 font-display">
-              Student Rankings ({filteredUsers.length})
+              Live Student Rankings ({filteredUsers.length})
             </h3>
           </div>
 

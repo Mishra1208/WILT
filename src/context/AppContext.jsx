@@ -13,7 +13,8 @@ import {
   saveConceptToSupabase,
   fetchConceptsFromSupabase,
   saveCommentToSupabase,
-  saveAttachmentToSupabase
+  saveAttachmentToSupabase,
+  fetchLeaderboardFromSupabase
 } from '../services/supabase';
 import { getOrCreateGuestUser } from '../services/storage';
 
@@ -22,7 +23,7 @@ const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [isPostsLoading, setIsPostsLoading] = useState(true);
 
-  // Initialize storage seeds and fetch remote Supabase posts & concepts
+  // Initialize storage seeds and fetch remote Supabase posts, concepts & live leaderboard
   useEffect(() => {
     initStorage();
     
@@ -30,9 +31,6 @@ export const AppProvider = ({ children }) => {
     fetchPostsFromSupabase().then((remotePosts) => {
       if (remotePosts) {
         setPosts(remotePosts);
-        try {
-          localStorage.setItem('wilt_posts_v8', JSON.stringify(remotePosts));
-        } catch (e) {}
       }
       setIsPostsLoading(false);
     }).catch(() => {
@@ -53,6 +51,39 @@ export const AppProvider = ({ children }) => {
         });
       }
     });
+
+    // 3. Fetch live audience leaderboard from Supabase
+    const loadLiveLeaderboard = () => {
+      fetchLeaderboardFromSupabase().then((remoteLeaderboard) => {
+        const guestUser = getOrCreateGuestUser();
+        let list = remoteLeaderboard || [];
+        
+        // Ensure active guest user exists in list
+        const exists = list.some(u => u.username === guestUser.username || u.id === guestUser.id);
+        if (!exists) {
+          list = [...list, {
+            id: guestUser.id,
+            name: `@${guestUser.username}`,
+            username: guestUser.username,
+            avatar: guestUser.avatar,
+            university: guestUser.university || 'Anonymous Campus',
+            major: guestUser.major || 'Guest Scholar',
+            xp: guestUser.xp || 150,
+            accuracy: guestUser.accuracy || 90,
+            tier: guestUser.tier || 'Curious Scholar'
+          }];
+          list.sort((a, b) => (b.xp || 0) - (a.xp || 0));
+          list = list.map((item, idx) => ({ ...item, rank: idx + 1 }));
+        }
+
+        setLeaderboard(list);
+      });
+    };
+
+    loadLiveLeaderboard();
+    const leaderboardInterval = setInterval(loadLiveLeaderboard, 4000);
+
+    return () => clearInterval(leaderboardInterval);
   }, []);
 
   const getViewFromPath = () => {

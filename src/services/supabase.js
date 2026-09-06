@@ -385,6 +385,92 @@ export const saveQuizAttemptToSupabase = async ({ userHandle, userName, score, t
 };
 
 /**
+ * Fetch real live audience leaderboard from Supabase
+ */
+export const fetchLeaderboardFromSupabase = async () => {
+  try {
+    const [profilesRes, attemptsRes] = await Promise.all([
+      supabase.from('user_profiles').select('*').order('xp', { ascending: false }).catch(() => ({ data: [] })),
+      supabase.from('quiz_attempts').select('*').order('created_at', { ascending: false }).catch(() => ({ data: [] }))
+    ]);
+
+    const profiles = profilesRes?.data || [];
+    const attempts = attemptsRes?.data || [];
+
+    const handleMap = new Map();
+
+    if (profiles && profiles.length > 0) {
+      profiles.forEach((p) => {
+        const handle = (p.username || p.name || 'anonymous').replace(/^@/, '').toLowerCase().trim();
+        if (handle) {
+          handleMap.set(handle, {
+            id: p.id || `user_${handle}`,
+            name: `@${handle}`,
+            username: handle,
+            avatar: p.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${handle}`,
+            university: p.university || 'Anonymous Campus',
+            major: p.major || 'Guest Scholar',
+            xp: Number(p.xp) || 150,
+            accuracy: Number(p.accuracy) || 90,
+            tier: p.tier || 'Curious Scholar',
+            quizzesCompleted: Number(p.quizzes_completed) || 0
+          });
+        }
+      });
+    }
+
+    if (attempts && attempts.length > 0) {
+      attempts.forEach((a) => {
+        const handle = (a.user_handle || 'anonymous').replace(/^@/, '').toLowerCase().trim();
+        if (handle) {
+          if (!handleMap.has(handle)) {
+            handleMap.set(handle, {
+              id: `anon_${handle}`,
+              name: `@${handle}`,
+              username: handle,
+              avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${handle}`,
+              university: 'Anonymous Campus',
+              major: 'Guest Scholar',
+              xp: Number(a.xp_earned) || 150,
+              accuracy: Number(a.accuracy_percentage) || 90,
+              tier: 'Curious Scholar',
+              quizzesCompleted: 1
+            });
+          } else {
+            const existing = handleMap.get(handle);
+            if (a.xp_earned && Number(a.xp_earned) > existing.xp) {
+              existing.xp = Number(a.xp_earned);
+              existing.accuracy = Number(a.accuracy_percentage) || existing.accuracy;
+            }
+          }
+        }
+      });
+    }
+
+    const leaderboardList = Array.from(handleMap.values());
+    leaderboardList.sort((a, b) => (b.xp || 0) - (a.xp || 0));
+
+    return leaderboardList.map((item, idx) => {
+      let tier = "Curious Scholar";
+      if (item.xp >= 2500) tier = "Mastermind";
+      else if (item.xp >= 1800) tier = "Grandmaster";
+      else if (item.xp >= 1200) tier = "Fellow Analyst";
+      else if (item.xp >= 600) tier = "Curious Scholar";
+
+      return {
+        ...item,
+        rank: idx + 1,
+        tier,
+        trophy: idx === 0 ? "🥇 Gold Champion" : idx === 1 ? "🥈 Silver Rank" : idx === 2 ? "🥉 Bronze Rank" : null
+      };
+    });
+  } catch (err) {
+    console.warn('Supabase fetch leaderboard catch:', err);
+    return [];
+  }
+};
+
+/**
  * 6. Save Peer Dictionary Concept to Supabase
  */
 export const saveConceptToSupabase = async (concept) => {
