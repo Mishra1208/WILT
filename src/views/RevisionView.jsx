@@ -26,58 +26,52 @@ export const RevisionView = () => {
 
   return (
     <div className="p-4 sm:p-8 max-w-4xl mx-auto space-y-8 animate-fadeIn">
-      {/* LIGHT & VIBRANT WILT "COMING SOON" HERO BANNER */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary-50/90 via-indigo-50/70 to-purple-50/80 p-6 sm:p-9 border border-primary-200/80 shadow-[0_4px_25px_-4px_rgba(79,70,229,0.06)]">
-        {/* Subtle ambient light glow */}
-        <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary-200/30 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-purple-200/30 rounded-full blur-3xl pointer-events-none" />
+      {/* DIRECT PAGE HEADER SECTION (NO CARD CONTAINER) */}
+      <div className="space-y-5">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80 text-xs font-black tracking-wide uppercase">
+            <Rocket className="w-3.5 h-3.5 text-amber-600 animate-bounce" />
+            <span>Coming Soon in 2026 Edition</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-primary-50 text-primary-700 border border-primary-200/80 text-xs font-extrabold font-mono">
+            <Sparkles className="w-3.5 h-3.5 text-primary-600" />
+            <span>AI Spaced Repetition Engine</span>
+          </span>
+        </div>
 
-        <div className="relative z-10 space-y-5">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-100/90 text-amber-900 border border-amber-200/90 text-xs font-black tracking-wide uppercase shadow-2xs">
-              <Rocket className="w-3.5 h-3.5 text-amber-600 animate-bounce" />
-              <span>Coming Soon in 2026 Edition</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary-100/80 text-primary-800 border border-primary-200/80 text-xs font-extrabold font-mono">
-              <Sparkles className="w-3.5 h-3.5 text-primary-600" />
-              <span>AI Spaced Repetition Engine</span>
-            </span>
+        <div className="space-y-1.5">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-snug">
+            Smart Spaced Repetition & Exam Flashcards
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 max-w-2xl font-medium leading-relaxed">
+            We are building WILT's next-generation SuperMemo AI active recall engine. Automatically convert community posts, formulas, and financial jargon into memory-boosting daily flashcard decks.
+          </p>
+        </div>
+
+        {/* Minimal Feature Teaser Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
+          <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-1">
+            <div className="flex items-center gap-2 text-amber-700 font-extrabold text-xs">
+              <Brain className="w-4 h-4 text-amber-600" />
+              <span>Active Recall AI</span>
+            </div>
+            <p className="text-[11px] text-slate-500 font-medium leading-normal">Adaptive decay curves based on recall speed.</p>
           </div>
 
-          <div className="space-y-1.5">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug">
-              Smart Spaced Repetition & Exam Flashcards
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-2xl font-normal leading-relaxed">
-              We are building WILT's next-generation SuperMemo AI active recall engine. Automatically convert community posts, formulas, and financial jargon into memory-boosting daily flashcard decks!
-            </p>
+          <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-1">
+            <div className="flex items-center gap-2 text-emerald-700 font-extrabold text-xs">
+              <Zap className="w-4 h-4 text-emerald-600" />
+              <span>1-Click Deck Builder</span>
+            </div>
+            <p className="text-[11px] text-slate-500 font-medium leading-normal">Turn saved posts into revision flashcards.</p>
           </div>
 
-          {/* Feature Badges Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-            <div className="p-3.5 rounded-2xl bg-white/90 border border-slate-200/80 shadow-2xs space-y-1">
-              <div className="flex items-center gap-2 text-amber-700 font-extrabold text-xs">
-                <Brain className="w-4 h-4 text-amber-600" />
-                <span>Active Recall AI</span>
-              </div>
-              <p className="text-[11px] text-slate-500 font-medium leading-normal">Adaptive decay curves based on how fast you recall definitions.</p>
+          <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-1">
+            <div className="flex items-center gap-2 text-indigo-700 font-extrabold text-xs">
+              <Layers className="w-4 h-4 text-indigo-600" />
+              <span>Formula Mastery</span>
             </div>
-
-            <div className="p-3.5 rounded-2xl bg-white/90 border border-slate-200/80 shadow-2xs space-y-1">
-              <div className="flex items-center gap-2 text-emerald-700 font-extrabold text-xs">
-                <Zap className="w-4 h-4 text-emerald-600" />
-                <span>1-Click Deck Builder</span>
-              </div>
-              <p className="text-[11px] text-slate-500 font-medium leading-normal">Turn saved posts directly into revision flashcards with 1 click.</p>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-white/90 border border-slate-200/80 shadow-2xs space-y-1">
-              <div className="flex items-center gap-2 text-indigo-700 font-extrabold text-xs">
-                <Layers className="w-4 h-4 text-indigo-600" />
-                <span>Formula Mastery</span>
-              </div>
-              <p className="text-[11px] text-slate-500 font-medium leading-normal">Interactive KaTeX math equations for Accounting & Corporate Finance.</p>
-            </div>
+            <p className="text-[11px] text-slate-500 font-medium leading-normal">Interactive KaTeX math equations for finance & accounting.</p>
           </div>
         </div>
       </div>
