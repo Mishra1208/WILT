@@ -40,7 +40,7 @@ export const AppProvider = ({ children }) => {
     };
 
     loadLivePosts();
-    const postsInterval = setInterval(loadLivePosts, 3000);
+    const postsInterval = setInterval(loadLivePosts, 10000);
 
     // 2. Fetch remote concepts from Supabase
     fetchConceptsFromSupabase().then((remoteConcepts) => {
@@ -88,7 +88,7 @@ export const AppProvider = ({ children }) => {
     };
 
     loadLiveLeaderboard();
-    const leaderboardInterval = setInterval(loadLiveLeaderboard, 3000);
+    const leaderboardInterval = setInterval(loadLiveLeaderboard, 10000);
 
     return () => {
       clearInterval(postsInterval);

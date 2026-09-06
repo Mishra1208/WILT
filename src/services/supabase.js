@@ -517,7 +517,9 @@ export const fetchConceptsFromSupabase = async () => {
     const { data, error } = await supabase
       .from('concepts')
       .select('*')
-      .order('created_at', { ascending: false });
+      .not('category', 'in', '("post_comment","post_attachment")')
+      .order('created_at', { ascending: false })
+      .limit(100);
 
     if (error) {
       console.warn('Supabase fetch concepts info:', error.message);
