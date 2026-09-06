@@ -320,26 +320,27 @@ export const saveUserProfileToSupabase = async (user) => {
   if (!user || !user.username) return { success: false };
 
   try {
+    const cleanUsername = (user.username || 'anonymous').replace(/^@/, '').toLowerCase().trim();
+    const payload = {
+      id: user.id || `user_${cleanUsername}`,
+      username: cleanUsername,
+      name: `@${cleanUsername}`,
+      avatar: user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanUsername}`,
+      email: user.email || '',
+      phone: user.phone || '',
+      university: user.university || 'Anonymous Campus',
+      major: user.major || 'Guest Scholar',
+      xp: Number(user.xp) || 150,
+      tier: user.tier || 'Curious Scholar',
+      rank: Number(user.rank) || 12,
+      accuracy: Number(user.accuracy) || 90,
+      quizzes_completed: Number(user.quizzesCompleted) || 0,
+      updated_at: new Date().toISOString()
+    };
+
     const { data, error } = await supabase
       .from('user_profiles')
-      .upsert([
-        {
-          id: user.id || `user_${user.username}`,
-          username: user.username,
-          name: user.name,
-          avatar: user.avatar,
-          email: user.email || '',
-          phone: user.phone || '',
-          university: user.university || 'University Student',
-          major: user.major || 'Finance & Tech',
-          xp: user.xp || 150,
-          tier: user.tier || 'Curious Scholar',
-          rank: user.rank || 12,
-          accuracy: user.accuracy || 90,
-          quizzes_completed: user.quizzesCompleted || 0,
-          updated_at: new Date().toISOString()
-        }
-      ], { onConflict: 'username' })
+      .upsert([payload])
       .select();
 
     if (error) {

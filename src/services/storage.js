@@ -1,4 +1,5 @@
 import { INITIAL_POSTS, INITIAL_CONCEPTS, INITIAL_LEADERBOARD_USERS } from '../data/seedData';
+import { saveUserProfileToSupabase } from './supabase';
 
 const STORAGE_KEYS = {
   POSTS: 'wilt_posts_v11',
@@ -161,6 +162,7 @@ export const getOrCreateGuestUser = () => {
     if (saved) {
       const parsed = JSON.parse(saved);
       updateLeaderboardUser(parsed);
+      saveUserProfileToSupabase(parsed);
       return parsed;
     }
 
@@ -188,6 +190,7 @@ export const getOrCreateGuestUser = () => {
 
     localStorage.setItem(key, JSON.stringify(guestUser));
     updateLeaderboardUser(guestUser);
+    saveUserProfileToSupabase(guestUser);
     return guestUser;
   } catch (e) {
     const randomNum = Math.floor(1000 + Math.random() * 9000);
