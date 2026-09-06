@@ -12,22 +12,28 @@ export const LeaderboardView = () => {
   const top2 = leaderboard[1];
   const top3 = leaderboard[2];
 
-  const filteredUsers = leaderboard.filter(
-    (u) =>
-      u.name.toLowerCase().includes(filterQuery.toLowerCase()) ||
-      u.username.toLowerCase().includes(filterQuery.toLowerCase()) ||
-      u.university?.toLowerCase().includes(filterQuery.toLowerCase())
-  );
+  const filteredUsers = leaderboard.filter((u) => {
+    const handle = `@${(u.username || u.name || '').replace(/^@/, '')}`.toLowerCase();
+    const uni = (u.university || '').toLowerCase();
+    const q = filterQuery.toLowerCase();
+    return handle.includes(q) || uni.includes(q);
+  });
+
+  const getCleanHandle = (u) => {
+    if (!u) return '';
+    const raw = u.username || u.name || 'anonymous';
+    return `@${raw.replace(/^@/, '')}`;
+  };
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-display">
             Campus Hierarchy
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
             Weekly peer rankings based on quiz accuracy, contributions, and streaks.
           </p>
         </div>
@@ -37,7 +43,7 @@ export const LeaderboardView = () => {
         </div>
       </div>
 
-      {/* Top 3 Clean Podium Cards (Nextplate Style) */}
+      {/* Top 3 Clean Podium Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Rank 2 (Silver) */}
         {top2 && (
@@ -52,12 +58,14 @@ export const LeaderboardView = () => {
               <div className="flex items-center gap-3.5 mb-3">
                 <img
                   src={top2.avatar}
-                  alt={top2.name}
+                  alt={getCleanHandle(top2)}
                   className="w-12 h-12 rounded-full object-cover border-2 border-slate-200"
                 />
                 <div>
-                  <h4 className="text-base font-bold text-slate-900">{top2.name}</h4>
-                  <span className="text-xs text-primary-600 font-mono font-semibold">@{top2.username}</span>
+                  <h4 className="text-base font-bold font-mono text-slate-900">
+                    {getCleanHandle(top2)}
+                  </h4>
+                  <span className="text-[11px] text-slate-500 font-medium">University Student</span>
                 </div>
               </div>
               <p className="text-xs text-slate-500 truncate">{top2.university}</p>
@@ -83,12 +91,14 @@ export const LeaderboardView = () => {
               <div className="flex items-center gap-4 mb-3">
                 <img
                   src={top1.avatar}
-                  alt={top1.name}
+                  alt={getCleanHandle(top1)}
                   className="w-14 h-14 rounded-full object-cover border-2 border-amber-400 shadow-md"
                 />
                 <div>
-                  <h4 className="text-lg font-extrabold text-slate-900">{top1.name}</h4>
-                  <span className="text-xs text-amber-700 font-mono font-bold">@{top1.username}</span>
+                  <h4 className="text-lg font-extrabold font-mono text-amber-700">
+                    {getCleanHandle(top1)}
+                  </h4>
+                  <span className="text-[11px] text-amber-800/80 font-medium">University Student</span>
                 </div>
               </div>
               <p className="text-xs text-slate-600 font-medium truncate">{top1.university}</p>
@@ -113,12 +123,14 @@ export const LeaderboardView = () => {
               <div className="flex items-center gap-3.5 mb-3">
                 <img
                   src={top3.avatar}
-                  alt={top3.name}
+                  alt={getCleanHandle(top3)}
                   className="w-12 h-12 rounded-full object-cover border-2 border-slate-200"
                 />
                 <div>
-                  <h4 className="text-base font-bold text-slate-900">{top3.name}</h4>
-                  <span className="text-xs text-primary-600 font-mono font-semibold">@{top3.username}</span>
+                  <h4 className="text-base font-bold font-mono text-slate-900">
+                    {getCleanHandle(top3)}
+                  </h4>
+                  <span className="text-[11px] text-slate-500 font-medium">University Student</span>
                 </div>
               </div>
               <p className="text-xs text-slate-500 truncate">{top3.university}</p>
@@ -134,7 +146,7 @@ export const LeaderboardView = () => {
       {/* Roster Table */}
       <div className="rounded-3xl bg-white border border-slate-200/80 shadow-soft overflow-hidden">
         <div className="p-5 border-b border-slate-100 flex items-center justify-between gap-4">
-          <h3 className="text-base font-bold text-slate-900">
+          <h3 className="text-base font-bold text-slate-900 font-display">
             Student Rankings
           </h3>
 
@@ -144,7 +156,7 @@ export const LeaderboardView = () => {
               type="text"
               value={filterQuery}
               onChange={(e) => setFilterQuery(e.target.value)}
-              placeholder="Filter by student or university..."
+              placeholder="Filter by handle or university..."
               className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary-500"
             />
           </div>
@@ -155,7 +167,7 @@ export const LeaderboardView = () => {
             <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
               <tr>
                 <th className="py-3.5 px-5">Rank</th>
-                <th className="py-3.5 px-5">Student</th>
+                <th className="py-3.5 px-5">Student Handle</th>
                 <th className="py-3.5 px-5">University</th>
                 <th className="py-3.5 px-5">Tier</th>
                 <th className="py-3.5 px-5">Accuracy</th>
@@ -165,6 +177,8 @@ export const LeaderboardView = () => {
             <tbody className="divide-y divide-slate-100">
               {filteredUsers.map((student) => {
                 const isCurrentUser = user && (user.id === student.id || user.username === student.username);
+                const handle = getCleanHandle(student);
+
                 return (
                   <tr
                     key={student.id}
@@ -175,31 +189,26 @@ export const LeaderboardView = () => {
                     }`}
                   >
                     <td className="py-4 px-5 whitespace-nowrap font-mono font-bold">
-                      {student.trophy === 'gold' && '🥇 #1'}
-                      {student.trophy === 'silver' && '🥈 #2'}
-                      {student.trophy === 'bronze' && '🥉 #3'}
-                      {!student.trophy && `#${student.rank}`}
+                      {student.trophy === 'gold' || student.rank === 1 ? '🥇 #1' : null}
+                      {student.trophy === 'silver' || student.rank === 2 ? '🥈 #2' : null}
+                      {student.trophy === 'bronze' || student.rank === 3 ? '🥉 #3' : null}
+                      {student.rank > 3 && `#${student.rank}`}
                     </td>
 
                     <td className="py-4 px-5 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <img
                           src={student.avatar}
-                          alt={student.name}
+                          alt={handle}
                           className="w-8 h-8 rounded-full object-cover border border-slate-200"
                         />
-                        <div>
-                          <span className="font-bold text-slate-900">
-                            {student.name}
-                          </span>
-                          <span className="text-[11px] text-primary-600 font-mono ml-1.5">
-                            @{student.username}
-                          </span>
-                        </div>
+                        <span className="font-bold font-mono text-primary-700">
+                          {handle}
+                        </span>
                       </div>
                     </td>
 
-                    <td className="py-4 px-5 text-slate-600">
+                    <td className="py-4 px-5 text-slate-600 font-medium">
                       {student.university}
                     </td>
 
@@ -224,3 +233,5 @@ export const LeaderboardView = () => {
     </div>
   );
 };
+
+export default LeaderboardView;

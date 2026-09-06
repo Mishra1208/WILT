@@ -1,22 +1,23 @@
 import { INITIAL_POSTS, INITIAL_CONCEPTS, INITIAL_LEADERBOARD_USERS } from '../data/seedData';
 
 const STORAGE_KEYS = {
-  POSTS: 'wilt_posts_v8',
-  CONCEPTS: 'wilt_concepts_v8',
-  LEADERBOARD: 'wilt_leaderboard_v8',
-  USER: 'wilt_current_user_v8',
-  SAVED_POSTS: 'wilt_saved_posts_v8',
-  QUIZ_HISTORY: 'wilt_quiz_history_v8',
+  POSTS: 'wilt_posts_v9',
+  CONCEPTS: 'wilt_concepts_v9',
+  LEADERBOARD: 'wilt_leaderboard_v9',
+  USER: 'wilt_current_user_v9',
+  SAVED_POSTS: 'wilt_saved_posts_v9',
+  QUIZ_HISTORY: 'wilt_quiz_history_v9',
 };
 
 // Initialize Storage with clean real user data
 export const initStorage = () => {
-  // Clear any old post storage keys (v1 through v7)
+  // Clear any old storage keys
   try {
-    ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'].forEach(v => {
+    ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8'].forEach(v => {
       localStorage.removeItem(`wilt_posts_${v}`);
       localStorage.removeItem(`wilt_saved_posts_${v}`);
       localStorage.removeItem(`wilt_concepts_${v}`);
+      localStorage.removeItem(`wilt_leaderboard_${v}`);
     });
   } catch (e) {}
 

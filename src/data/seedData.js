@@ -91,7 +91,7 @@ export const INITIAL_CONCEPTS = [
 export const INITIAL_LEADERBOARD_USERS = [
   {
     id: "user-1",
-    name: "Narendra Mishra",
+    name: "@narendramishra",
     username: "narendramishra",
     avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
     university: "Concordia University, Canada",
@@ -110,7 +110,7 @@ export const INITIAL_LEADERBOARD_USERS = [
   },
   {
     id: "user-2",
-    name: "Avinendra Pratap Singh",
+    name: "@avinendra_singh",
     username: "avinendra_singh",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
     university: "Symbiosis School of Banking and Finance, Pune",
@@ -129,7 +129,7 @@ export const INITIAL_LEADERBOARD_USERS = [
   },
   {
     id: "user-3",
-    name: "Kumar",
+    name: "@kumar_lead",
     username: "kumar_lead",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
     university: "Symbiosis School of Banking and Finance, Pune",
