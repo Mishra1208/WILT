@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, FileText, Compass, Filter } from 'lucide-react';
+import { Sparkles, FileText, Compass, Filter, Loader2 } from 'lucide-react';
 import { CATEGORIES } from '../data/seedData';
 import { useApp } from '../context/AppContext';
 import { PostCard } from '../components/cards/PostCard';
@@ -12,7 +12,8 @@ export const DiscoverView = () => {
     selectedCategory,
     setSelectedCategory,
     searchQuery,
-    setIsNewPostModalOpen
+    setIsNewPostModalOpen,
+    isPostsLoading
   } = useApp();
 
   const query = searchQuery.toLowerCase().trim();
@@ -108,6 +109,16 @@ export const DiscoverView = () => {
             {filteredPosts.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
+          </div>
+        ) : isPostsLoading ? (
+          <div className="flex flex-col items-center justify-center p-16 my-6 rounded-3xl bg-white border border-slate-200/80 text-center shadow-xs">
+            <Loader2 className="w-8 h-8 text-primary-600 animate-spin mb-3" />
+            <h3 className="text-sm font-extrabold text-slate-900">
+              Loading Campus Insights...
+            </h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Fetching latest verified student posts from database.
+            </p>
           </div>
         ) : (
           /* Empty State */

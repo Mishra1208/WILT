@@ -20,6 +20,8 @@ import { getOrCreateGuestUser } from '../context/AuthContext';
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
+  const [isPostsLoading, setIsPostsLoading] = useState(true);
+
   // Initialize storage seeds and fetch remote Supabase posts & concepts
   useEffect(() => {
     initStorage();
@@ -45,9 +47,17 @@ export const AppProvider = ({ children }) => {
             }
           });
 
+          // Cache in localStorage to ensure zero refresh flicker
+          try {
+            localStorage.setItem('wilt_posts_v7', JSON.stringify(merged));
+          } catch (e) {}
+
           return merged;
         });
       }
+      setIsPostsLoading(false);
+    }).catch(() => {
+      setIsPostsLoading(false);
     });
 
     // 2. Fetch remote concepts from Supabase
@@ -437,7 +447,8 @@ export const AppProvider = ({ children }) => {
         isReportBugModalOpen,
         setIsReportBugModalOpen,
         openReportBugModal,
-        closeReportBugModal
+        closeReportBugModal,
+        isPostsLoading
       }}
     >
       {children}
