@@ -3,6 +3,7 @@ import {
   initStorage,
   getStoredPosts,
   savePost as storageSavePost,
+  saveAllPostsToStorage,
   getStoredConcepts,
   saveConcept as storageSaveConcept,
   getStoredLeaderboard
@@ -31,8 +32,9 @@ export const AppProvider = ({ children }) => {
     // 1. Fetch remote posts from Supabase (Supabase is single source of truth)
     const loadLivePosts = () => {
       fetchPostsFromSupabase().then((remotePosts) => {
-        if (remotePosts) {
+        if (remotePosts && remotePosts.length > 0) {
           setPosts(remotePosts);
+          saveAllPostsToStorage(remotePosts);
         }
         setIsPostsLoading(false);
       }).catch(() => {

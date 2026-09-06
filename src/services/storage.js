@@ -58,6 +58,14 @@ export const savePost = (post) => {
   return newPosts;
 };
 
+export const saveAllPostsToStorage = (postsList) => {
+  try {
+    if (postsList && Array.isArray(postsList)) {
+      localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(postsList));
+    }
+  } catch (e) {}
+};
+
 export const updatePostInStorage = savePost;
 
 export const getStoredConcepts = () => {
