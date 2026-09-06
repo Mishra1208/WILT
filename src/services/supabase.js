@@ -403,7 +403,9 @@ export const fetchLeaderboardFromSupabase = async () => {
     if (profiles && profiles.length > 0) {
       profiles.forEach((p) => {
         const handle = (p.username || p.name || 'anonymous').replace(/^@/, '').toLowerCase().trim();
-        if (handle) {
+        const userXp = Number(p.xp) || 0;
+        const quizzesDone = Number(p.quizzes_completed) || 0;
+        if (handle && !handle.startsWith('archived_reset_') && (userXp > 0 || quizzesDone > 0)) {
           handleMap.set(handle, {
             id: p.id || `user_${handle}`,
             name: `@${handle}`,
@@ -411,10 +413,10 @@ export const fetchLeaderboardFromSupabase = async () => {
             avatar: p.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${handle}`,
             university: p.university || 'Anonymous Campus',
             major: p.major || 'Guest Scholar',
-            xp: Number(p.xp) || 150,
+            xp: userXp,
             accuracy: Number(p.accuracy) || 90,
             tier: p.tier || 'Curious Scholar',
-            quizzesCompleted: Number(p.quizzes_completed) || 0
+            quizzesCompleted: quizzesDone
           });
         }
       });
@@ -423,7 +425,8 @@ export const fetchLeaderboardFromSupabase = async () => {
     if (attempts && attempts.length > 0) {
       attempts.forEach((a) => {
         const handle = (a.user_handle || 'anonymous').replace(/^@/, '').toLowerCase().trim();
-        if (handle) {
+        const earnedXp = Number(a.xp_earned) || 0;
+        if (handle && !handle.startsWith('archived_reset_') && earnedXp > 0) {
           if (!handleMap.has(handle)) {
             handleMap.set(handle, {
               id: `anon_${handle}`,
@@ -432,15 +435,15 @@ export const fetchLeaderboardFromSupabase = async () => {
               avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${handle}`,
               university: 'Anonymous Campus',
               major: 'Guest Scholar',
-              xp: Number(a.xp_earned) || 150,
+              xp: earnedXp,
               accuracy: Number(a.accuracy_percentage) || 90,
               tier: 'Curious Scholar',
               quizzesCompleted: 1
             });
           } else {
             const existing = handleMap.get(handle);
-            if (a.xp_earned && Number(a.xp_earned) > existing.xp) {
-              existing.xp = Number(a.xp_earned);
+            if (earnedXp > existing.xp) {
+              existing.xp = earnedXp;
               existing.accuracy = Number(a.accuracy_percentage) || existing.accuracy;
             }
           }
