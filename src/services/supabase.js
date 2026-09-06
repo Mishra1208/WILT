@@ -102,8 +102,6 @@ export const savePostToSupabase = async (post) => {
           author_avatar: post.author?.avatar || '',
           key_takeaways: post.keyTakeaways || [],
           terms: post.terms || [],
-          source_url: post.sourceUrl || '',
-          source_context: post.sourceContext || '',
           created_at: new Date().toISOString()
         }
       ])
