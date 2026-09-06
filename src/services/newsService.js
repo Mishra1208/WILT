@@ -1,61 +1,71 @@
 /**
- * News Service — Fetches 60+ live business news articles and formats them into
- * 60-second Recruiter-Ready Inshorts-style digests with interview talking points.
+ * News Service — Fetches REAL-TIME TODAY'S live business & international news
+ * via live RSS-to-JSON endpoints and formats them into 60-second Recruiter-Ready digests.
  */
 
-const NEWS_API_BUSINESS = 'https://saurav.tech/NewsAPI/top-headlines/category/business/in.json';
-const NEWS_API_TECH = 'https://saurav.tech/NewsAPI/top-headlines/category/technology/in.json';
+const RSS_BUSINESS = 'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnews.google.com%2Frss%2Fheadlines%2Fsection%2Ftopic%2FBUSINESS%3Fhl%3Den-IN%26gl%3DIN%26ceid%3DIN%3Aen';
+const RSS_WORLD = 'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnews.google.com%2Frss%2Fheadlines%2Fsection%2Ftopic%2FWORLD%3Fhl%3Den-IN%26gl%3DIN%26ceid%3DIN%3Aen';
+const RSS_TECH = 'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnews.google.com%2Frss%2Fheadlines%2Fsection%2Ftopic%2FTECHNOLOGY%3Fhl%3Den-IN%26gl%3DIN%26ceid%3DIN%3Aen';
+
+// High-resolution Unsplash images for news categories
+const DYNAMIC_IMAGES = [
+  'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+];
 
 // Helper to generate dynamic placement interview talking point based on title and content
-const generateInterviewTalkingPoint = (title, content, source) => {
-  const lower = (title + ' ' + (content || '')).toLowerCase();
+const generateInterviewTalkingPoint = (title, source) => {
+  const lower = title.toLowerCase();
   
-  if (lower.includes('fed') || lower.includes('rate') || lower.includes('rbi') || lower.includes('inflation')) {
-    return `If asked about monetary policy: "Central bank interest rate decisions directly dictate the cost of corporate borrowing and liquidity. Sustained rate stability helps stabilize inflation while sustaining corporate earnings growth."`;
+  if (lower.includes('fed') || lower.includes('rate') || lower.includes('rbi') || lower.includes('inflation') || lower.includes('gdp')) {
+    return `If asked about economic indicators: "Macroeconomic metrics like GDP trends and central bank interest rates dictate corporate borrowing costs and equity valuations across key sectors."`;
   }
-  if (lower.includes('ipo') || lower.includes('share') || lower.includes('market') || lower.includes('nifty') || lower.includes('sensex')) {
-    return `If asked about stock market trends: "Equity market valuations reflect investor confidence in economic growth, corporate margins, and steady domestic institutional liquidity balancing foreign capital movements."`;
+  if (lower.includes('ipo') || lower.includes('share') || lower.includes('market') || lower.includes('nifty') || lower.includes('sensex') || lower.includes('sebi')) {
+    return `If asked about capital markets: "Strong institutional capital and regulatory clearance like SEBI IPO approvals reflect robust retail investor participation and domestic equity market depth."`;
   }
-  if (lower.includes('tech') || lower.includes('startup') || lower.includes('ai') || lower.includes('zepto') || lower.includes('funding')) {
-    return `If asked about startup valuation & technology: "High-growth tech companies focus on unit economics and sustainable cash flow over burn rate. Rapid scaling combined with operational efficiency creates long-term enterprise value."`;
+  if (lower.includes('apple') || lower.includes('ai') || lower.includes('tech') || lower.includes('google') || lower.includes('chip') || lower.includes('nvidia')) {
+    return `If asked about technology & innovation: "Product innovation cycles and AI infrastructure spending create sustainable competitive advantages and long-term enterprise value."`;
   }
-  if (lower.includes('tata') || lower.includes('car') || lower.includes('auto') || lower.includes('ev') || lower.includes('power')) {
-    return `If asked about industrial & manufacturing growth: "India’s manufacturing resurgence is driven by heavy capex investments, rising domestic consumption, and green transition initiatives like EV adoption."`;
+  if (lower.includes('auto') || lower.includes('car') || lower.includes('maruti') || lower.includes('mahindra') || lower.includes('ev')) {
+    return `If asked about manufacturing & automotive: "Consumer demand shifts toward modern automotive features and EV technology are driving capex growth and supply chain modernization in India."`;
   }
 
-  return `If asked about this sector in an interview: "Understanding ${source || 'industry'} dynamics demonstrates strong commercial awareness. Key trends indicate shifting consumer demand and strategic corporate re-positioning."`;
+  return `If asked about this sector in an interview: "Staying current with recent ${source || 'industry'} developments demonstrates strong commercial awareness and strategic thinking in candidate interviews."`;
 };
 
 // Helper to extract key terms
-const extractKeyTerms = (title, description) => {
-  const text = (title + ' ' + (description || '')).toUpperCase();
+const extractKeyTerms = (title) => {
+  const text = title.toUpperCase();
   const terms = [];
   
   if (text.includes('IPO')) terms.push('IPO');
-  if (text.includes('RBI') || text.includes('FED')) terms.push('Monetary Policy');
-  if (text.includes('NIFTY') || text.includes('SENSEX') || text.includes('STOCKS')) terms.push('Stock Market');
-  if (text.includes('VALUATION') || text.includes('FUNDING')) terms.push('Venture Capital');
-  if (text.includes('EV') || text.includes('AUTO') || text.includes('CAR')) terms.push('Automotive');
-  if (text.includes('INFLATION')) terms.push('Macroeconomics');
+  if (text.includes('SEBI') || text.includes('RBI') || text.includes('FED')) terms.push('Regulatory Policy');
+  if (text.includes('NIFTY') || text.includes('SENSEX') || text.includes('STOCK')) terms.push('Equity Markets');
+  if (text.includes('GDP') || text.includes('INFLATION')) terms.push('Macroeconomics');
+  if (text.includes('AI') || text.includes('TECH') || text.includes('APPLE')) terms.push('Technology');
+  if (text.includes('AUTO') || text.includes('EV') || text.includes('CAR')) terms.push('Automotive');
 
-  if (terms.length === 0) terms.push('Corporate Strategy', 'Industry Insights');
+  if (terms.length === 0) terms.push('Corporate Strategy', 'Industry Trends');
   return terms;
 };
 
 // Helper to map article to sub-hub category
-const categorizeArticle = (title, description, sourceName) => {
-  const text = (title + ' ' + (description || '') + ' ' + (sourceName || '')).toLowerCase();
+const categorizeArticle = (title, sourceName) => {
+  const text = (title + ' ' + (sourceName || '')).toLowerCase();
   
-  if (text.includes('us') || text.includes('global') || text.includes('tesla') || text.includes('amazon') || text.includes('fed') || text.includes('world')) {
+  if (text.includes('us') || text.includes('world') || text.includes('iran') || text.includes('global') || text.includes('trump') || text.includes('apple') || text.includes('china')) {
     return { id: 'international', label: '🌐 International Business' };
   }
-  if (text.includes('market') || text.includes('sensex') || text.includes('nifty') || text.includes('stock') || text.includes('shares') || text.includes('bse')) {
+  if (text.includes('market') || text.includes('sensex') || text.includes('nifty') || text.includes('stock') || text.includes('gdp') || text.includes('gift')) {
     return { id: 'markets', label: '📈 Markets & Economy' };
   }
-  if (text.includes('rbi') || text.includes('bank') || text.includes('icici') || text.includes('lending') || text.includes('rate')) {
+  if (text.includes('rbi') || text.includes('sebi') || text.includes('cbi') || text.includes('lic') || text.includes('bank') || text.includes('fed')) {
     return { id: 'banking', label: '🏦 Banking & Policy' };
   }
-  if (text.includes('fund') || text.includes('invest') || text.includes('sip') || text.includes('lic') || text.includes('ipo')) {
+  if (text.includes('fund') || text.includes('invest') || text.includes('sip') || text.includes('ipo') || text.includes('profit')) {
     return { id: 'mutual_funds', label: '💰 Mutual Funds & Finance' };
   }
   
@@ -64,57 +74,75 @@ const categorizeArticle = (title, description, sourceName) => {
 
 export const fetchLiveBusinessNews = async () => {
   try {
-    const [bizRes, techRes] = await Promise.all([
-      fetch(NEWS_API_BUSINESS).then(r => r.json()).catch(() => null),
-      fetch(NEWS_API_TECH).then(r => r.json()).catch(() => null)
+    const [bizRes, worldRes, techRes] = await Promise.all([
+      fetch(RSS_BUSINESS).then(r => r.json()).catch(() => null),
+      fetch(RSS_WORLD).then(r => r.json()).catch(() => null),
+      fetch(RSS_TECH).then(r => r.json()).catch(() => null)
     ]);
 
-    const rawArticles = [
-      ...(bizRes?.articles || []),
-      ...(techRes?.articles || [])
+    const rawItems = [
+      ...(bizRes?.items || []),
+      ...(worldRes?.items || []),
+      ...(techRes?.items || [])
     ];
 
-    if (!rawArticles || rawArticles.length === 0) {
+    if (!rawItems || rawItems.length === 0) {
       return null;
     }
 
-    // Filter out articles missing title or description
-    const valid = rawArticles.filter(a => a && a.title && a.title.length > 10 && a.url);
+    // Filter valid items
+    const valid = rawItems.filter(item => item && item.title && item.title.length > 8);
 
-    return valid.map((art, idx) => {
-      const cleanTitle = art.title.replace(/ - [^-]+$/, '');
-      const sourceName = art.source?.name || 'Inshorts News';
-      const catObj = categorizeArticle(art.title, art.description, sourceName);
-      const terms = extractKeyTerms(art.title, art.description);
-      const talkingPoint = generateInterviewTalkingPoint(art.title, art.description, sourceName);
+    return valid.map((item, idx) => {
+      // Split Title and Source
+      const parts = item.title.split(' - ');
+      const cleanSource = parts.length > 1 ? parts.pop() : 'Business News';
+      const cleanTitle = parts.join(' - ');
 
-      const pubDate = art.publishedAt ? new Date(art.publishedAt).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      }) : 'Recently';
+      const catObj = categorizeArticle(cleanTitle, cleanSource);
+      const terms = extractKeyTerms(cleanTitle);
+      const talkingPoint = generateInterviewTalkingPoint(cleanTitle, cleanSource);
+      const randomImg = DYNAMIC_IMAGES[idx % DYNAMIC_IMAGES.length];
+
+      // Format date to Today / Yesterday / Recent date
+      let formattedDate = 'Today';
+      if (item.pubDate) {
+        const pub = new Date(item.pubDate);
+        const now = new Date();
+        const diffHours = Math.floor((now - pub) / (1000 * 60 * 60));
+        if (diffHours < 24) {
+          formattedDate = diffHours <= 1 ? 'Just now' : `${diffHours} hours ago`;
+        } else {
+          formattedDate = pub.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+      }
+
+      // Clean snippet summary
+      const cleanDescription = item.description 
+        ? item.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim()
+        : cleanTitle;
 
       return {
-        id: `live-news-${idx}-${Date.now()}`,
+        id: `live-rss-${idx}-${Date.now()}`,
         title: cleanTitle,
         category: catObj.id,
         categoryLabel: catObj.label,
-        date: pubDate,
+        date: formattedDate,
         readTime: '60 sec read',
-        source: sourceName,
-        toiUrl: art.url,
-        imageUrl: art.urlToImage || 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
+        source: cleanSource,
+        toiUrl: item.link || 'https://news.google.com',
+        imageUrl: item.thumbnail || randomImg,
         summary: {
-          whatHappened: art.description || art.title,
-          whyItMatters: art.content ? art.content.replace(/\[\+\d+ chars\]/, '') : 'Key corporate development impacting industry valuations and commercial growth.',
-          keyMetric: `Source: ${sourceName}`
+          whatHappened: cleanDescription.length > 15 ? cleanDescription : cleanTitle,
+          whyItMatters: `Key recent development reported by ${cleanSource} impacting sector valuations and business outlook.`,
+          keyMetric: `Published: ${formattedDate}`
         },
         interviewTalkingPoint: talkingPoint,
         keyTerms: terms
       };
     });
   } catch (e) {
-    console.warn('Failed to fetch live news, falling back:', e);
+    console.warn('Failed to fetch real-time live news, falling back:', e);
     return null;
   }
 };
