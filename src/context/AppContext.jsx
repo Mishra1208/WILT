@@ -43,7 +43,12 @@ export const AppProvider = ({ children }) => {
     };
 
     loadLivePosts();
-    const postsInterval = setInterval(loadLivePosts, 10000);
+    // Safety-net poll only — the Realtime subscription below (#4) is the
+    // primary sync path for posts, comments, and attachments. This just
+    // guards against a dropped websocket, so it can afford to be slow.
+    const postsInterval = setInterval(() => {
+      if (!document.hidden) loadLivePosts();
+    }, 60000);
 
     // 2. Fetch remote concepts from Supabase
     fetchConceptsFromSupabase().then((remoteConcepts) => {
@@ -91,7 +96,9 @@ export const AppProvider = ({ children }) => {
     };
 
     loadLiveLeaderboard();
-    const leaderboardInterval = setInterval(loadLiveLeaderboard, 10000);
+    const leaderboardInterval = setInterval(() => {
+      if (!document.hidden) loadLiveLeaderboard();
+    }, 30000);
 
     // 4. Supabase Realtime listener for instant cross-tab / cross-browser post push
     let postsChannel;
@@ -332,7 +339,9 @@ export const AppProvider = ({ children }) => {
     return true;
   };
 
-  // Cross-browser & real-time comment sync effect
+  // Cross-tab (same device) instant comment/post sync via BroadcastChannel.
+  // Cross-device sync is already handled by the Supabase Realtime
+  // subscription set up above (#4) — no polling needed here.
   useEffect(() => {
     let bc;
     try {
@@ -350,44 +359,8 @@ export const AppProvider = ({ children }) => {
       };
     } catch (e) {}
 
-    // Polling interval to sync comments from remote devices/browsers
-    const intervalId = setInterval(() => {
-      fetchPostsFromSupabase().then((remotePosts) => {
-        if (remotePosts && remotePosts.length > 0) {
-          setPosts((current) => {
-            let hasChanges = false;
-            const updatedList = current.map((localPost) => {
-              const remote = remotePosts.find((r) => r.id === localPost.id);
-              if (remote) {
-                const localCommentsCount = (localPost.comments || []).length;
-                const remoteComments = remote.comments || [];
-                const mergedAttachments = (remote.attachments && remote.attachments.length > 0) ? remote.attachments : (localPost.attachments || []);
-
-                if (remoteComments.length > localCommentsCount || (remote.attachments && remote.attachments.length > (localPost.attachments || []).length)) {
-                  hasChanges = true;
-                  const mergedPost = {
-                    ...localPost,
-                    ...remote,
-                    attachments: mergedAttachments,
-                    comments: remoteComments.length >= localCommentsCount ? remoteComments : (localPost.comments || [])
-                  };
-                  if (selectedPost && selectedPost.id === localPost.id) {
-                    setSelectedPost(mergedPost);
-                  }
-                  return mergedPost;
-                }
-              }
-              return localPost;
-            });
-            return hasChanges ? updatedList : current;
-          });
-        }
-      });
-    }, 3000);
-
     return () => {
       if (bc) bc.close();
-      clearInterval(intervalId);
     };
   }, [selectedPost?.id]);
 
