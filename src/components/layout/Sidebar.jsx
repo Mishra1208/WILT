@@ -39,7 +39,6 @@ export const Sidebar = () => {
     { id: 'about', label: 'About WILT', icon: Info },
     { id: 'report-bug', label: 'Report a Bug', icon: AlertTriangle, action: openReportBugModal },
     { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   if (!isSidebarOpen) {
@@ -204,7 +203,7 @@ export const Sidebar = () => {
       <div className="p-4 border-t border-slate-100 bg-slate-50/50">
         {isLoggedIn ? (
           <div
-            onClick={() => handleNavClick('settings')}
+            onClick={() => handleNavClick('about')}
             className="flex items-center justify-between p-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 cursor-pointer transition-all"
           >
             <div className="flex items-center gap-2.5 truncate">

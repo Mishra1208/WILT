@@ -92,7 +92,6 @@ export function App() {
       case 'notifications':
         return <NotificationsView />;
       case 'settings':
-        return <SettingsView />;
       case 'about':
         return <AboutView />;
       case 'privacy':

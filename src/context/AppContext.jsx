@@ -75,6 +75,7 @@ export const AppProvider = ({ children }) => {
         'notifications', 'settings', 'privacy', 'terms', 'standards'
       ];
       if (path === 'knowledge-quest' || path === 'quest') return 'knowledge-quest';
+      if (path === 'settings') return 'about';
       if (validViews.includes(path)) {
         return path;
       }
@@ -82,6 +83,7 @@ export const AppProvider = ({ children }) => {
       const page = params.get('page');
       if (page) {
         if (page === 'knowledge-quest' || page === 'quest') return 'knowledge-quest';
+        if (page === 'settings') return 'about';
         if (validViews.includes(page)) return page;
       }
     } catch (e) {}
