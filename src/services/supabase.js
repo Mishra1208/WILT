@@ -157,7 +157,8 @@ export const fetchCommentsFromSupabase = async () => {
       .from('concepts')
       .select('*')
       .eq('category', 'post_comment')
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      .limit(100);
 
     if (error) {
       console.warn('Supabase fetch comments error:', error.message);
@@ -229,7 +230,8 @@ export const fetchAttachmentsFromSupabase = async () => {
       .from('concepts')
       .select('*')
       .eq('category', 'post_attachment')
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      .limit(100);
 
     if (error) {
       console.warn('Supabase fetch attachments error:', error.message);
@@ -264,23 +266,22 @@ export const fetchAttachmentsFromSupabase = async () => {
  */
 export const fetchPostsFromSupabase = async () => {
   try {
-    const { data, error } = await supabase
-      .from('posts')
-      .select('*')
-      .gt('created_at', '2026-09-02T22:18:00.000Z')
-      .order('created_at', { ascending: false });
+    const [postsRes, allComments, allAttachments] = await Promise.all([
+      supabase.from('posts').select('*').gt('created_at', '2026-09-02T22:18:00.000Z').order('created_at', { ascending: false }).limit(100),
+      fetchCommentsFromSupabase().catch(() => []),
+      fetchAttachmentsFromSupabase().catch(() => [])
+    ]);
+
+    const { data, error } = postsRes || {};
 
     if (error) {
       console.warn('Supabase fetch posts info:', error.message);
       return [];
     }
 
-    const allComments = await fetchCommentsFromSupabase();
-    const allAttachments = await fetchAttachmentsFromSupabase();
-
     return (data || []).map((row) => {
-      const postComments = allComments.filter((c) => c.postId === row.id);
-      const postAttachments = allAttachments.filter((a) => a.postId === row.id);
+      const postComments = (allComments || []).filter((c) => c.postId === row.id);
+      const postAttachments = (allAttachments || []).filter((a) => a.postId === row.id);
       return {
         id: row.id,
         title: row.title,
