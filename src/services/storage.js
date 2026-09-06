@@ -2,19 +2,19 @@ import { INITIAL_POSTS, INITIAL_CONCEPTS, INITIAL_LEADERBOARD_USERS } from '../d
 import { saveUserProfileToSupabase } from './supabase';
 
 const STORAGE_KEYS = {
-  POSTS: 'wilt_posts_v12',
-  CONCEPTS: 'wilt_concepts_v12',
-  LEADERBOARD: 'wilt_leaderboard_v12',
-  USER: 'wilt_current_user_v12',
-  SAVED_POSTS: 'wilt_saved_posts_v12',
-  QUIZ_HISTORY: 'wilt_quiz_history_v12',
+  POSTS: 'wilt_posts_v13',
+  CONCEPTS: 'wilt_concepts_v13',
+  LEADERBOARD: 'wilt_leaderboard_v13',
+  USER: 'wilt_current_user_v13',
+  SAVED_POSTS: 'wilt_saved_posts_v13',
+  QUIZ_HISTORY: 'wilt_quiz_history_v13',
 };
 
 // Initialize Storage with clean real user data
 export const initStorage = () => {
   // Clear any old storage keys
   try {
-    ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11'].forEach(v => {
+    ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12'].forEach(v => {
       localStorage.removeItem(`wilt_posts_${v}`);
       localStorage.removeItem(`wilt_saved_posts_${v}`);
       localStorage.removeItem(`wilt_concepts_${v}`);
@@ -118,9 +118,14 @@ export const updateLeaderboardUser = (updatedUser) => {
   if (index >= 0) {
     updatedList = [...list];
     updatedList[index] = { ...updatedList[index], ...formattedUser };
-  } else {
+  } else if ((formattedUser.xp || 0) > 0) {
     updatedList = [...list, formattedUser];
+  } else {
+    updatedList = [...list];
   }
+
+  // Filter out any 0 XP entries so empty leaderboard stays 100% clean
+  updatedList = updatedList.filter(u => (Number(u.xp) || 0) > 0);
 
   // Sort descending by XP
   updatedList.sort((a, b) => (b.xp || 0) - (a.xp || 0));
@@ -158,12 +163,19 @@ export const saveUser = saveStoredUser;
 
 export const getOrCreateGuestUser = () => {
   try {
-    const key = 'wilt_guest_identity_v12';
+    const key = 'wilt_guest_identity_v13';
     const saved = localStorage.getItem(key);
     if (saved) {
       const parsed = JSON.parse(saved);
-      updateLeaderboardUser(parsed);
-      saveUserProfileToSupabase(parsed);
+      if (!parsed.quizzesCompleted && (parsed.xp === 150 || !parsed.xp)) {
+        parsed.xp = 0;
+        parsed.accuracy = 0;
+        localStorage.setItem(key, JSON.stringify(parsed));
+      }
+      if (parsed.xp > 0) {
+        updateLeaderboardUser(parsed);
+        saveUserProfileToSupabase(parsed);
+      }
       return parsed;
     }
 
@@ -190,8 +202,6 @@ export const getOrCreateGuestUser = () => {
     };
 
     localStorage.setItem(key, JSON.stringify(guestUser));
-    updateLeaderboardUser(guestUser);
-    saveUserProfileToSupabase(guestUser);
     return guestUser;
   } catch (e) {
     const randomNum = Math.floor(1000 + Math.random() * 9000);
@@ -206,7 +216,6 @@ export const getOrCreateGuestUser = () => {
       accuracy: 0,
       isGuest: true
     };
-    updateLeaderboardUser(fallbackGuest);
     return fallbackGuest;
   }
 };
