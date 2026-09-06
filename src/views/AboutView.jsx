@@ -229,71 +229,71 @@ export const AboutView = () => {
         </div>
       </div>
 
-      {/* PROJECT CREATORS & FOUNDERS SPOTLIGHT */}
-      <div className="p-8 sm:p-10 rounded-3xl bg-white border border-slate-200/90 shadow-[0_20px_50px_rgba(0,0,0,0.04)] space-y-8">
-        <div className="text-center space-y-2 max-w-xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 border border-primary-100 text-primary-700 text-xs font-bold">
-            <HeartHandshake className="w-3.5 h-3.5" />
-            <span>Original Idea & Architecture</span>
+      {/* PROJECT CREATORS & FOUNDERS SPOTLIGHT (DIRECTLY ON PAGE CANVAS) */}
+      <div className="space-y-8">
+        <div className="text-center space-y-2 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary-50 border border-primary-100/80 text-primary-700 text-xs font-extrabold shadow-2xs">
+            <HeartHandshake className="w-4 h-4 text-primary-600" />
+            <span>Original Idea & Platform Architecture</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Meet the Creators
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
             WILT was envisioned and created by <strong>Narendra Mishra</strong> (Concordia University, Canada), <strong>Avinendra Pratap Singh</strong>, and <strong>Kumar</strong> (Symbiosis School of Banking & Finance).
           </p>
         </div>
 
-        {/* 3 Founders Cards with Large Stylish Photos */}
+        {/* 3 Founders Cards directly on page canvas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {creators.map((creator, idx) => (
             <div
               key={idx}
-              className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-soft hover:shadow-hover hover:border-primary-300 transition-all duration-300 flex flex-col justify-between group relative text-center"
+              className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/80 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_-4px_rgba(79,70,229,0.08)] hover:border-primary-300 transition-all duration-300 flex flex-col justify-between group relative text-center"
             >
               <div>
                 {/* Stylish Large Profile Photo Container */}
-                <div className="relative mx-auto my-2 w-24 h-24 sm:w-28 sm:h-28">
+                <div className="relative mx-auto my-3 w-28 h-28 sm:w-32 sm:h-32">
                   <img
                     src={creator.avatar}
                     alt={creator.name}
-                    className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover ring-4 ring-primary-100 group-hover:ring-primary-400 group-hover:scale-105 shadow-md transition-all duration-300"
+                    className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl object-cover ring-4 ring-slate-100 group-hover:ring-primary-300 group-hover:scale-105 shadow-md transition-all duration-300"
                   />
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 ring-2 ring-white flex items-center justify-center text-[10px] text-white font-bold" title="Co-Founder Active">
+                  <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-emerald-500 ring-2 ring-white flex items-center justify-center text-xs text-white font-black shadow-xs" title="Co-Founder Active">
                     ✓
                   </div>
                 </div>
 
                 {/* Creator Details */}
-                <div className="space-y-1 mt-3">
-                  <h3 className="text-base sm:text-lg font-extrabold text-slate-900 group-hover:text-primary-700 transition-colors leading-tight">
+                <div className="space-y-1 mt-4">
+                  <h3 className="text-lg font-extrabold text-slate-900 group-hover:text-primary-700 transition-colors leading-snug">
                     {creator.name}
                   </h3>
-                  <p className="text-xs font-extrabold text-primary-600 font-mono">
+                  <p className="text-xs font-extrabold text-primary-600 font-mono tracking-wide">
                     {creator.role}
                   </p>
                 </div>
 
                 {/* University Badge */}
-                <div className="mt-2.5 inline-block">
-                  <span className="px-3 py-1 rounded-xl bg-indigo-50/90 border border-indigo-100 text-[10px] font-extrabold text-indigo-950 inline-flex items-center gap-1 shadow-2xs">
+                <div className="mt-3 inline-block">
+                  <span className="px-3.5 py-1.5 rounded-xl bg-indigo-50/90 border border-indigo-100/90 text-xs font-extrabold text-indigo-950 inline-flex items-center gap-1.5 shadow-2xs">
                     🏫 {creator.university}
                   </span>
                 </div>
 
                 {/* Personal Quote */}
-                <p className="text-xs text-slate-600 leading-relaxed italic bg-slate-50/80 p-3.5 rounded-2xl border border-slate-100 font-serif mt-3.5 text-left">
+                <p className="text-xs text-slate-600 leading-relaxed italic bg-slate-50/80 p-4 rounded-2xl border border-slate-100 font-serif mt-4 text-left">
                   "{creator.quote}"
                 </p>
               </div>
 
               {/* Card Footer */}
-              <div className="pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium gap-2 text-left">
-                <span className="flex items-center gap-1 text-primary-700 font-bold truncate">
-                  <Award className="w-3.5 h-3.5 text-primary-600 flex-shrink-0" />
+              <div className="pt-3.5 mt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium gap-2 text-left">
+                <span className="flex items-center gap-1.5 text-primary-700 font-bold truncate">
+                  <Award className="w-4 h-4 text-primary-600 flex-shrink-0" />
                   <span className="truncate">{creator.focus}</span>
                 </span>
-                <span className="font-mono text-slate-600 text-[10px] font-extrabold bg-slate-100 px-2 py-0.5 rounded-md flex-shrink-0">{creator.cohort}</span>
+                <span className="font-mono text-slate-600 text-[11px] font-extrabold bg-slate-100 px-2.5 py-0.5 rounded-md flex-shrink-0">{creator.cohort}</span>
               </div>
             </div>
           ))}
