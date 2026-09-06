@@ -94,17 +94,21 @@ export const PostCard = ({ post }) => {
           </div>
         )}
 
-        {/* Source of Trust (Clean verified tag) */}
+        {/* Source of Trust & Learning Location */}
         {(post.sourceUrl || post.sourceContext) && (
-          <div className="flex items-center gap-1.5 text-[11px] text-emerald-800 bg-emerald-50/60 px-2.5 py-1 rounded-xl border border-emerald-100/80">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-            <span className="truncate font-medium">
-              {trustDomain ? (
-                <span className="underline">{trustDomain}</span>
-              ) : (
-                post.sourceContext
-              )}
-            </span>
+          <div className="flex items-center gap-2 flex-wrap pt-0.5">
+            {post.sourceContext && (
+              <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200/80 shadow-2xs">
+                <MapPin className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+                <span className="truncate">{post.sourceContext}</span>
+              </div>
+            )}
+            {trustDomain && (
+              <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-800 bg-emerald-50/70 px-2.5 py-1 rounded-xl border border-emerald-100/80">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                <span className="truncate underline font-mono">{trustDomain}</span>
+              </div>
+            )}
           </div>
         )}
       </div>

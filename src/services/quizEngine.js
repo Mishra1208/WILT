@@ -107,7 +107,7 @@ export const generateWeeklyQuiz = (posts = [], count = 5) => {
         postId: p.id,
         postTitle: p.title,
         category: p.category || "General",
-        question: `According to @${p.author?.username || 'peer'}'s bite on "${p.title}", which of the following is a primary key takeaway?`,
+        question: `Regarding "${p.title}", which of the following is a primary key takeaway?`,
         options: [
           takeaway,
           `Operating expenses should be capitalized into long-term intangibles`,
@@ -116,7 +116,7 @@ export const generateWeeklyQuiz = (posts = [], count = 5) => {
         ].sort(() => 0.5 - Math.random()),
         correctIndex: 0, // calculated dynamically below
         correctAnswerText: takeaway,
-        explanation: `In the post "${p.title}", the author highlights: ${takeaway}`,
+        explanation: `In "${p.title}", the primary takeaway is: ${takeaway}`,
         sourceSnippet: p.summary || takeaway
       };
     });

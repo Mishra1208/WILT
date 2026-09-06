@@ -12,7 +12,27 @@ export const DictionaryView = () => {
 
   const alphabet = ['All', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
 
-  const filteredConcepts = concepts.filter((c) => {
+  // Extract jargon terms from community posts dynamically
+  const postExtractedConcepts = (posts || []).flatMap((p) => {
+    if (!p.terms || p.terms.length === 0) return [];
+    return p.terms.map((term, idx) => ({
+      id: `post-term-${p.id}-${idx}`,
+      term: term,
+      category: p.category || 'General',
+      definition: p.summary || p.title,
+      plainExplanation: p.keyTakeaways?.[0] || `Community concept from post "${p.title}"`,
+      contributor: p.author?.username || 'peer',
+      relatedPostId: p.id
+    }));
+  });
+
+  // Combine concepts and post terms, deduplicating by term
+  const allConcepts = [...(concepts || []), ...postExtractedConcepts];
+  const uniqueConcepts = Array.from(
+    new Map(allConcepts.map((c) => [c.term.trim().toLowerCase(), c])).values()
+  );
+
+  const filteredConcepts = uniqueConcepts.filter((c) => {
     const matchesSearch =
       !search ||
       c.term.toLowerCase().includes(search.toLowerCase()) ||

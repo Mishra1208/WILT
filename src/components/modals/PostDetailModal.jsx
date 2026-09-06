@@ -18,7 +18,8 @@ import {
   Paperclip,
   FileText,
   Image as ImageIcon,
-  Link as LinkIcon
+  Link as LinkIcon,
+  MapPin
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -243,36 +244,55 @@ export const PostDetailModal = () => {
             );
           })()}
 
-          {/* Source of Trust & Verification Block */}
+          {/* Source of Trust & Learning Location Block */}
           {(() => {
             const linkAttachment = selectedPost.attachments?.find((a) => a.type === 'link');
             const effectiveSourceUrl = selectedPost.sourceUrl || linkAttachment?.url || linkAttachment?.name;
+            const hasContext = selectedPost.sourceContext?.trim();
 
-            if (!effectiveSourceUrl) return null;
+            if (!effectiveSourceUrl && !hasContext) return null;
 
             return (
-              <div className="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
-                <div className="flex items-center gap-2 text-xs font-extrabold text-emerald-950 uppercase tracking-wider">
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex items-center gap-2 text-xs font-extrabold text-slate-800 uppercase tracking-wider">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>Source of Trust & Verification</span>
+                  <span>Reference & Learning Context</span>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-white border border-emerald-100 flex items-center justify-between gap-3">
-                  <div className="truncate">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Reference Source</span>
-                    <span className="font-mono text-emerald-700 truncate block text-xs sm:text-sm font-bold uppercase mt-0.5">
-                      {effectiveSourceUrl.replace(/^https?:\/\/(www\.)?/i, '')}
-                    </span>
-                  </div>
-                  <a
-                    href={effectiveSourceUrl.startsWith('http') ? effectiveSourceUrl : `https://${effectiveSourceUrl}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 whitespace-nowrap shadow-2xs transition-all cursor-pointer"
-                  >
-                    <span>Open</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {hasContext && (
+                    <div className="p-3.5 rounded-xl bg-amber-50/90 border border-amber-200 flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-amber-100 text-amber-700">
+                        <MapPin className="w-4 h-4" />
+                      </div>
+                      <div className="truncate">
+                        <span className="text-[10px] uppercase font-extrabold text-amber-800/80 block">Learning Location / Context</span>
+                        <span className="text-xs sm:text-sm font-extrabold text-amber-950 truncate block mt-0.5">
+                          {selectedPost.sourceContext}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {effectiveSourceUrl && (
+                    <div className="p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 flex items-center justify-between gap-3">
+                      <div className="truncate">
+                        <span className="text-[10px] uppercase font-extrabold text-emerald-800/80 block font-mono">Reference URL</span>
+                        <span className="font-mono text-emerald-700 truncate block text-xs sm:text-sm font-extrabold uppercase mt-0.5">
+                          {effectiveSourceUrl.replace(/^https?:\/\/(www\.)?/i, '')}
+                        </span>
+                      </div>
+                      <a
+                        href={effectiveSourceUrl.startsWith('http') ? effectiveSourceUrl : `https://${effectiveSourceUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shrink-0 shadow-2xs transition-all cursor-pointer"
+                      >
+                        <span>Open</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
             );
