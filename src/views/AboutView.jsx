@@ -20,6 +20,7 @@ import { useApp } from '../context/AppContext';
 import { DrawCircleHeading } from '../components/ui/DrawCircleHeading';
 import avinendraImg from '../avinendra.JPG';
 import kumarImg from '../kumar.JPG';
+import narendraImg from '../narendra.jpg';
 
 export const AboutView = () => {
   const { setCurrentView } = useApp();
@@ -67,7 +68,7 @@ export const AboutView = () => {
       role: "Co-Creator & Lead Architect",
       badge: "⚡ Co-Founder",
       university: "Symbiosis School of Banking & Finance",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=80",
+      avatar: narendraImg,
       quote: "Knowledge grows when shared. WILT makes continuous peer learning seamless, high-yield, and accessible to every banking and tech student.",
       focus: "Full-Stack System Architecture & Cloud Infrastructure"
     },
