@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { Trophy, Search, Zap, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Trophy, Search, Sparkles, UserCheck, ArrowDown, Award } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
+import { cn } from '../lib/utils';
 
 export const LeaderboardView = () => {
   const { leaderboard } = useApp();
   const { user } = useAuth();
   const [filterQuery, setFilterQuery] = useState('');
+  const [visibleCount, setVisibleCount] = useState(10);
+
+  // Reset pagination when search filter changes
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [filterQuery]);
 
   const top1 = leaderboard[0];
   const top2 = leaderboard[1];
   const top3 = leaderboard[2];
-
-  const filteredUsers = leaderboard.filter((u) => {
-    const handle = `@${(u.username || u.name || '').replace(/^@/, '')}`.toLowerCase();
-    const uni = (u.university || '').toLowerCase();
-    const q = filterQuery.toLowerCase();
-    return handle.includes(q) || uni.includes(q);
-  });
 
   const getCleanHandle = (u) => {
     if (!u) return '';
@@ -25,9 +25,47 @@ export const LeaderboardView = () => {
     return `@${raw.replace(/^@/, '')}`;
   };
 
+  const activeUserHandle = getCleanHandle(user);
+  const activeUserRankItem = leaderboard.find((u) => {
+    const h = getCleanHandle(u).toLowerCase();
+    return (user && user.id === u.id) || (activeUserHandle && h === activeUserHandle.toLowerCase());
+  });
+
+  const activeUserRank = activeUserRankItem ? activeUserRankItem.rank : (user?.rank || 12);
+  const activeUserXP = activeUserRankItem ? activeUserRankItem.xp : (user?.xp || 150);
+
+  // Filter Users across handle, rank number (#1, 1), university, or tier
+  const filteredUsers = leaderboard.filter((u) => {
+    const handle = getCleanHandle(u).toLowerCase();
+    const rankStr = `${u.rank || ''}`;
+    const formattedRankStr = `#${u.rank || ''}`;
+    const uni = (u.university || '').toLowerCase();
+    const tier = (u.tier || '').toLowerCase();
+    const q = filterQuery.toLowerCase().trim();
+
+    if (!q) return true;
+    return (
+      handle.includes(q) ||
+      rankStr === q ||
+      formattedRankStr === q ||
+      uni.includes(q) ||
+      tier.includes(q)
+    );
+  });
+
+  const displayedUsers = filteredUsers.slice(0, visibleCount);
+
+  const handleScrollToMyRank = () => {
+    const element = document.getElementById('active-user-rank-row');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-8 animate-fadeIn">
-      {/* Header */}
+    <div className="p-4 sm:p-8 max-w-6xl mx-auto space-y-8 animate-fadeIn pb-16">
+      
+      {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-display">
@@ -38,10 +76,38 @@ export const LeaderboardView = () => {
           </p>
         </div>
 
-        <div className="px-4 py-2 rounded-xl bg-primary-50 border border-primary-100 text-xs font-bold text-primary-700 font-mono self-start sm:self-auto">
+        <div className="px-4 py-2 rounded-xl bg-primary-50 border border-primary-100 text-xs font-bold text-primary-700 font-mono self-start sm:self-auto shadow-xs">
           Fall Semester 2026
         </div>
       </div>
+
+      {/* Active User Rank Highlight Banner */}
+      {activeUserHandle && (
+        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-500/15 via-indigo-500/10 to-primary-500/15 border-2 border-amber-400/80 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black text-lg shadow-sm shrink-0">
+              #{activeUserRank}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-extrabold text-amber-900 uppercase tracking-wider">Your Campus Standing</span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black uppercase">Active Player</span>
+              </div>
+              <h3 className="text-sm sm:text-base font-extrabold font-mono text-slate-900 mt-0.5">
+                {activeUserHandle} <span className="text-xs font-semibold text-slate-600">({activeUserXP} XP · {user?.tier || 'Curious Scholar'})</span>
+              </h3>
+            </div>
+          </div>
+
+          <button
+            onClick={handleScrollToMyRank}
+            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+          >
+            <UserCheck className="w-3.5 h-3.5 text-amber-400" />
+            <span>Jump to My Rank Row</span>
+          </button>
+        </div>
+      )}
 
       {/* Top 3 Clean Podium Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -115,7 +181,7 @@ export const LeaderboardView = () => {
           <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-soft flex flex-col justify-between order-3 md:order-3">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-coral-50 text-coral-600 border border-coral-100">
+                <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
                   🥉 #3 Rank
                 </span>
                 <span className="text-xs text-slate-500 font-mono font-bold">{top3.accuracy}% Acc</span>
@@ -145,19 +211,22 @@ export const LeaderboardView = () => {
 
       {/* Roster Table */}
       <div className="rounded-3xl bg-white border border-slate-200/80 shadow-soft overflow-hidden">
-        <div className="p-5 border-b border-slate-100 flex items-center justify-between gap-4">
-          <h3 className="text-base font-bold text-slate-900 font-display">
-            Student Rankings
-          </h3>
+        <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-primary-600" />
+            <h3 className="text-base font-bold text-slate-900 font-display">
+              Student Rankings ({filteredUsers.length})
+            </h3>
+          </div>
 
-          <div className="relative w-64">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative w-full sm:w-72">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={filterQuery}
               onChange={(e) => setFilterQuery(e.target.value)}
-              placeholder="Filter by handle or university..."
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary-500"
+              placeholder="Search handle, rank (#1), or campus..."
+              className="w-full pl-10 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary-500 font-medium"
             />
           </div>
         </div>
@@ -175,24 +244,23 @@ export const LeaderboardView = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredUsers.map((student) => {
-                const isCurrentUser = user && (user.id === student.id || user.username === student.username);
+              {displayedUsers.map((student) => {
                 const handle = getCleanHandle(student);
+                const isCurrentUser = (user && user.id === student.id) || (activeUserHandle && handle.toLowerCase() === activeUserHandle.toLowerCase());
 
                 return (
                   <tr
                     key={student.id}
-                    className={`transition-colors ${
+                    id={isCurrentUser ? 'active-user-rank-row' : undefined}
+                    className={cn(
+                      "transition-all duration-200",
                       isCurrentUser
-                        ? 'bg-primary-50/70 font-bold text-primary-950'
-                        : 'hover:bg-slate-50/80'
-                    }`}
+                        ? "bg-amber-100/70 border-l-4 border-l-amber-500 font-bold text-slate-950 shadow-xs"
+                        : "hover:bg-slate-50/80"
+                    )}
                   >
                     <td className="py-4 px-5 whitespace-nowrap font-mono font-bold">
-                      {student.trophy === 'gold' || student.rank === 1 ? '🥇 #1' : null}
-                      {student.trophy === 'silver' || student.rank === 2 ? '🥈 #2' : null}
-                      {student.trophy === 'bronze' || student.rank === 3 ? '🥉 #3' : null}
-                      {student.rank > 3 && `#${student.rank}`}
+                      {student.rank === 1 ? '🥇 #1' : student.rank === 2 ? '🥈 #2' : student.rank === 3 ? '🥉 #3' : `#${student.rank}`}
                     </td>
 
                     <td className="py-4 px-5 whitespace-nowrap">
@@ -200,11 +268,21 @@ export const LeaderboardView = () => {
                         <img
                           src={student.avatar}
                           alt={handle}
-                          className="w-8 h-8 rounded-full object-cover border border-slate-200"
+                          className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0"
                         />
-                        <span className="font-bold font-mono text-primary-700">
-                          {handle}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={cn(
+                            "font-bold font-mono",
+                            isCurrentUser ? "text-amber-950 text-sm font-black" : "text-primary-700"
+                          )}>
+                            {handle}
+                          </span>
+                          {isCurrentUser && (
+                            <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black uppercase shadow-2xs">
+                              ⭐ YOU
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </td>
 
@@ -229,6 +307,20 @@ export const LeaderboardView = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Load More Rankings Button (+5 increment) */}
+        {filteredUsers.length > visibleCount && (
+          <div className="p-4 border-t border-slate-100 flex justify-center bg-slate-50/50">
+            <button
+              onClick={() => setVisibleCount((prev) => prev + 5)}
+              className="px-6 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-800 font-extrabold text-xs shadow-xs hover:shadow-md hover:border-primary-300 hover:text-primary-600 transition-all flex items-center gap-2 cursor-pointer group"
+            >
+              <span>Load More Rankings (+5 remaining)</span>
+              <ArrowDown className="w-3.5 h-3.5 text-primary-600 group-hover:translate-y-0.5 transition-transform" />
+            </button>
+          </div>
+        )}
+
       </div>
     </div>
   );

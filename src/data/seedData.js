@@ -29,7 +29,7 @@ export const INITIAL_CONCEPTS = [
     definition: "Earnings Before Interest, Taxes, Depreciation, and Amortization. A key measure of core operating profitability.",
     plainExplanation: "The cash profitability of a company's main business operations before accounting for tax, debt interest, or equipment replacement costs.",
     formula: "EBITDA = Operating Income + Depreciation + Amortization",
-    contributor: "avinendra_singh"
+    contributor: "quantum_scholar_8912"
   },
   {
     id: "concept-2",
@@ -38,7 +38,7 @@ export const INITIAL_CONCEPTS = [
     definition: "The interest rate at which commercial banks borrow money from the Central Bank by pledging government securities.",
     plainExplanation: "The Central Bank's interest rate. When Repo Rate rises, loan interest rates rise across all banks, cooling inflation.",
     formula: "High Repo Rate -> Expensive Bank Borrowing -> Tight Liquidity",
-    contributor: "narendramishra"
+    contributor: "apex_builder_1623"
   },
   {
     id: "concept-3",
@@ -47,7 +47,7 @@ export const INITIAL_CONCEPTS = [
     definition: "A tree and graph traversal algorithm that explores all neighbor nodes at the present depth level before moving to nodes at the next depth level.",
     plainExplanation: "Explores nodes level-by-level (like water ripples) using a Queue. Always finds the shortest path in unweighted graphs.",
     formula: "Queue (FIFO) -> Level-by-Level Exploration",
-    contributor: "kumar_lead"
+    contributor: "cipher_mind_3051"
   },
   {
     id: "concept-4",
@@ -56,7 +56,7 @@ export const INITIAL_CONCEPTS = [
     definition: "Funds used by a company to acquire, upgrade, and maintain physical assets such as property, plants, buildings, or technology.",
     plainExplanation: "Money spent on long-term assets that will generate value for years, recorded on the Balance Sheet rather than as an immediate expense.",
     formula: "CapEx = Net Increase in Property, Plant & Equipment + Current Depreciation",
-    contributor: "avinendra_singh"
+    contributor: "nexus_thinker_9410"
   },
   {
     id: "concept-5",
@@ -65,7 +65,7 @@ export const INITIAL_CONCEPTS = [
     definition: "The minimum percentage of total customer deposits commercial banks must reserve in pure cash with the Central Bank.",
     plainExplanation: "Emergency safety cash banks must deposit at the RBI/Central Bank with 0% interest to keep the financial system stable.",
     formula: "CRR Cash = Total Deposits (NDTL) × CRR %",
-    contributor: "narendramishra"
+    contributor: "cosmic_fellow_7431"
   },
   {
     id: "concept-6",
@@ -74,7 +74,7 @@ export const INITIAL_CONCEPTS = [
     definition: "A profitability metric measuring the difference between interest income earned by a bank on loans and interest paid out to depositors.",
     plainExplanation: "The bank's profit margin on lending. High NIM means the bank earns significantly more interest on loans than it pays on savings accounts.",
     formula: "NIM % = (Interest Earned - Interest Expensed) / Average Earning Assets",
-    contributor: "avinendra_singh"
+    contributor: "quantum_scholar_8912"
   },
   {
     id: "concept-7",
@@ -83,36 +83,36 @@ export const INITIAL_CONCEPTS = [
     definition: "A valuation ratio comparing a company's current stock market share price to its per-share earnings (EPS).",
     plainExplanation: "How many dollars investors are willing to pay for every $1 of annual profit the company generates.",
     formula: "P/E Ratio = Market Share Price / Earnings Per Share (EPS)",
-    contributor: "kumar_lead"
+    contributor: "cipher_mind_3051"
   }
 ];
 
-// Initial Leaderboard
+// Completely Anonymous Initial Leaderboard (No real names or handles)
 export const INITIAL_LEADERBOARD_USERS = [
   {
-    id: "user-1",
-    name: "@narendramishra",
-    username: "narendramishra",
-    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    id: "user-top-1",
+    name: "@quantum_scholar_8912",
+    username: "quantum_scholar_8912",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=quantum_scholar_8912",
     university: "Concordia University, Canada",
     major: "Software Engineering & Cloud Architecture",
     rank: 1,
-    tier: "Master Fellow",
+    tier: "Mastermind",
     tierColor: "from-amber-400 to-amber-600",
     xp: 2980,
     weeklyScore: 580,
     accuracy: 98,
-    postsShared: 0,
-    quizzesCompleted: 0,
-    streakDays: 1,
-    trophy: "🥇 Gold Podium",
+    postsShared: 12,
+    quizzesCompleted: 15,
+    streakDays: 8,
+    trophy: "🥇 Gold Champion",
     badges: ["⚡ System Architect"]
   },
   {
-    id: "user-2",
-    name: "@avinendra_singh",
-    username: "avinendra_singh",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    id: "user-top-2",
+    name: "@apex_builder_1623",
+    username: "apex_builder_1623",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=apex_builder_1623",
     university: "Symbiosis School of Banking and Finance, Pune",
     major: "Banking & Financial Services (SSBF)",
     rank: 2,
@@ -121,17 +121,17 @@ export const INITIAL_LEADERBOARD_USERS = [
     xp: 2840,
     weeklyScore: 540,
     accuracy: 96,
-    postsShared: 0,
-    quizzesCompleted: 0,
-    streakDays: 1,
-    trophy: "🥈 Silver Podium",
+    postsShared: 9,
+    quizzesCompleted: 14,
+    streakDays: 7,
+    trophy: "🥈 Silver Rank",
     badges: ["📊 Banking Architect"]
   },
   {
-    id: "user-3",
-    name: "@kumar_lead",
-    username: "kumar_lead",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+    id: "user-top-3",
+    name: "@cipher_mind_3051",
+    username: "cipher_mind_3051",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=cipher_mind_3051",
     university: "Symbiosis School of Banking and Finance, Pune",
     major: "Banking & FinTech Systems (SSBF)",
     rank: 3,
@@ -140,10 +140,136 @@ export const INITIAL_LEADERBOARD_USERS = [
     xp: 2490,
     weeklyScore: 480,
     accuracy: 94,
-    postsShared: 0,
-    quizzesCompleted: 0,
-    streakDays: 1,
-    trophy: "🥉 Bronze Podium",
+    postsShared: 7,
+    quizzesCompleted: 11,
+    streakDays: 5,
+    trophy: "🥉 Bronze Rank",
     badges: ["🧠 FinTech Lead"]
+  },
+  {
+    id: "user-4",
+    name: "@nexus_thinker_9410",
+    username: "nexus_thinker_9410",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=nexus_thinker_9410",
+    university: "IIT Bombay, India",
+    major: "Computer Science & Quantitative Finance",
+    rank: 4,
+    tier: "Grand Scholar",
+    xp: 2150,
+    weeklyScore: 410,
+    accuracy: 92,
+    streakDays: 4
+  },
+  {
+    id: "user-5",
+    name: "@cosmic_fellow_7431",
+    username: "cosmic_fellow_7431",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=cosmic_fellow_7431",
+    university: "IIM Ahmedabad, India",
+    major: "Corporate Strategy & Investment Banking",
+    rank: 5,
+    tier: "Grand Scholar",
+    xp: 1980,
+    weeklyScore: 390,
+    accuracy: 91,
+    streakDays: 4
+  },
+  {
+    id: "user-6",
+    name: "@orbit_seeker_9204",
+    username: "orbit_seeker_9204",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=orbit_seeker_9204",
+    university: "University of Toronto, Canada",
+    major: "Economics & Macro Policy",
+    rank: 6,
+    tier: "Fellow Analyst",
+    xp: 1720,
+    weeklyScore: 340,
+    accuracy: 89,
+    streakDays: 3
+  },
+  {
+    id: "user-7",
+    name: "@vector_explorer_5129",
+    username: "vector_explorer_5129",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=vector_explorer_5129",
+    university: "Symbiosis SSBF Pune, India",
+    major: "Financial Risk Management",
+    rank: 7,
+    tier: "Fellow Analyst",
+    xp: 1540,
+    weeklyScore: 310,
+    accuracy: 88,
+    streakDays: 3
+  },
+  {
+    id: "user-8",
+    name: "@matrix_mind_6381",
+    username: "matrix_mind_6381",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=matrix_mind_6381",
+    university: "McGill University, Canada",
+    major: "Data Science & Financial Markets",
+    rank: 8,
+    tier: "Fellow Analyst",
+    xp: 1390,
+    weeklyScore: 280,
+    accuracy: 86,
+    streakDays: 2
+  },
+  {
+    id: "user-9",
+    name: "@zenith_learner_2749",
+    username: "zenith_learner_2749",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=zenith_learner_2749",
+    university: "Delhi School of Economics, India",
+    major: "Applied Econometrics",
+    rank: 9,
+    tier: "Curious Scholar",
+    xp: 1210,
+    weeklyScore: 250,
+    accuracy: 85,
+    streakDays: 2
+  },
+  {
+    id: "user-10",
+    name: "@hyper_architect_4150",
+    username: "hyper_architect_4150",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=hyper_architect_4150",
+    university: "UBC Vancouver, Canada",
+    major: "Software Engineering & Cloud",
+    rank: 10,
+    tier: "Curious Scholar",
+    xp: 1080,
+    weeklyScore: 220,
+    accuracy: 84,
+    streakDays: 2
+  },
+  {
+    id: "user-11",
+    name: "@stellar_seeker_3812",
+    username: "stellar_seeker_3812",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=stellar_seeker_3812",
+    university: "ISB Hyderabad, India",
+    major: "General Management",
+    rank: 11,
+    tier: "Curious Scholar",
+    xp: 940,
+    weeklyScore: 190,
+    accuracy: 82,
+    streakDays: 1
+  },
+  {
+    id: "user-12",
+    name: "@apex_scholar_6190",
+    username: "apex_scholar_6190",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=apex_scholar_6190",
+    university: "Symbiosis SSBF Pune, India",
+    major: "Investment Banking",
+    rank: 12,
+    tier: "Curious Scholar",
+    xp: 810,
+    weeklyScore: 160,
+    accuracy: 80,
+    streakDays: 1
   }
 ];

@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useUser, useClerk } from '@clerk/clerk-react';
-import confetti from 'canvas-confetti';
 import { getStoredUser, saveStoredUser, updateLeaderboardUser, getOrCreateGuestUser } from '../services/storage';
 import { saveUserProfileToSupabase } from '../services/supabase';
 
@@ -18,18 +17,16 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (isClerkLoaded) {
       if (isSignedIn && clerkUser) {
+        const guestIdentity = getOrCreateGuestUser();
         const email = clerkUser.primaryEmailAddress?.emailAddress || '';
         const phone = clerkUser.primaryPhoneNumber?.phoneNumber || '';
-        const displayName = clerkUser.fullName || clerkUser.firstName || (email ? email.split('@')[0] : '') || phone || 'Student Scholar';
-        const rawUsername = clerkUser.username || (email ? email.split('@')[0] : '') || `scholar_${clerkUser.id.slice(-4)}`;
-        const cleanUsername = rawUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
-        const avatar = clerkUser.imageUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80`;
+        const cleanUsername = guestIdentity.username;
 
         const authenticatedUser = {
           id: clerkUser.id,
-          name: displayName,
+          name: `@${cleanUsername}`,
           username: cleanUsername,
-          avatar: avatar,
+          avatar: guestIdentity.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanUsername}`,
           email: email,
           phone: phone,
           university: clerkUser.publicMetadata?.university || "University Scholar",
@@ -69,12 +66,15 @@ export const AuthProvider = ({ children }) => {
     setIsAuthModalOpen(true);
   };
 
-  const login = ({ username, name, university, major, avatar, email, phone }) => {
+  const login = ({ university, major, avatar, email, phone }) => {
+    const guestIdentity = getOrCreateGuestUser();
+    const cleanUsername = guestIdentity.username;
+
     const newUser = {
       id: `user-${Date.now()}`,
-      name: name || "Student Scholar",
-      username: username.replace(/^@/, '').toLowerCase().trim(),
-      avatar: avatar || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80`,
+      name: `@${cleanUsername}`,
+      username: cleanUsername,
+      avatar: avatar || guestIdentity.avatar,
       university: university || "University Student",
       major: major || "Finance & Tech",
       email: email || '',
@@ -103,19 +103,20 @@ export const AuthProvider = ({ children }) => {
         await clerkSignOut();
       }
     } catch (e) {}
-    setUser(null);
-    saveStoredUser(null);
+    const guest = getOrCreateGuestUser();
+    setUser(guest);
+    saveStoredUser(guest);
   };
 
   const addXP = (amount, isQuizPassed = false) => {
-    if (!user) return;
-    const newXP = (user.xp || 0) + amount;
-    const newWeekly = (user.weeklyScore || 0) + amount;
-    const newQuizzes = (user.quizzesCompleted || 0) + (isQuizPassed ? 1 : 0);
+    const currentUser = user || getOrCreateGuestUser();
+    const newXP = (currentUser.xp || 0) + amount;
+    const newWeekly = (currentUser.weeklyScore || 0) + amount;
+    const newQuizzes = (currentUser.quizzesCompleted || 0) + (isQuizPassed ? 1 : 0);
     
     // Recalculate tier based on XP
-    let tier = user.tier || "Novice";
-    let tierColor = user.tierColor || "from-slate-400 to-slate-600";
+    let tier = currentUser.tier || "Novice";
+    let tierColor = currentUser.tierColor || "from-slate-400 to-slate-600";
     if (newXP >= 2500) {
       tier = "Mastermind";
       tierColor = "from-amber-400 to-yellow-600";
@@ -131,7 +132,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     const updatedUser = {
-      ...user,
+      ...currentUser,
       xp: newXP,
       weeklyScore: newWeekly,
       quizzesCompleted: newQuizzes,
@@ -139,10 +140,18 @@ export const AuthProvider = ({ children }) => {
       tierColor
     };
 
+    const updatedLeaderboard = updateLeaderboardUser(updatedUser);
+    
+    // Update user rank from sorted leaderboard
+    const userInList = updatedLeaderboard.find(u => u.id === updatedUser.id || u.username === updatedUser.username);
+    if (userInList) {
+      updatedUser.rank = userInList.rank;
+    }
+
     setUser(updatedUser);
     saveStoredUser(updatedUser);
-    updateLeaderboardUser(updatedUser);
     saveUserProfileToSupabase(updatedUser);
+    return updatedUser;
   };
 
   return (
