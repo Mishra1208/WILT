@@ -82,7 +82,7 @@ export const AboutView = () => {
       focus: "Banking & Financial Services (SSBF)"
     },
     {
-      name: "Kumar",
+      name: "Karan Kumar",
       role: "Platform Lead",
       university: "Symbiosis School of Banking & Finance, Pune",
       cohort: "SSBF '26",
@@ -134,7 +134,7 @@ export const AboutView = () => {
     },
     {
       q: 'Who started the WILT project?',
-      a: 'WILT was conceptualized and created by Narendra Mishra, Avinendra Pratap Singh, and Kumar as a modern peer-learning ecosystem combining micro-notes, spaced repetition, and university hierarchy leaderboards.'
+      a: 'WILT was conceptualized and created by Narendra Mishra, Avinendra Pratap Singh, and Karan Kumar as a modern peer-learning ecosystem combining micro-notes, spaced repetition, and university hierarchy leaderboards.'
     }
   ];
 
@@ -240,7 +240,7 @@ export const AboutView = () => {
             Meet the Creators
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-            WILT was envisioned and created by <strong>Narendra Mishra</strong> (Concordia University, Canada), <strong>Avinendra Pratap Singh</strong>, and <strong>Kumar</strong> (Symbiosis School of Banking & Finance, Pune).
+            WILT was envisioned and created by <strong>Narendra Mishra</strong> (Concordia University, Canada), <strong>Avinendra Pratap Singh</strong>, and <strong>Karan Kumar</strong> (Symbiosis School of Banking & Finance, Pune).
           </p>
         </div>
 
