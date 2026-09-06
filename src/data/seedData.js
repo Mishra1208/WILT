@@ -94,7 +94,7 @@ export const INITIAL_LEADERBOARD_USERS = [
     name: "Narendra Mishra",
     username: "narendramishra",
     avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-    university: "University Student",
+    university: "Symbiosis School of Banking and Finance",
     major: "Software Engineering & Cloud Architecture",
     rank: 1,
     tier: "Master Fellow",
@@ -113,8 +113,8 @@ export const INITIAL_LEADERBOARD_USERS = [
     name: "Avinendra Pratap Singh",
     username: "avinendra_singh",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    university: "University Student",
-    major: "Finance & Accounting",
+    university: "Symbiosis School of Banking and Finance",
+    major: "Banking & Financial Services (SSBF)",
     rank: 2,
     tier: "Grandmaster",
     tierColor: "from-slate-400 to-slate-600",
@@ -125,15 +125,15 @@ export const INITIAL_LEADERBOARD_USERS = [
     quizzesCompleted: 0,
     streakDays: 1,
     trophy: "🥈 Silver Podium",
-    badges: ["👑 Co-Founder", "📊 Model Architect"]
+    badges: ["👑 Co-Founder", "📊 Banking Architect"]
   },
   {
     id: "user-3",
     name: "Kumar",
     username: "kumar_lead",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-    university: "University Student",
-    major: "Computer Science & FinTech",
+    university: "Symbiosis School of Banking and Finance",
+    major: "Banking & FinTech Systems (SSBF)",
     rank: 3,
     tier: "Grandmaster",
     tierColor: "from-amber-600 to-amber-800",
@@ -144,6 +144,6 @@ export const INITIAL_LEADERBOARD_USERS = [
     quizzesCompleted: 0,
     streakDays: 1,
     trophy: "🥉 Bronze Podium",
-    badges: ["⚡ Co-Founder", "🧠 Recall Engineer"]
+    badges: ["⚡ Co-Founder", "🧠 FinTech Lead"]
   }
 ];

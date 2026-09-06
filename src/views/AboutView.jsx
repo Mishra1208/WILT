@@ -64,25 +64,28 @@ export const AboutView = () => {
       name: "Narendra Mishra",
       role: "Co-Creator & Lead Architect",
       badge: "⚡ Co-Founder",
+      university: "Symbiosis School of Banking & Finance",
       avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=250&auto=format&fit=crop&q=80",
-      quote: "Knowledge grows when shared. WILT makes continuous peer learning seamless, high-yield, and accessible to every student.",
+      quote: "Knowledge grows when shared. WILT makes continuous peer learning seamless, high-yield, and accessible to every banking and tech student.",
       focus: "Full-Stack System Architecture & Cloud Infrastructure"
     },
     {
       name: "Avinendra Pratap Singh",
       role: "Co-Creator & Concept Architect",
       badge: "🎓 Co-Founder",
+      university: "Symbiosis School of Banking & Finance",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=250&auto=format&fit=crop&q=80",
-      quote: "Students shouldn't have to reread 500-page textbooks for one formula. WILT is built so peers can teach each other in 30 seconds.",
-      focus: "Micro-Learning Architecture & Product Vision"
+      quote: "Students shouldn't have to reread 500-page finance textbooks for one formula. WILT is built so SSBF peers can teach each other in 30 seconds.",
+      focus: "Banking & Financial Services (SSBF)"
     },
     {
       name: "Kumar",
       role: "Co-Creator & Platform Lead",
       badge: "🚀 Co-Founder",
+      university: "Symbiosis School of Banking & Finance",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=250&auto=format&fit=crop&q=80",
-      quote: "The secret to acing exams isn't memorization—it's active recall. We engineered WILT to turn revision into a fast, gamified habit.",
-      focus: "Spaced Repetition Engine & Gamification"
+      quote: "The secret to acing banking exams isn't cramming—it's active recall. We engineered WILT to turn financial revision into a fast, gamified habit.",
+      focus: "Banking & FinTech Systems (SSBF)"
     }
   ];
 
@@ -234,7 +237,7 @@ export const AboutView = () => {
             Meet the Creators
           </h2>
           <p className="text-xs text-slate-500">
-            WILT was envisioned and created by <strong>Narendra Mishra</strong>, <strong>Avinendra Pratap Singh</strong>, and <strong>Kumar</strong> to solve how college students retain complex knowledge.
+            WILT was envisioned and created by <strong>Narendra Mishra</strong>, <strong>Avinendra Pratap Singh</strong>, and <strong>Kumar</strong> at <strong>Symbiosis School of Banking & Finance (SSBF)</strong>.
           </p>
         </div>
 
@@ -268,6 +271,10 @@ export const AboutView = () => {
                   </span>
                 </div>
 
+                <div className="px-2.5 py-1 rounded-xl bg-indigo-50/80 border border-indigo-100 text-[10px] font-extrabold text-indigo-900 truncate">
+                  🏫 {creator.university}
+                </div>
+
                 <p className="text-xs text-slate-600 leading-relaxed italic bg-white p-3 rounded-2xl border border-slate-100 font-serif">
                   "{creator.quote}"
                 </p>
@@ -278,7 +285,7 @@ export const AboutView = () => {
                   <Award className="w-3.5 h-3.5 text-primary-600 flex-shrink-0" />
                   <span className="truncate">{creator.focus}</span>
                 </span>
-                <span className="font-mono text-slate-400 text-[10px] flex-shrink-0">Class of '26</span>
+                <span className="font-mono text-slate-500 text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded-md flex-shrink-0">SSBF '26</span>
               </div>
             </div>
           ))}
