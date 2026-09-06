@@ -21,6 +21,7 @@ import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { getOrCreateGuestUser } from '../services/storage';
 import { validateContent } from '../services/moderation';
+import { uploadAttachmentToStorage } from '../services/supabase';
 import GradientText from '../components/ui/GradientText';
 import DotPattern from '../components/ui/DotPattern';
 import { cn } from '../lib/utils';
@@ -35,6 +36,7 @@ export const NotepadLandingView = () => {
   const [text, setText] = useState('');
   const [references, setReferences] = useState(['']);
   const [attachments, setAttachments] = useState([]);
+  const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
   
   // Status & Moderation
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -71,22 +73,40 @@ export const NotepadLandingView = () => {
   const [linkError, setLinkError] = useState(null);
 
   // Attachment Handlers
-  const handleFileUpload = (e, type) => {
+  const handleFileUpload = async (e, type) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64Url = event.target.result;
-      const newAttachment = {
-        id: `att-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-        name: file.name,
-        type: type, // 'image' | 'file'
-        url: base64Url
-      };
-      setAttachments(prev => [...prev, newAttachment]);
-    };
-    reader.readAsDataURL(file);
+    setIsUploadingAttachment(true);
+
+    try {
+      // Upload raw file to Supabase Storage bucket 'attachments'
+      const publicUrl = await uploadAttachmentToStorage(file);
+
+      if (publicUrl) {
+        const newAttachment = {
+          id: `att-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+          name: file.name,
+          type: type, // 'image' | 'file'
+          url: publicUrl
+        };
+        setAttachments(prev => [...prev, newAttachment]);
+      } else {
+        // Fallback: If bucket is not created yet or fails, use local Blob URL (0 network egress)
+        const localBlobUrl = URL.createObjectURL(file);
+        const newAttachment = {
+          id: `att-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+          name: file.name,
+          type: type,
+          url: localBlobUrl
+        };
+        setAttachments(prev => [...prev, newAttachment]);
+      }
+    } catch (err) {
+      console.warn('Attachment upload failed:', err);
+    } finally {
+      setIsUploadingAttachment(false);
+    }
   };
 
   const handleOpenLinkModal = () => {
@@ -378,8 +398,14 @@ export const NotepadLandingView = () => {
           </div>
 
           {/* ATTACHMENTS PREVIEW CHIPS */}
-          {attachments.length > 0 && (
+          {(attachments.length > 0 || isUploadingAttachment) && (
             <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-100">
+              {isUploadingAttachment && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold animate-pulse">
+                  <Sparkles className="w-3.5 h-3.5 text-primary-600 animate-spin" />
+                  <span>Uploading to cloud storage...</span>
+                </div>
+              )}
               {attachments.map(att => (
                 <div key={att.id} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-primary-50 border border-primary-200 text-primary-800 text-xs font-bold">
                   {att.type === 'image' && <ImageIcon className="w-3.5 h-3.5 text-primary-600" />}

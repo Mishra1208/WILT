@@ -189,17 +189,58 @@ export const fetchCommentsFromSupabase = async () => {
 };
 
 /**
+ * Upload attachment file directly to Supabase Storage bucket 'attachments'
+ * Returns the public URL string or null on failure.
+ */
+export const uploadAttachmentToStorage = async (file) => {
+  if (!file) return null;
+
+  try {
+    const fileExt = file.name.split('.').pop() || 'file';
+    const cleanFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const filePath = `uploads/${Date.now()}_${Math.random().toString(36).substring(2, 7)}_${cleanFileName}`;
+
+    const { data, error } = await supabase.storage
+      .from('attachments')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      console.warn('Supabase storage upload info:', error.message);
+      return null;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('attachments')
+      .getPublicUrl(filePath);
+
+    return urlData?.publicUrl || null;
+  } catch (err) {
+    console.warn('Supabase storage upload catch:', err);
+    return null;
+  }
+};
+
+/**
  * Save post attachment (photo, document, link) to Supabase
  */
 export const saveAttachmentToSupabase = async (postId, attachment) => {
   if (!postId || !attachment) return { success: false };
 
   try {
+    // Sanitize away base64 data URLs to prevent database bloat
+    const safeAttachment = {
+      ...attachment,
+      url: (attachment.url && attachment.url.startsWith('data:')) ? '' : attachment.url
+    };
+
     const payload = {
       id: attachment.id || `att-${Date.now()}`,
       term: postId,
       category: 'post_attachment',
-      definition: JSON.stringify(attachment),
+      definition: JSON.stringify(safeAttachment),
       plain_explanation: attachment.name || '',
       contributor: 'scholar',
       created_at: new Date().toISOString()
@@ -241,9 +282,16 @@ export const fetchAttachmentsFromSupabase = async () => {
     return (data || []).map((row) => {
       try {
         const parsed = JSON.parse(row.definition);
+        // Strip legacy huge base64 data URLs to prevent egress spikes
+        let safeUrl = parsed.url || '';
+        if (safeUrl.startsWith('data:')) {
+          safeUrl = '';
+        }
+
         return {
           postId: row.term,
-          ...parsed
+          ...parsed,
+          url: safeUrl
         };
       } catch (e) {
         return {
