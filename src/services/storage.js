@@ -109,8 +109,8 @@ export const updateLeaderboardUser = (updatedUser) => {
     avatar: updatedUser.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanHandle}`,
     university: updatedUser.university || 'Anonymous Campus',
     major: updatedUser.major || 'Guest Scholar',
-    xp: updatedUser.xp || 150,
-    accuracy: updatedUser.accuracy || 90,
+    xp: updatedUser.xp ?? 0,
+    accuracy: updatedUser.accuracy ?? 0,
     tier: updatedUser.tier || 'Curious Scholar'
   };
 

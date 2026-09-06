@@ -330,10 +330,10 @@ export const saveUserProfileToSupabase = async (user) => {
       phone: user.phone || '',
       university: user.university || 'Anonymous Campus',
       major: user.major || 'Guest Scholar',
-      xp: Number(user.xp) || 150,
+      xp: user.xp !== undefined && user.xp !== null ? Number(user.xp) : 0,
       tier: user.tier || 'Curious Scholar',
-      rank: Number(user.rank) || 12,
-      accuracy: Number(user.accuracy) || 90,
+      rank: Number(user.rank) || 1,
+      accuracy: user.accuracy !== undefined && user.accuracy !== null ? Number(user.accuracy) : 0,
       quizzes_completed: Number(user.quizzesCompleted) || 0,
       updated_at: new Date().toISOString()
     };

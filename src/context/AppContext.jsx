@@ -58,23 +58,25 @@ export const AppProvider = ({ children }) => {
         const guestUser = getOrCreateGuestUser();
         let list = remoteLeaderboard || [];
         
-        // Ensure active guest user exists in list
-        const exists = list.some(u => u.username === guestUser.username || u.id === guestUser.id);
-        if (!exists) {
-          list = [...list, {
-            id: guestUser.id,
-            name: `@${guestUser.username}`,
-            username: guestUser.username,
-            avatar: guestUser.avatar,
-            university: guestUser.university || 'Anonymous Campus',
-            major: guestUser.major || 'Guest Scholar',
-            xp: guestUser.xp || 150,
-            accuracy: guestUser.accuracy || 90,
-            tier: guestUser.tier || 'Curious Scholar'
-          }];
-          list.sort((a, b) => (b.xp || 0) - (a.xp || 0));
-          list = list.map((item, idx) => ({ ...item, rank: idx + 1 }));
+        // Ensure active guest user with positive XP exists in list
+        if (guestUser && (guestUser.xp > 0 || guestUser.quizzesCompleted > 0)) {
+          const exists = list.some(u => u.username === guestUser.username || u.id === guestUser.id);
+          if (!exists) {
+            list = [...list, {
+              id: guestUser.id,
+              name: `@${guestUser.username}`,
+              username: guestUser.username,
+              avatar: guestUser.avatar,
+              university: guestUser.university || 'Anonymous Campus',
+              major: guestUser.major || 'Guest Scholar',
+              xp: guestUser.xp || 0,
+              accuracy: guestUser.accuracy || 0,
+              tier: guestUser.tier || 'Curious Scholar'
+            }];
+          }
         }
+        list.sort((a, b) => (b.xp || 0) - (a.xp || 0));
+        list = list.map((item, idx) => ({ ...item, rank: idx + 1 }));
 
         setLeaderboard(list);
       });
