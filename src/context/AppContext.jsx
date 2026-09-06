@@ -28,14 +28,19 @@ export const AppProvider = ({ children }) => {
     initStorage();
     
     // 1. Fetch remote posts from Supabase (Supabase is single source of truth)
-    fetchPostsFromSupabase().then((remotePosts) => {
-      if (remotePosts) {
-        setPosts(remotePosts);
-      }
-      setIsPostsLoading(false);
-    }).catch(() => {
-      setIsPostsLoading(false);
-    });
+    const loadLivePosts = () => {
+      fetchPostsFromSupabase().then((remotePosts) => {
+        if (remotePosts) {
+          setPosts(remotePosts);
+        }
+        setIsPostsLoading(false);
+      }).catch(() => {
+        setIsPostsLoading(false);
+      });
+    };
+
+    loadLivePosts();
+    const postsInterval = setInterval(loadLivePosts, 3000);
 
     // 2. Fetch remote concepts from Supabase
     fetchConceptsFromSupabase().then((remoteConcepts) => {
@@ -83,9 +88,12 @@ export const AppProvider = ({ children }) => {
     };
 
     loadLiveLeaderboard();
-    const leaderboardInterval = setInterval(loadLiveLeaderboard, 4000);
+    const leaderboardInterval = setInterval(loadLiveLeaderboard, 3000);
 
-    return () => clearInterval(leaderboardInterval);
+    return () => {
+      clearInterval(postsInterval);
+      clearInterval(leaderboardInterval);
+    };
   }, []);
 
   const getViewFromPath = () => {

@@ -391,9 +391,9 @@ export const saveQuizAttemptToSupabase = async ({ userHandle, userName, score, t
 export const fetchLeaderboardFromSupabase = async () => {
   try {
     const [profilesRes, attemptsRes] = await Promise.all([
-      supabase.from('user_profiles').select('*').order('xp', { ascending: false }).catch(() => ({ data: [] })),
-      supabase.from('quiz_attempts').select('*').order('created_at', { ascending: false }).catch(() => ({ data: [] }))
-    ]);
+      supabase.from('user_profiles').select('*').order('xp', { ascending: false }),
+      supabase.from('quiz_attempts').select('*').order('created_at', { ascending: false })
+    ]).catch(() => [{ data: [] }, { data: [] }]);
 
     const profiles = profilesRes?.data || [];
     const attempts = attemptsRes?.data || [];
