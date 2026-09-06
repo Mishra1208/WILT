@@ -75,7 +75,7 @@ export const AboutView = () => {
     {
       name: "Avinendra Pratap Singh",
       role: "Concept Architect",
-      university: "Symbiosis School of Banking & Finance",
+      university: "Symbiosis School of Banking & Finance, Pune",
       cohort: "SSBF '26",
       avatar: avinendraImg,
       quote: "Students shouldn't have to reread 500-page finance textbooks for one formula. WILT is built so SSBF peers can teach each other in 30 seconds.",
@@ -84,7 +84,7 @@ export const AboutView = () => {
     {
       name: "Kumar",
       role: "Platform Lead",
-      university: "Symbiosis School of Banking & Finance",
+      university: "Symbiosis School of Banking & Finance, Pune",
       cohort: "SSBF '26",
       avatar: kumarImg,
       quote: "The secret to acing banking exams isn't cramming—it's active recall. We engineered WILT to turn financial revision into a fast, gamified habit.",
@@ -240,7 +240,7 @@ export const AboutView = () => {
             Meet the Creators
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-            WILT was envisioned and created by <strong>Narendra Mishra</strong> (Concordia University, Canada), <strong>Avinendra Pratap Singh</strong>, and <strong>Kumar</strong> (Symbiosis School of Banking & Finance).
+            WILT was envisioned and created by <strong>Narendra Mishra</strong> (Concordia University, Canada), <strong>Avinendra Pratap Singh</strong>, and <strong>Kumar</strong> (Symbiosis School of Banking & Finance, Pune).
           </p>
         </div>
 
