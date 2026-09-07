@@ -157,7 +157,7 @@ export const fetchCommentsFromSupabase = async () => {
       .from('concepts')
       .select('*')
       .eq('category', 'post_comment')
-      .gte('created_at', '2026-09-07T00:00:00.000Z')
+      .gte('created_at', '2026-09-07T05:45:00.000Z')
       .order('created_at', { ascending: true })
       .limit(100);
 
@@ -272,7 +272,7 @@ export const fetchAttachmentsFromSupabase = async () => {
       .from('concepts')
       .select('*')
       .eq('category', 'post_attachment')
-      .gte('created_at', '2026-09-07T00:00:00.000Z')
+      .gte('created_at', '2026-09-07T05:45:00.000Z')
       .order('created_at', { ascending: true })
       .limit(100);
 
@@ -357,7 +357,7 @@ export const fetchLikesFromSupabase = async () => {
       .select('*')
       .eq('category', 'post_like')
       .neq('plain_explanation', 'unliked')
-      .gte('created_at', '2026-09-07T00:00:00.000Z')
+      .gte('created_at', '2026-09-07T05:45:00.000Z')
       .limit(500);
 
     if (error) {
@@ -385,7 +385,7 @@ export const fetchPostsFromSupabase = async () => {
       supabase
         .from('posts')
         .select('*')
-        .gte('created_at', '2026-09-07T00:00:00.000Z')
+        .gte('created_at', '2026-09-07T05:45:00.000Z')
         .order('created_at', { ascending: false })
         .limit(100),
       fetchCommentsFromSupabase().catch(() => []),
@@ -518,12 +518,12 @@ export const fetchLeaderboardFromSupabase = async () => {
       supabase
         .from('user_profiles')
         .select('*')
-        .gte('updated_at', '2026-09-07T00:00:00.000Z')
+        .gte('updated_at', '2026-09-07T05:45:00.000Z')
         .order('xp', { ascending: false }),
       supabase
         .from('quiz_attempts')
         .select('*')
-        .gte('created_at', '2026-09-07T00:00:00.000Z')
+        .gte('created_at', '2026-09-07T05:45:00.000Z')
         .order('created_at', { ascending: false })
     ]).catch(() => [{ data: [] }, { data: [] }]);
 
