@@ -237,9 +237,13 @@ export const LeaderboardView = () => {
             <div className="space-y-2">
               <span className="text-2xl">🥉</span>
               <h4 className="text-sm font-bold text-slate-700">Open #3 Rank Slot</h4>
-              <p className="text-xs text-slate-500 max-w-xs mx-auto">Attempt today's weekly quiz to claim the #3 spot!</p>
+              <p className="text-xs text-slate-500 max-w-xs mx-auto">
+                {activeUserRank ? "Compete in today's weekly quiz to boost your ranking!" : "Attempt today's weekly quiz to claim the #3 spot!"}
+              </p>
             </div>
-            <button onClick={() => setCurrentView('quiz')} className="mt-4 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold shadow-xs cursor-pointer">Take Quiz Now</button>
+            <button onClick={() => setCurrentView('quiz')} className="mt-4 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer">
+              {activeUserRank ? "Practice Quiz for XP" : "Take Quiz Now"}
+            </button>
           </div>
         )}
       </div>

@@ -29,6 +29,8 @@ export const QuizView = () => {
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
 
+  const [userAnswers, setUserAnswers] = useState({});
+
   const startNewQuiz = () => {
     const questions = generateWeeklyQuiz(posts, 5);
     setQuizQuestions(questions);
@@ -36,6 +38,7 @@ export const QuizView = () => {
     setSelectedOption(null);
     setIsAnswerSubmitted(false);
     setScore(0);
+    setUserAnswers({});
     setIsQuizCompleted(false);
     setQuizStarted(true);
   };
@@ -50,6 +53,7 @@ export const QuizView = () => {
     const currentQ = quizQuestions[currentIdx];
     const isCorrect = selectedOption === currentQ.correctIndex;
 
+    setUserAnswers((prev) => ({ ...prev, [currentIdx]: selectedOption }));
     if (isCorrect) {
       setScore((prev) => prev + 1);
     }
@@ -208,8 +212,8 @@ export const QuizView = () => {
     const xpWon = score * 20 + 50;
 
     return (
-      <div className="p-8 max-w-2xl mx-auto space-y-6 animate-fadeIn">
-        <div className="p-10 rounded-3xl bg-white border border-slate-200/80 shadow-soft text-center space-y-6">
+      <div className="p-8 max-w-3xl mx-auto space-y-6 animate-fadeIn pb-16">
+        <div className="p-8 sm:p-10 rounded-3xl bg-white border border-slate-200/80 shadow-soft text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mx-auto">
             <Trophy className="w-8 h-8" />
           </div>
@@ -262,6 +266,96 @@ export const QuizView = () => {
               <Trophy className="w-4 h-4" />
               <span>View Campus Leaderboard</span>
             </button>
+          </div>
+        </div>
+
+        {/* FULL QUESTIONS & ANSWERS RECALL REVIEW */}
+        <div className="space-y-4 pt-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-extrabold text-slate-900 font-display">
+              Detailed Questions & Active Recall Review
+            </h3>
+            <span className="text-xs text-slate-500 font-mono">
+              {quizQuestions.length} Questions Reviewed
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {quizQuestions.map((q, qIdx) => {
+              const userChoice = userAnswers[qIdx];
+              const isUserCorrect = userChoice === q.correctIndex;
+
+              return (
+                <div key={qIdx} className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-primary-600 font-mono uppercase">
+                      Q{qIdx + 1} • {q.category}
+                    </span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1.5 ${
+                      isUserCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                    }`}>
+                      {isUserCorrect ? (
+                        <>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Correct</span>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                          <span>Incorrect</span>
+                        </>
+                      )}
+                    </span>
+                  </div>
+
+                  <h4 className="text-sm sm:text-base font-extrabold text-slate-900 leading-snug">
+                    {q.question}
+                  </h4>
+
+                  <div className="space-y-2">
+                    {q.options.map((opt, optIdx) => {
+                      const isCorrect = optIdx === q.correctIndex;
+                      const isSelected = optIdx === userChoice;
+
+                      let optStyle = "bg-slate-50 text-slate-700 border-slate-200";
+                      if (isCorrect) {
+                        optStyle = "bg-emerald-50 border-emerald-400 text-emerald-900 font-bold";
+                      } else if (isSelected && !isCorrect) {
+                        optStyle = "bg-rose-50 border-rose-300 text-rose-900 line-through";
+                      }
+
+                      return (
+                        <div key={optIdx} className={`p-3 rounded-xl border text-xs sm:text-sm flex items-center justify-between ${optStyle}`}>
+                          <div className="flex items-center gap-2.5">
+                            <span className="font-mono font-bold">{String.fromCharCode(65 + optIdx)}.</span>
+                            <span>{opt}</span>
+                          </div>
+                          {isCorrect && <span className="text-[10px] uppercase font-extrabold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded">Correct Answer ✓</span>}
+                          {isSelected && !isCorrect && <span className="text-[10px] uppercase font-extrabold text-rose-700 bg-rose-100/70 px-2 py-0.5 rounded">Your Choice ✗</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* EXPLANATION & DIRECT SOURCE LINK */}
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                    <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                      💡 <span className="font-bold">Explanation:</span> {q.explanation}
+                    </p>
+                    {q.postTitle && (
+                      <button
+                        onClick={() => handleReadSourcePost(q)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs shadow-2xs transition-all cursor-pointer mt-1"
+                      >
+                        <BookOpen className="w-3.5 h-3.5" />
+                        <span>Open Source Post: "{q.postTitle}"</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

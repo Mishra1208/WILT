@@ -71,7 +71,11 @@ export const updatePostInStorage = savePost;
 export const getStoredConcepts = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.CONCEPTS);
-    return raw ? JSON.parse(raw) : INITIAL_CONCEPTS;
+    const parsed = raw ? JSON.parse(raw) : INITIAL_CONCEPTS;
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed;
+    }
+    return INITIAL_CONCEPTS;
   } catch (e) {
     return INITIAL_CONCEPTS;
   }

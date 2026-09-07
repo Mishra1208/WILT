@@ -244,29 +244,51 @@ export const PostDetailModal = () => {
             );
           })()}
 
-          {/* Source of Trust & Learning Location Block */}
+          {/* Source of Trust & Reference Links Block */}
           {(() => {
-            const linkAttachment = selectedPost.attachments?.find((a) => a.type === 'link');
-            const effectiveSourceUrl = selectedPost.sourceUrl || linkAttachment?.url || linkAttachment?.name;
-            const hasContext = selectedPost.sourceContext?.trim();
+            // Extract all reference links from post
+            const linksList = [];
+            
+            if (selectedPost.sourceUrl) {
+              linksList.push({ name: selectedPost.sourceUrl, url: selectedPost.sourceUrl });
+            }
 
-            if (!effectiveSourceUrl && !hasContext) return null;
+            if (selectedPost.attachments && selectedPost.attachments.length > 0) {
+              selectedPost.attachments.forEach(att => {
+                if (att.type === 'link' || (att.url && /^https?:\/\//i.test(att.url))) {
+                  if (!linksList.some(l => l.url === att.url)) {
+                    linksList.push({ name: att.name || att.url, url: att.url });
+                  }
+                }
+              });
+            }
+
+            if (selectedPost.sourceContext && /^https?:\/\//i.test(selectedPost.sourceContext.trim())) {
+              const url = selectedPost.sourceContext.trim();
+              if (!linksList.some(l => l.url === url)) {
+                linksList.push({ name: url, url: url });
+              }
+            }
+
+            const hasContextText = selectedPost.sourceContext && !/^https?:\/\//i.test(selectedPost.sourceContext.trim()) && selectedPost.sourceContext !== 'Verified Learner Post';
+
+            if (linksList.length === 0 && !hasContextText) return null;
 
             return (
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                 <div className="flex items-center gap-2 text-xs font-extrabold text-slate-800 uppercase tracking-wider">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>Reference & Learning Context</span>
+                  <span>Reference Links & Learning Context ({linksList.length})</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {hasContext && (
+                  {hasContextText && (
                     <div className="p-3.5 rounded-xl bg-amber-50/90 border border-amber-200 flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-amber-100 text-amber-700">
                         <MapPin className="w-4 h-4" />
                       </div>
                       <div className="truncate">
-                        <span className="text-[10px] uppercase font-extrabold text-amber-800/80 block">Learning Location / Context</span>
+                        <span className="text-[10px] uppercase font-extrabold text-amber-800/80 block">Learning Context / Location</span>
                         <span className="text-xs sm:text-sm font-extrabold text-amber-950 truncate block mt-0.5">
                           {selectedPost.sourceContext}
                         </span>
@@ -274,25 +296,30 @@ export const PostDetailModal = () => {
                     </div>
                   )}
 
-                  {effectiveSourceUrl && (
-                    <div className="p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 flex items-center justify-between gap-3">
-                      <div className="truncate">
-                        <span className="text-[10px] uppercase font-extrabold text-emerald-800/80 block font-mono">Reference URL</span>
-                        <span className="font-mono text-emerald-700 truncate block text-xs sm:text-sm font-extrabold uppercase mt-0.5">
-                          {effectiveSourceUrl.replace(/^https?:\/\/(www\.)?/i, '')}
-                        </span>
+                  {linksList.map((linkItem, idx) => {
+                    const cleanUrl = linkItem.url.startsWith('http') ? linkItem.url : `https://${linkItem.url}`;
+                    const domain = cleanUrl.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0];
+                    
+                    return (
+                      <div key={idx} className="p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 flex items-center justify-between gap-3 shadow-2xs">
+                        <div className="truncate">
+                          <span className="text-[10px] uppercase font-extrabold text-emerald-800/80 block font-mono">Reference Link #{idx + 1}</span>
+                          <span className="font-mono text-emerald-900 truncate block text-xs font-extrabold mt-0.5">
+                            {domain}
+                          </span>
+                        </div>
+                        <a
+                          href={cleanUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shrink-0 shadow-2xs transition-all cursor-pointer"
+                        >
+                          <span>Visit Link</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
                       </div>
-                      <a
-                        href={effectiveSourceUrl.startsWith('http') ? effectiveSourceUrl : `https://${effectiveSourceUrl}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shrink-0 shadow-2xs transition-all cursor-pointer"
-                      >
-                        <span>Open</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    </div>
-                  )}
+                    );
+                  })}
                 </div>
               </div>
             );

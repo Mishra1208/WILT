@@ -51,17 +51,17 @@ export const AppProvider = ({ children }) => {
 
     // 2. Fetch remote concepts from Supabase
     fetchConceptsFromSupabase().then((remoteConcepts) => {
-      if (remoteConcepts && remoteConcepts.length > 0) {
-        setConcepts((current) => {
-          const merged = [...remoteConcepts];
-          current.forEach((c) => {
-            if (!merged.some((m) => m.term.toLowerCase() === c.term.toLowerCase())) {
-              merged.push(c);
-            }
-          });
-          return merged;
+      setConcepts((current) => {
+        const merged = [...(remoteConcepts || [])];
+        INITIAL_CONCEPTS.forEach((c) => {
+          if (!merged.some((m) => m.term.toLowerCase() === c.term.toLowerCase())) {
+            merged.push(c);
+          }
         });
-      }
+        return merged;
+      });
+    }).catch(() => {
+      setConcepts(INITIAL_CONCEPTS);
     });
 
     // 3. Fetch live audience leaderboard from Supabase
@@ -270,18 +270,36 @@ export const AppProvider = ({ children }) => {
   };
 
   const toggleLike = (postId, user) => {
+    let targetUpdatedPost = null;
+
     setPosts(prev =>
       prev.map(p => {
         if (p.id === postId) {
           const hasLiked = user?.likedPosts?.includes(postId);
-          return {
+          const newLikes = hasLiked ? Math.max(0, (p.likes || 0) - 1) : (p.likes || 0) + 1;
+          const updated = {
             ...p,
-            likes: hasLiked ? Math.max(0, p.likes - 1) : p.likes + 1
+            likes: newLikes
           };
+          targetUpdatedPost = updated;
+          return updated;
         }
         return p;
       })
     );
+
+    if (targetUpdatedPost) {
+      if (selectedPost && selectedPost.id === postId) {
+        setSelectedPost(targetUpdatedPost);
+      }
+      storageSavePost(targetUpdatedPost);
+      savePostToSupabase(targetUpdatedPost);
+      try {
+        const bc = new BroadcastChannel('wilt_comments_channel');
+        bc.postMessage({ type: 'SYNC_POST', post: targetUpdatedPost });
+        bc.close();
+      } catch (e) {}
+    }
   };
 
   const addCommentToPost = (postId, commentText, currentUser) => {
