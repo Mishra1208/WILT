@@ -157,6 +157,7 @@ export const fetchCommentsFromSupabase = async () => {
       .from('concepts')
       .select('*')
       .eq('category', 'post_comment')
+      .gte('created_at', '2026-09-07T00:00:00.000Z')
       .order('created_at', { ascending: true })
       .limit(100);
 
@@ -271,6 +272,7 @@ export const fetchAttachmentsFromSupabase = async () => {
       .from('concepts')
       .select('*')
       .eq('category', 'post_attachment')
+      .gte('created_at', '2026-09-07T00:00:00.000Z')
       .order('created_at', { ascending: true })
       .limit(100);
 
@@ -315,7 +317,12 @@ export const fetchAttachmentsFromSupabase = async () => {
 export const fetchPostsFromSupabase = async () => {
   try {
     const [postsRes, allComments, allAttachments] = await Promise.all([
-      supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(100),
+      supabase
+        .from('posts')
+        .select('*')
+        .gte('created_at', '2026-09-07T00:00:00.000Z')
+        .order('created_at', { ascending: false })
+        .limit(100),
       fetchCommentsFromSupabase().catch(() => []),
       fetchAttachmentsFromSupabase().catch(() => [])
     ]);

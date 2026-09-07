@@ -32,10 +32,9 @@ export const AppProvider = ({ children }) => {
     // 1. Fetch remote posts from Supabase (Supabase is single source of truth)
     const loadLivePosts = () => {
       fetchPostsFromSupabase().then((remotePosts) => {
-        if (remotePosts && remotePosts.length > 0) {
-          setPosts(remotePosts);
-          saveAllPostsToStorage(remotePosts);
-        }
+        const cleanList = remotePosts || [];
+        setPosts(cleanList);
+        saveAllPostsToStorage(cleanList);
         setIsPostsLoading(false);
       }).catch(() => {
         setIsPostsLoading(false);
