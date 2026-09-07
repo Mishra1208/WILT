@@ -2,19 +2,19 @@ import { INITIAL_POSTS, INITIAL_CONCEPTS, INITIAL_LEADERBOARD_USERS } from '../d
 import { saveUserProfileToSupabase } from './supabase';
 
 const STORAGE_KEYS = {
-  POSTS: 'wilt_posts_v13',
-  CONCEPTS: 'wilt_concepts_v13',
-  LEADERBOARD: 'wilt_leaderboard_v13',
-  USER: 'wilt_current_user_v13',
-  SAVED_POSTS: 'wilt_saved_posts_v13',
-  QUIZ_HISTORY: 'wilt_quiz_history_v13',
+  POSTS: 'wilt_posts_v14',
+  CONCEPTS: 'wilt_concepts_v14',
+  LEADERBOARD: 'wilt_leaderboard_v14',
+  USER: 'wilt_current_user_v14',
+  SAVED_POSTS: 'wilt_saved_posts_v14',
+  QUIZ_HISTORY: 'wilt_quiz_history_v14',
 };
 
 // Initialize Storage with clean real user data
 export const initStorage = () => {
   // Clear any old storage keys
   try {
-    ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12'].forEach(v => {
+    ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13'].forEach(v => {
       localStorage.removeItem(`wilt_posts_${v}`);
       localStorage.removeItem(`wilt_saved_posts_${v}`);
       localStorage.removeItem(`wilt_concepts_${v}`);
@@ -171,7 +171,7 @@ export const saveUser = saveStoredUser;
 
 export const getOrCreateGuestUser = () => {
   try {
-    const key = 'wilt_guest_identity_v13';
+    const key = 'wilt_guest_identity_v14';
     const saved = localStorage.getItem(key);
     if (saved) {
       const parsed = JSON.parse(saved);
