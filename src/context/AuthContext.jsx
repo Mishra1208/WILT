@@ -154,6 +154,24 @@ export const AuthProvider = ({ children }) => {
     return updatedUser;
   };
 
+  const toggleUserLikePost = (postId) => {
+    if (!user || !postId) return;
+    const isLiked = (user.likedPosts || []).includes(postId);
+    const updatedLiked = isLiked
+      ? (user.likedPosts || []).filter((id) => id !== postId)
+      : [...(user.likedPosts || []), postId];
+
+    const updatedUser = { ...user, likedPosts: updatedLiked };
+    setUser(updatedUser);
+    saveStoredUser(updatedUser);
+    if (updatedUser.isGuest) {
+      try {
+        localStorage.setItem('wilt_guest_identity_v15', JSON.stringify(updatedUser));
+      } catch (e) {}
+    }
+    return updatedUser;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -162,6 +180,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         addXP,
+        toggleUserLikePost,
         openAuth,
         isAuthModalOpen,
         setIsAuthModalOpen: openAuth,

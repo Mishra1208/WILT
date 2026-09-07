@@ -196,11 +196,15 @@ export const NotepadLandingView = () => {
 
     const activeUser = user || getOrCreateGuestUser();
 
-    // Convert activeReferences URLs into link attachment objects to guarantee persistence in Supabase concepts table
+    // Convert ALL activeReferences into attachment objects (links or text sources) to guarantee persistence in Supabase concepts table
     const finalAttachments = [...attachments];
     activeReferences.forEach((refStr) => {
       const trimmed = refStr.trim();
-      if (/^(https?:\/\/|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/i.test(trimmed)) {
+      if (!trimmed) return;
+
+      const isUrl = /^(https?:\/\/|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/i.test(trimmed);
+
+      if (isUrl) {
         const formattedUrl = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
         if (!finalAttachments.some((a) => a.url === formattedUrl)) {
           finalAttachments.push({
@@ -210,10 +214,19 @@ export const NotepadLandingView = () => {
             url: formattedUrl
           });
         }
+      } else {
+        if (!finalAttachments.some((a) => a.name === trimmed)) {
+          finalAttachments.push({
+            id: `att-ref-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+            name: trimmed,
+            type: 'reference_source',
+            url: ''
+          });
+        }
       }
     });
 
-    const primarySource = activeReferences[0] || (finalAttachments[0] ? finalAttachments[0].url : 'Self-Learned Insight');
+    const primarySource = activeReferences[0] || (finalAttachments[0] ? finalAttachments[0].url || finalAttachments[0].name : 'Self-Learned Insight');
     const additionalSources = activeReferences.slice(1).join(', ');
 
     await createPost({

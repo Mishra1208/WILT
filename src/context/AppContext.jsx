@@ -16,6 +16,7 @@ import {
   fetchConceptsFromSupabase,
   saveCommentToSupabase,
   saveAttachmentToSupabase,
+  saveLikeToSupabase,
   fetchLeaderboardFromSupabase,
   supabase
 } from '../services/supabase';
@@ -44,8 +45,7 @@ export const AppProvider = ({ children }) => {
 
     loadLivePosts();
     // Safety-net poll only — the Realtime subscription below (#4) is the
-    // primary sync path for posts, comments, and attachments. This just
-    // guards against a dropped websocket, so it can afford to be slow.
+    // primary sync path for posts, comments, attachments, and likes.
     const postsInterval = setInterval(() => {
       if (!document.hidden) loadLivePosts();
     }, 60000);
@@ -100,12 +100,15 @@ export const AppProvider = ({ children }) => {
       if (!document.hidden) loadLiveLeaderboard();
     }, 30000);
 
-    // 4. Supabase Realtime listener for instant cross-tab / cross-browser post push
+    // 4. Supabase Realtime listener for instant cross-tab / cross-browser post & like push
     let postsChannel;
     try {
       postsChannel = supabase
         .channel('realtime:posts')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+          loadLivePosts();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'concepts' }, () => {
           loadLivePosts();
         })
         .subscribe();
@@ -271,36 +274,54 @@ export const AppProvider = ({ children }) => {
   };
 
   const toggleLike = (postId, user) => {
-    let targetUpdatedPost = null;
+    if (!postId) return;
 
-    setPosts(prev =>
-      prev.map(p => {
+    const username = user?.username || getOrCreateGuestUser().username;
+    const hasLiked = (user?.likedPosts || []).includes(postId);
+    const newIsLiked = !hasLiked;
+
+    // 1. Update posts array in state
+    setPosts((prev) =>
+      prev.map((p) => {
         if (p.id === postId) {
-          const hasLiked = user?.likedPosts?.includes(postId);
-          const newLikes = hasLiked ? Math.max(0, (p.likes || 0) - 1) : (p.likes || 0) + 1;
-          const updated = {
-            ...p,
-            likes: newLikes
-          };
-          targetUpdatedPost = updated;
-          return updated;
+          const currentLikes = p.likes || 0;
+          const updatedLikes = newIsLiked ? currentLikes + 1 : Math.max(0, currentLikes - 1);
+          return { ...p, likes: updatedLikes };
         }
         return p;
       })
     );
 
-    if (targetUpdatedPost) {
-      if (selectedPost && selectedPost.id === postId) {
-        setSelectedPost(targetUpdatedPost);
+    // 2. Synchronously update selectedPost state if modal is open for this post
+    setSelectedPost((prev) => {
+      if (prev && prev.id === postId) {
+        const currentLikes = prev.likes || 0;
+        const updatedLikes = newIsLiked ? currentLikes + 1 : Math.max(0, currentLikes - 1);
+        return { ...prev, likes: updatedLikes };
       }
-      storageSavePost(targetUpdatedPost);
-      savePostToSupabase(targetUpdatedPost);
-      try {
-        const bc = new BroadcastChannel('wilt_comments_channel');
-        bc.postMessage({ type: 'SYNC_POST', post: targetUpdatedPost });
-        bc.close();
-      } catch (e) {}
-    }
+      return prev;
+    });
+
+    // 3. Find current post and persist update to localStorage & Supabase
+    setPosts((currentPosts) => {
+      const targetPost = currentPosts.find((p) => p.id === postId);
+      if (targetPost) {
+        const currentLikes = targetPost.likes || 0;
+        const updatedLikes = newIsLiked ? currentLikes + 1 : Math.max(0, currentLikes - 1);
+        const postToSave = { ...targetPost, likes: updatedLikes };
+
+        storageSavePost(postToSave);
+        savePostToSupabase(postToSave);
+        saveLikeToSupabase(postId, username, newIsLiked);
+
+        try {
+          const bc = new BroadcastChannel('wilt_comments_channel');
+          bc.postMessage({ type: 'SYNC_POST', post: postToSave });
+          bc.close();
+        } catch (e) {}
+      }
+      return currentPosts;
+    });
   };
 
   const addCommentToPost = (postId, commentText, currentUser) => {

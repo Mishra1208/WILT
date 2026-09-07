@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 
 export const PostCard = ({ post }) => {
   const { openPostDetail, toggleLike, isPostSaved, toggleSavePost } = useApp();
-  const { user, setUser } = useAuth();
+  const { user, setUser, toggleUserLikePost } = useAuth();
 
   const isLiked = user?.likedPosts?.includes(post.id);
   const isSaved = isPostSaved(post.id) || (user?.savedPosts && user.savedPosts.includes(post.id));
@@ -14,10 +14,7 @@ export const PostCard = ({ post }) => {
     e.stopPropagation();
     if (!user) return;
     toggleLike(post.id, user);
-    const updatedLiked = isLiked
-      ? user.likedPosts.filter((id) => id !== post.id)
-      : [...(user.likedPosts || []), post.id];
-    setUser({ ...user, likedPosts: updatedLiked });
+    toggleUserLikePost(post.id);
   };
 
   const handleSave = (e) => {
@@ -31,12 +28,14 @@ export const PostCard = ({ post }) => {
     }
   };
 
-  // Clean trust source text
+  // Clean trust source & reference badges
   const linkAtt = post.attachments?.find((a) => a.type === 'link');
-  const effectiveUrl = post.sourceUrl || linkAtt?.url || linkAtt?.name;
-  const trustDomain = effectiveUrl 
-    ? effectiveUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]
-    : null;
+  const refSourceAtt = post.attachments?.find((a) => a.type === 'reference_source');
+  
+  const rawUrl = linkAtt?.url || (post.sourceUrl && /^(https?:\/\/|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/i.test(post.sourceUrl) ? post.sourceUrl : null);
+  const trustDomain = rawUrl ? rawUrl.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0] : null;
+
+  const locationText = refSourceAtt?.name || (post.sourceContext && post.sourceContext !== 'Verified Learner Post' ? post.sourceContext : (post.sourceUrl && !rawUrl ? post.sourceUrl : null));
 
   return (
     <div
@@ -95,12 +94,12 @@ export const PostCard = ({ post }) => {
         )}
 
         {/* Source of Trust & Learning Location */}
-        {(post.sourceUrl || post.sourceContext) && (
+        {(trustDomain || locationText) && (
           <div className="flex items-center gap-2 flex-wrap pt-0.5">
-            {post.sourceContext && (
+            {locationText && (
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200/80 shadow-2xs">
                 <MapPin className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-                <span className="truncate">{post.sourceContext}</span>
+                <span className="truncate">{locationText}</span>
               </div>
             )}
             {trustDomain && (

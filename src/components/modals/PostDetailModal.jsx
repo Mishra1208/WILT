@@ -26,7 +26,7 @@ import { useAuth } from '../../context/AuthContext';
 
 export const PostDetailModal = () => {
   const { selectedPost, closePostDetail, highlightSnippet, toggleLike, setCurrentView, setSearchQuery, addCommentToPost, isPostSaved, toggleSavePost } = useApp();
-  const { user, setUser } = useAuth();
+  const { user, setUser, toggleUserLikePost } = useAuth();
   const [commentInput, setCommentInput] = useState('');
   const [commentError, setCommentError] = useState(null);
 
@@ -40,10 +40,7 @@ export const PostDetailModal = () => {
   const handleLike = () => {
     if (!user) return;
     toggleLike(selectedPost.id, user);
-    const updatedLiked = isLiked
-      ? user.likedPosts.filter((id) => id !== selectedPost.id)
-      : [...(user.likedPosts || []), selectedPost.id];
-    setUser({ ...user, likedPosts: updatedLiked });
+    toggleUserLikePost(selectedPost.id);
   };
 
   const handleSave = () => {
@@ -197,7 +194,9 @@ export const PostDetailModal = () => {
 
           {/* Attached Media / Photos / Files Gallery */}
           {(() => {
-            const mediaAttachments = (selectedPost.attachments || []).filter((a) => a.type !== 'link');
+            const mediaAttachments = (selectedPost.attachments || []).filter(
+              (a) => a.type !== 'link' && a.type !== 'reference_source'
+            );
             if (mediaAttachments.length === 0) return null;
 
             return (
@@ -283,11 +282,13 @@ export const PostDetailModal = () => {
               selectedPost.sourceContext.split(',').forEach(processRef);
             }
 
-            // 4. Process ONLY link-type attachments
+            // 4. Process link and reference_source attachments
             if (selectedPost.attachments && selectedPost.attachments.length > 0) {
               selectedPost.attachments.forEach((att) => {
                 if (att.type === 'link') {
                   processRef(att.url || att.name);
+                } else if (att.type === 'reference_source') {
+                  processRef(att.name);
                 }
               });
             }

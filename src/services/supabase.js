@@ -312,11 +312,76 @@ export const fetchAttachmentsFromSupabase = async () => {
 };
 
 /**
+ * Save or Update Post Like in Supabase
+ */
+export const saveLikeToSupabase = async (postId, username, isLiked) => {
+  if (!postId) return { success: false };
+
+  try {
+    const cleanUser = (username || 'scholar').replace(/^@/, '').toLowerCase().trim();
+    const likeId = `like-${postId}-${cleanUser}`;
+
+    const payload = {
+      id: likeId,
+      term: postId,
+      category: 'post_like',
+      definition: JSON.stringify({ postId, username: cleanUser, liked: isLiked }),
+      plain_explanation: isLiked ? 'liked' : 'unliked',
+      contributor: cleanUser,
+      created_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabase
+      .from('concepts')
+      .upsert([payload])
+      .select();
+
+    if (error) {
+      console.warn('Supabase save like error:', error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true, data };
+  } catch (err) {
+    console.warn('Supabase like catch:', err);
+    return { success: false, error: err.message };
+  }
+};
+
+/**
+ * Fetch all active post likes from Supabase
+ */
+export const fetchLikesFromSupabase = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('concepts')
+      .select('*')
+      .eq('category', 'post_like')
+      .neq('plain_explanation', 'unliked')
+      .gte('created_at', '2026-09-07T00:00:00.000Z')
+      .limit(500);
+
+    if (error) {
+      console.warn('Supabase fetch likes error:', error.message);
+      return [];
+    }
+
+    return (data || []).map((row) => ({
+      id: row.id,
+      postId: row.term,
+      username: row.contributor || 'scholar'
+    }));
+  } catch (err) {
+    console.warn('Supabase fetch likes catch:', err);
+    return [];
+  }
+};
+
+/**
  * 3. Fetch all posts from Supabase
  */
 export const fetchPostsFromSupabase = async () => {
   try {
-    const [postsRes, allComments, allAttachments] = await Promise.all([
+    const [postsRes, allComments, allAttachments, allLikes] = await Promise.all([
       supabase
         .from('posts')
         .select('*')
@@ -324,7 +389,8 @@ export const fetchPostsFromSupabase = async () => {
         .order('created_at', { ascending: false })
         .limit(100),
       fetchCommentsFromSupabase().catch(() => []),
-      fetchAttachmentsFromSupabase().catch(() => [])
+      fetchAttachmentsFromSupabase().catch(() => []),
+      fetchLikesFromSupabase().catch(() => [])
     ]);
 
     const { data, error } = postsRes || {};
@@ -337,6 +403,8 @@ export const fetchPostsFromSupabase = async () => {
     return (data || []).map((row) => {
       const postComments = (allComments || []).filter((c) => c.postId === row.id);
       const postAttachments = (allAttachments || []).filter((a) => a.postId === row.id);
+      const postLikes = (allLikes || []).filter((l) => l.postId === row.id);
+
       return {
         id: row.id,
         title: row.title,
@@ -346,7 +414,7 @@ export const fetchPostsFromSupabase = async () => {
         content: row.content,
         readTime: '2 min read',
         createdAt: 'Recently',
-        likes: 0,
+        likes: postLikes.length,
         savedCount: 0,
         author: {
           name: row.author_name,
