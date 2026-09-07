@@ -280,19 +280,37 @@ export const AppProvider = ({ children }) => {
     const hasLiked = (user?.likedPosts || []).includes(postId);
     const newIsLiked = !hasLiked;
 
-    // 1. Update posts array in state
-    setPosts((prev) =>
-      prev.map((p) => {
+    // Single setPosts state update & persistence execution
+    setPosts((prev) => {
+      let targetPostToSave = null;
+
+      const updatedPosts = prev.map((p) => {
         if (p.id === postId) {
           const currentLikes = p.likes || 0;
           const updatedLikes = newIsLiked ? currentLikes + 1 : Math.max(0, currentLikes - 1);
-          return { ...p, likes: updatedLikes };
+          const updatedPost = { ...p, likes: updatedLikes };
+          targetPostToSave = updatedPost;
+          return updatedPost;
         }
         return p;
-      })
-    );
+      });
 
-    // 2. Synchronously update selectedPost state if modal is open for this post
+      if (targetPostToSave) {
+        storageSavePost(targetPostToSave);
+        savePostToSupabase(targetPostToSave);
+        saveLikeToSupabase(postId, username, newIsLiked);
+
+        try {
+          const bc = new BroadcastChannel('wilt_comments_channel');
+          bc.postMessage({ type: 'SYNC_POST', post: targetPostToSave });
+          bc.close();
+        } catch (e) {}
+      }
+
+      return updatedPosts;
+    });
+
+    // Synchronously update selectedPost state if modal is open for this post
     setSelectedPost((prev) => {
       if (prev && prev.id === postId) {
         const currentLikes = prev.likes || 0;
@@ -300,27 +318,6 @@ export const AppProvider = ({ children }) => {
         return { ...prev, likes: updatedLikes };
       }
       return prev;
-    });
-
-    // 3. Find current post and persist update to localStorage & Supabase
-    setPosts((currentPosts) => {
-      const targetPost = currentPosts.find((p) => p.id === postId);
-      if (targetPost) {
-        const currentLikes = targetPost.likes || 0;
-        const updatedLikes = newIsLiked ? currentLikes + 1 : Math.max(0, currentLikes - 1);
-        const postToSave = { ...targetPost, likes: updatedLikes };
-
-        storageSavePost(postToSave);
-        savePostToSupabase(postToSave);
-        saveLikeToSupabase(postId, username, newIsLiked);
-
-        try {
-          const bc = new BroadcastChannel('wilt_comments_channel');
-          bc.postMessage({ type: 'SYNC_POST', post: postToSave });
-          bc.close();
-        } catch (e) {}
-      }
-      return currentPosts;
     });
   };
 
