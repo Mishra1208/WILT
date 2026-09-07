@@ -246,65 +246,74 @@ export const PostDetailModal = () => {
 
           {/* Source of Trust & Reference Links Block */}
           {(() => {
-            // Extract all reference links from post
             const linksList = [];
-            
-            if (selectedPost.sourceUrl) {
-              linksList.push({ name: selectedPost.sourceUrl, url: selectedPost.sourceUrl });
+            const textSources = [];
+
+            const processRef = (refStr) => {
+              if (!refStr || typeof refStr !== 'string') return;
+              const trimmed = refStr.trim();
+              if (!trimmed || trimmed === 'Verified Learner Post' || trimmed === 'Self-Learned Insight') return;
+
+              // Ignore Supabase Storage object URLs for image/file attachments!
+              if (trimmed.includes('.supabase.co/storage/v1/object/public/')) return;
+
+              // Check if string is a URL (e.g., gmail.com, https://github.com, etc.)
+              if (/^(https?:\/\/|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/i.test(trimmed)) {
+                const formattedUrl = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+                if (!linksList.some((l) => l.url === formattedUrl)) {
+                  linksList.push({ name: trimmed, url: formattedUrl });
+                }
+              } else {
+                if (!textSources.includes(trimmed)) {
+                  textSources.push(trimmed);
+                }
+              }
+            };
+
+            // 1. Process post.references array if present
+            if (Array.isArray(selectedPost.references)) {
+              selectedPost.references.forEach(processRef);
             }
 
+            // 2. Process sourceUrl
+            processRef(selectedPost.sourceUrl);
+
+            // 3. Process sourceContext
+            if (selectedPost.sourceContext) {
+              selectedPost.sourceContext.split(',').forEach(processRef);
+            }
+
+            // 4. Process ONLY link-type attachments
             if (selectedPost.attachments && selectedPost.attachments.length > 0) {
-              selectedPost.attachments.forEach(att => {
-                if (att.type === 'link' || (att.url && /^https?:\/\//i.test(att.url))) {
-                  if (!linksList.some(l => l.url === att.url)) {
-                    linksList.push({ name: att.name || att.url, url: att.url });
-                  }
+              selectedPost.attachments.forEach((att) => {
+                if (att.type === 'link') {
+                  processRef(att.url || att.name);
                 }
               });
             }
 
-            if (selectedPost.sourceContext && /^https?:\/\//i.test(selectedPost.sourceContext.trim())) {
-              const url = selectedPost.sourceContext.trim();
-              if (!linksList.some(l => l.url === url)) {
-                linksList.push({ name: url, url: url });
-              }
-            }
-
-            const hasContextText = selectedPost.sourceContext && !/^https?:\/\//i.test(selectedPost.sourceContext.trim()) && selectedPost.sourceContext !== 'Verified Learner Post';
-
-            if (linksList.length === 0 && !hasContextText) return null;
+            if (linksList.length === 0 && textSources.length === 0) return null;
 
             return (
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                 <div className="flex items-center gap-2 text-xs font-extrabold text-slate-800 uppercase tracking-wider">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>Reference Links & Learning Context ({linksList.length})</span>
+                  <span>Reference Links & Study Sources ({linksList.length + textSources.length})</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {hasContextText && (
-                    <div className="p-3.5 rounded-xl bg-amber-50/90 border border-amber-200 flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-amber-100 text-amber-700">
-                        <MapPin className="w-4 h-4" />
-                      </div>
-                      <div className="truncate">
-                        <span className="text-[10px] uppercase font-extrabold text-amber-800/80 block">Learning Context / Location</span>
-                        <span className="text-xs sm:text-sm font-extrabold text-amber-950 truncate block mt-0.5">
-                          {selectedPost.sourceContext}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
+                  {/* Clickable URL Links */}
                   {linksList.map((linkItem, idx) => {
-                    const cleanUrl = linkItem.url.startsWith('http') ? linkItem.url : `https://${linkItem.url}`;
+                    const cleanUrl = linkItem.url;
                     const domain = cleanUrl.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0];
-                    
+
                     return (
-                      <div key={idx} className="p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 flex items-center justify-between gap-3 shadow-2xs">
+                      <div key={`link-${idx}`} className="p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 flex items-center justify-between gap-3 shadow-2xs">
                         <div className="truncate">
-                          <span className="text-[10px] uppercase font-extrabold text-emerald-800/80 block font-mono">Reference Link #{idx + 1}</span>
-                          <span className="font-mono text-emerald-900 truncate block text-xs font-extrabold mt-0.5">
+                          <span className="text-[10px] uppercase font-extrabold text-emerald-800/80 block font-mono">
+                            Reference Link #{idx + 1}
+                          </span>
+                          <span className="font-mono text-emerald-950 truncate block text-xs font-extrabold mt-0.5">
                             {domain}
                           </span>
                         </div>
@@ -320,6 +329,23 @@ export const PostDetailModal = () => {
                       </div>
                     );
                   })}
+
+                  {/* Text Book / Paper Sources */}
+                  {textSources.map((sourceText, idx) => (
+                    <div key={`txt-${idx}`} className="p-3.5 rounded-xl bg-amber-50/90 border border-amber-200 flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-amber-100 text-amber-700 shrink-0">
+                        <MapPin className="w-4 h-4" />
+                      </div>
+                      <div className="truncate">
+                        <span className="text-[10px] uppercase font-extrabold text-amber-800/80 block font-mono">
+                          Source / Book Reference
+                        </span>
+                        <span className="text-xs font-extrabold text-amber-950 truncate block mt-0.5">
+                          {sourceText}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             );

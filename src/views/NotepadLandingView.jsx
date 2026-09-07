@@ -194,10 +194,27 @@ export const NotepadLandingView = () => {
 
     const finalCategory = category === 'Other' ? (customCategory.trim() || 'General Knowledge') : category;
 
-    const primarySource = activeReferences[0] || (attachments[0] ? attachments[0].url : 'Self-Learned Insight');
-    const additionalSources = activeReferences.slice(1).join(', ');
-
     const activeUser = user || getOrCreateGuestUser();
+
+    // Convert activeReferences URLs into link attachment objects to guarantee persistence in Supabase concepts table
+    const finalAttachments = [...attachments];
+    activeReferences.forEach((refStr) => {
+      const trimmed = refStr.trim();
+      if (/^(https?:\/\/|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/i.test(trimmed)) {
+        const formattedUrl = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+        if (!finalAttachments.some((a) => a.url === formattedUrl)) {
+          finalAttachments.push({
+            id: `att-link-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+            name: trimmed,
+            type: 'link',
+            url: formattedUrl
+          });
+        }
+      }
+    });
+
+    const primarySource = activeReferences[0] || (finalAttachments[0] ? finalAttachments[0].url : 'Self-Learned Insight');
+    const additionalSources = activeReferences.slice(1).join(', ');
 
     await createPost({
       title: title.trim() || 'Daily Learning Note',
@@ -208,7 +225,7 @@ export const NotepadLandingView = () => {
       terms: '',
       sourceUrl: primarySource,
       sourceContext: additionalSources || 'Verified Learner Post',
-      attachments: attachments,
+      attachments: finalAttachments,
       author: {
         name: `@${activeUser.username}`,
         username: activeUser.username,
