@@ -203,7 +203,7 @@ export const Sidebar = () => {
       <div className="p-4 border-t border-slate-100 bg-slate-50/50">
         {isLoggedIn ? (
           <div
-            onClick={() => handleNavClick('about')}
+            onClick={() => handleNavClick('leaderboard')}
             className="flex items-center justify-between p-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 cursor-pointer transition-all"
           >
             <div className="flex items-center gap-2.5 truncate">

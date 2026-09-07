@@ -66,7 +66,7 @@ export const Header = () => {
         <SignedIn>
           <div className="flex items-center gap-2">
             <div
-              onClick={() => setCurrentView('about')}
+              onClick={() => setCurrentView('leaderboard')}
               className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-colors"
             >
               <img
