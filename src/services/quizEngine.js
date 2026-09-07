@@ -1,10 +1,40 @@
 // Automatic Quiz Generator & Question Bank Engine
 // Generates contextual MCQs dynamically from weekly posts and community concepts.
 
-export const generateWeeklyQuiz = (posts = [], count = 5) => {
-  if (!posts || posts.length === 0) return [];
+const isValidQuizPost = (p) => {
+  if (!p || !p.title || typeof p.title !== 'string') return false;
 
-  // Question Templates and extracted generators
+  const cleanTitle = p.title.trim();
+  // Require titles to be substantial (at least 12 characters)
+  if (cleanTitle.length < 12) return false;
+
+  // Reject titles with repetitive pattern (e.g., "AAAAA...", "SDSDSDSD...")
+  const cleanNoSpaces = cleanTitle.replace(/[\s\-_]+/g, '').toLowerCase();
+  if (/^(.)\1+$/i.test(cleanNoSpaces)) return false;
+
+  // Reject obvious junk or placeholder titles
+  const junkPatterns = [
+    /^(diy|test|okok|sdsd|asdf|qwerty|abc|idk|new|demo|temp|sample|foo|bar)+$/i,
+    /no\s*context/i,
+    /try\s*now/i,
+    /new\s*test/i,
+    /hello\s*world/i,
+    /test\s*post/i
+  ];
+  if (junkPatterns.some(pat => pat.test(cleanTitle) || pat.test(cleanNoSpaces))) {
+    return false;
+  }
+
+  // Must contain substantial educational content: either structured takeaways, a detailed summary, or long body content
+  const hasTakeaways = Array.isArray(p.keyTakeaways) && p.keyTakeaways.some(t => t && typeof t === 'string' && t.trim().length >= 15);
+  const hasGoodSummary = p.summary && typeof p.summary === 'string' && p.summary.trim().length >= 30;
+  const hasGoodContent = p.content && typeof p.content === 'string' && p.content.trim().length >= 60;
+
+  return hasTakeaways || hasGoodSummary || hasGoodContent;
+};
+
+export const generateWeeklyQuiz = (posts = [], count = 5) => {
+  // Static high-quality seed question pool
   const questionPool = [
     {
       postId: "post-1",
@@ -98,28 +128,31 @@ export const generateWeeklyQuiz = (posts = [], count = 5) => {
     }
   ];
 
-  // If user has custom posts, dynamically generate extra questions
-  const customPostQuestions = posts
-    .filter(p => !questionPool.some(q => q.postId === p.id))
-    .map(p => {
-      const takeaway = p.keyTakeaways?.[0] || p.summary || p.title;
-      return {
-        postId: p.id,
-        postTitle: p.title,
-        category: p.category || "General",
-        question: `Regarding "${p.title}", which of the following is a primary key takeaway?`,
-        options: [
-          takeaway,
-          `Operating expenses should be capitalized into long-term intangibles`,
-          `Central banks strictly ban liquidity ratios for educational institutions`,
-          `This concept only applies when market variance drops below zero`
-        ].sort(() => 0.5 - Math.random()),
-        correctIndex: 0, // calculated dynamically below
-        correctAnswerText: takeaway,
-        explanation: `In "${p.title}", the primary takeaway is: ${takeaway}`,
-        sourceSnippet: p.summary || takeaway
-      };
-    });
+  // Only consider posts that pass strict educational quality validation
+  const validCustomPosts = (posts || []).filter(p => isValidQuizPost(p) && !questionPool.some(q => q.postId === p.id));
+
+  const customPostQuestions = validCustomPosts.map(p => {
+    const takeaway = (p.keyTakeaways && p.keyTakeaways[0] && p.keyTakeaways[0].trim()) 
+      || (p.summary && p.summary.trim()) 
+      || p.title;
+
+    return {
+      postId: p.id,
+      postTitle: p.title,
+      category: p.category || "General",
+      question: `Regarding "${p.title}", which of the following is a primary key takeaway?`,
+      options: [
+        takeaway,
+        `Operating expenses should be capitalized into long-term intangibles`,
+        `Central banks strictly ban liquidity ratios for educational institutions`,
+        `This concept only applies when market variance drops below zero`
+      ].sort(() => 0.5 - Math.random()),
+      correctIndex: 0,
+      correctAnswerText: takeaway,
+      explanation: `In "${p.title}", the primary takeaway is: ${takeaway}`,
+      sourceSnippet: p.summary || takeaway
+    };
+  });
 
   // Re-index correctIndex for shuffled custom options
   customPostQuestions.forEach(q => {
