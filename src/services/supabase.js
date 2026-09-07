@@ -447,8 +447,16 @@ export const saveQuizAttemptToSupabase = async ({ userHandle, userName, score, t
 export const fetchLeaderboardFromSupabase = async () => {
   try {
     const [profilesRes, attemptsRes] = await Promise.all([
-      supabase.from('user_profiles').select('*').order('xp', { ascending: false }),
-      supabase.from('quiz_attempts').select('*').order('created_at', { ascending: false })
+      supabase
+        .from('user_profiles')
+        .select('*')
+        .gte('updated_at', '2026-09-07T00:00:00.000Z')
+        .order('xp', { ascending: false }),
+      supabase
+        .from('quiz_attempts')
+        .select('*')
+        .gte('created_at', '2026-09-07T00:00:00.000Z')
+        .order('created_at', { ascending: false })
     ]).catch(() => [{ data: [] }, { data: [] }]);
 
     const profiles = profilesRes?.data || [];
