@@ -9,7 +9,8 @@ import {
   Zap, 
   Compass,
   PenTool,
-  Check
+  Check,
+  Calendar
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { PostCard } from '../components/cards/PostCard';
@@ -173,6 +174,13 @@ export const SavedView = () => {
                         <div className="absolute top-3 left-3">
                           <span className="px-2.5 py-1 rounded-lg bg-white/95 text-slate-900 font-extrabold text-[10px] uppercase tracking-wider shadow-xs">
                             {article.categoryLabel || 'Business News'}
+                          </span>
+                        </div>
+
+                        <div className="absolute top-3 right-3">
+                          <span className="px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-white font-extrabold text-[10px] tracking-wide flex items-center gap-1.5 shadow-md border border-white/20">
+                            <Calendar className="w-3 h-3 text-amber-400" />
+                            <span>{article.date}</span>
                           </span>
                         </div>
 

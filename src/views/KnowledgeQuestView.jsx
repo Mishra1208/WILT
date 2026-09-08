@@ -14,7 +14,9 @@ import {
   ArrowDown,
   Zap,
   Check,
-  X
+  X,
+  Calendar,
+  Clock
 } from 'lucide-react';
 import { KNOWLEDGE_QUEST_CATEGORIES, KNOWLEDGE_QUEST_ARTICLES, KNOWLEDGE_QUEST_QUIZ, SECONDARY_FALLBACK_IMAGES } from '../data/knowledgeQuestData';
 import { fetchLiveBusinessNews, getNewsFallbackSvg } from '../services/newsService';
@@ -235,18 +237,25 @@ export const KnowledgeQuestView = () => {
                     }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
                   
                   <div className="absolute top-3 left-3">
-                    <span className="px-3 py-1 rounded-xl bg-white/90 backdrop-blur-md text-slate-900 font-black text-[10px] uppercase tracking-wider shadow-sm">
+                    <span className="px-3 py-1 rounded-xl bg-white/95 backdrop-blur-md text-slate-900 font-black text-[10px] uppercase tracking-wider shadow-sm">
                       {article.categoryLabel}
                     </span>
                   </div>
 
-                  <div className="absolute bottom-3 left-3 right-3 text-white">
-                    <span className="text-[10px] font-bold text-slate-300 block mb-0.5">
-                      {article.source} · {article.date}
+                  <div className="absolute top-3 right-3">
+                    <span className="px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-white font-extrabold text-[10px] tracking-wide flex items-center gap-1.5 shadow-md border border-white/20">
+                      <Calendar className="w-3 h-3 text-amber-400" />
+                      <span>{article.date}</span>
                     </span>
+                  </div>
+
+                  <div className="absolute bottom-3 left-3 right-3 text-white">
+                    <div className="flex items-center gap-2 mb-1 text-[11px] font-bold text-slate-200">
+                      <span>{article.source}</span>
+                    </div>
                     <h3 className="text-sm font-extrabold leading-snug line-clamp-2">
                       {article.title}
                     </h3>
