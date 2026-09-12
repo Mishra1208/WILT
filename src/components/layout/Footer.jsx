@@ -24,6 +24,14 @@ export const Footer = () => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
+
+  const handleCopyEmail = (e) => {
+    if (e) e.preventDefault();
+    navigator.clipboard.writeText('wilt.support@gmail.com');
+    setEmailCopied(true);
+    setTimeout(() => setEmailCopied(false), 2500);
+  };
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
@@ -70,10 +78,28 @@ export const Footer = () => {
               The premier campus micro-learning network. Transforming daily student insights into a structured, verified open source of trust.
             </p>
 
-            {/* Live Network Status Indicator */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-800 text-[11px] font-bold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Campus Network Operational · 2026 Edition</span>
+            {/* Live Network Status & Support Email Badge */}
+            <div className="flex flex-col gap-2 pt-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-800 text-[11px] font-bold self-start">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Campus Network Operational · 2026 Edition</span>
+              </div>
+
+              <button
+                onClick={handleCopyEmail}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-primary-50/70 border border-slate-200 text-slate-700 text-[11px] font-semibold transition-all cursor-pointer group self-start"
+                title="Click to copy WILT support email"
+              >
+                <Mail className="w-3.5 h-3.5 text-primary-600 shrink-0" />
+                <span>Support: <strong className="text-slate-900 font-bold group-hover:text-primary-600">wilt.support@gmail.com</strong></span>
+                {emailCopied ? (
+                  <span className="ml-1 px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-extrabold flex items-center gap-1 animate-fadeIn">
+                    <Check className="w-3 h-3 text-emerald-600" /> Email Copied!
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-slate-400 font-normal group-hover:text-primary-500">(Click to copy)</span>
+                )}
+              </button>
             </div>
           </div>
 
@@ -250,13 +276,20 @@ export const Footer = () => {
             >
               <Github className="w-4 h-4" />
             </a>
-            <a 
-              href="mailto:info.wilt@gmail.com" 
-              title="Email Support"
-              className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-primary-50 text-slate-500 hover:text-primary-600 border border-slate-200/60 flex items-center justify-center transition-colors cursor-pointer"
-            >
-              <Mail className="w-4 h-4" />
-            </a>
+            <div className="relative">
+              <button 
+                onClick={handleCopyEmail}
+                title="Copy WILT Support Email (wilt.support@gmail.com)"
+                className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-primary-50 text-slate-500 hover:text-primary-600 border border-slate-200/60 flex items-center justify-center transition-colors cursor-pointer relative"
+              >
+                {emailCopied ? <Check className="w-4 h-4 text-emerald-600 font-extrabold" /> : <Mail className="w-4 h-4" />}
+              </button>
+              {emailCopied && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-slate-900 text-white font-extrabold text-[10px] rounded-lg shadow-lg whitespace-nowrap animate-fadeIn z-30">
+                  Email Copied!
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Quick Legal Horizontal Links */}
