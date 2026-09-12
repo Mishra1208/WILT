@@ -1,5 +1,4 @@
-// Automatic Quiz Generator & Question Bank Engine
-// Generates contextual MCQs dynamically from weekly posts and community concepts.
+import { KNOWLEDGE_QUEST_ARTICLES } from '../data/knowledgeQuestData';
 
 const isValidQuizPost = (p) => {
   if (!p || !p.title || typeof p.title !== 'string') return false;
@@ -34,7 +33,44 @@ const isValidQuizPost = (p) => {
 };
 
 export const generateWeeklyQuiz = (posts = [], count = 5) => {
-  // Static high-quality seed question pool
+  // 1. Generate questions dynamically from Times of India Business News articles
+  const newsQuestions = (KNOWLEDGE_QUEST_ARTICLES || []).map((article, idx) => {
+    const whyItMatters = typeof article.summary === 'object' ? (article.summary?.whyItMatters || article.summary?.whatHappened || article.title) : article.title;
+    const whatHappened = typeof article.summary === 'object' ? (article.summary?.whatHappened || article.title) : article.title;
+
+    const otherArticles = KNOWLEDGE_QUEST_ARTICLES.filter(a => a.id !== article.id);
+    const d1 = typeof otherArticles[(idx + 1) % otherArticles.length]?.summary === 'object' 
+      ? otherArticles[(idx + 1) % otherArticles.length].summary.whyItMatters 
+      : "Operating expenses should be capitalized into long-term intangibles";
+    const d2 = typeof otherArticles[(idx + 2) % otherArticles.length]?.summary === 'object' 
+      ? otherArticles[(idx + 2) % otherArticles.length].summary.whyItMatters 
+      : "Central banks strictly ban liquidity ratios for educational institutions";
+    const d3 = "This economic metric only fluctuates when market variance drops below zero";
+
+    const rawOptions = [whyItMatters, d1, d2, d3];
+    // Deduplicate and shuffle
+    const uniqueOptions = Array.from(new Set(rawOptions));
+    while (uniqueOptions.length < 4) {
+      uniqueOptions.push(`Standard monetary adjustment #${uniqueOptions.length + 1}`);
+    }
+    const options = uniqueOptions.sort(() => 0.5 - Math.random());
+
+    return {
+      isNews: true,
+      newsId: article.id,
+      postTitle: article.title,
+      toiUrl: article.toiUrl || 'https://timesofindia.indiatimes.com/business',
+      category: article.categoryLabel || 'Times of India Business',
+      question: `Times of India Business News: Regarding "${article.title}", why does this development matter?`,
+      options: options,
+      correctIndex: options.indexOf(whyItMatters),
+      correctAnswerText: whyItMatters,
+      explanation: `${whatHappened}\nWhy It Matters: ${whyItMatters}`,
+      sourceSnippet: `${whatHappened} (${typeof article.summary === 'object' ? article.summary?.keyMetric : article.source})`
+    };
+  });
+
+  // 2. Static high-quality peer seed question pool
   const questionPool = [
     {
       postId: "post-1",
@@ -128,7 +164,7 @@ export const generateWeeklyQuiz = (posts = [], count = 5) => {
     }
   ];
 
-  // Only consider posts that pass strict educational quality validation
+  // 3. Custom peer post questions
   const validCustomPosts = (posts || []).filter(p => isValidQuizPost(p) && !questionPool.some(q => q.postId === p.id));
 
   const customPostQuestions = validCustomPosts.map(p => {
@@ -161,7 +197,8 @@ export const generateWeeklyQuiz = (posts = [], count = 5) => {
     }
   });
 
-  const allQuestions = [...questionPool, ...customPostQuestions];
+  // 4. Combine all sources: News + Static Peer Pool + Custom Posts
+  const allQuestions = [...newsQuestions, ...questionPool, ...customPostQuestions];
 
   // Shuffle and pick `count` questions
   const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());

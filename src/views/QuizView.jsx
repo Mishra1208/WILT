@@ -9,7 +9,9 @@ import {
   RotateCcw,
   Trophy,
   AlertCircle,
-  HelpCircle
+  HelpCircle,
+  Globe2,
+  ExternalLink
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
@@ -97,6 +99,11 @@ export const QuizView = () => {
   const handleReadSourcePost = (question) => {
     if (!question) return;
 
+    if (question.isNews || question.toiUrl) {
+      window.open(question.toiUrl || 'https://timesofindia.indiatimes.com/business', '_blank', 'noopener,noreferrer');
+      return;
+    }
+
     let matchedPost = posts.find(
       (p) =>
         p.id === question.postId ||
@@ -141,68 +148,46 @@ export const QuizView = () => {
             </span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
-            5 randomized MCQs selected from community peer learning cards. Test your retention and rank on the campus leaderboard.
+            5 randomized MCQs selected from community peer learning cards & Times of India breaking business news. Test your retention and rank on the campus leaderboard.
           </p>
         </div>
 
-        {posts.length === 0 ? (
-          <div className="p-10 rounded-3xl bg-white border border-dashed border-slate-200 text-center space-y-4 shadow-soft">
-            <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 text-primary-600 flex items-center justify-center mx-auto">
-              <Sparkles className="w-7 h-7" />
+        <div className="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
+              <div className="text-[11px] font-bold text-slate-400 uppercase">Questions</div>
+              <div className="text-xl font-extrabold text-slate-900 mt-1">5 MCQs</div>
             </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900">
-                No Learning Cards Published Yet
-              </h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
-                The active recall engine generates questions directly from peer lessons. Publish your first 30-second card on the Notepad Slate to unlock quizzes!
-              </p>
+            <div className="p-4 rounded-2xl bg-coral-50 border border-coral-100 text-center">
+              <div className="text-[11px] font-bold text-coral-500 uppercase">Reward</div>
+              <div className="text-xl font-extrabold text-coral-600 mt-1">+150 XP</div>
+            </div>
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-center">
+              <div className="text-[11px] font-bold text-emerald-500 uppercase">Smart Review</div>
+              <div className="text-xl font-extrabold text-emerald-600 mt-1">Instant Link</div>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-primary-50/70 border border-primary-100 text-xs text-primary-900 flex items-start gap-3">
+            <HelpCircle className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+            <div className="leading-relaxed font-medium">
+              <span className="font-bold">Active recall rule:</span> If you answer any question incorrectly, our recall engine will instantly display <span className="font-bold underline">"Did you forget about it? Read full article / post"</span> with a direct link to the original news article or peer post.
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+            <div className="text-xs text-slate-600 font-mono font-bold">
+              Playing as: <span className="text-primary-600">@{user?.username || 'scholar'}</span> • {user?.xp || 0} XP
             </div>
             <button
-              onClick={() => setCurrentView('notepad')}
-              className="px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs shadow-btn transition-all cursor-pointer"
+              onClick={startNewQuiz}
+              className="px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn transition-all flex items-center gap-2 cursor-pointer"
             >
-              Open Notepad Slate 📝
+              <Sparkles className="w-4 h-4" />
+              <span>Start Challenge</span>
             </button>
           </div>
-        ) : (
-          <div className="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                <div className="text-[11px] font-bold text-slate-400 uppercase">Questions</div>
-                <div className="text-xl font-extrabold text-slate-900 mt-1">{Math.min(5, posts.length)} MCQs</div>
-              </div>
-              <div className="p-4 rounded-2xl bg-coral-50 border border-coral-100 text-center">
-                <div className="text-[11px] font-bold text-coral-500 uppercase">Reward</div>
-                <div className="text-xl font-extrabold text-coral-600 mt-1">+150 XP</div>
-              </div>
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-center">
-                <div className="text-[11px] font-bold text-emerald-500 uppercase">Smart Review</div>
-                <div className="text-xl font-extrabold text-emerald-600 mt-1">Instant Link</div>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-primary-50/70 border border-primary-100 text-xs text-primary-900 flex items-start gap-3">
-              <HelpCircle className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
-              <div className="leading-relaxed font-medium">
-                <span className="font-bold">Active recall rule:</span> If you answer any question incorrectly, our recall engine will instantly display <span className="font-bold underline">"Did you forget about it? Read it here"</span> with a direct link to the original peer post.
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-              <div className="text-xs text-slate-600 font-mono font-bold">
-                Playing as: <span className="text-primary-600">@{user?.username || 'scholar'}</span> • {user?.xp || 150} XP
-              </div>
-              <button
-                onClick={startNewQuiz}
-                className="px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Start Challenge</span>
-              </button>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     );
   }
@@ -340,10 +325,21 @@ export const QuizView = () => {
 
                   {/* EXPLANATION & DIRECT SOURCE LINK */}
                   <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-                    <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                    <p className="text-xs text-slate-700 leading-relaxed font-medium whitespace-pre-line">
                       💡 <span className="font-bold">Explanation:</span> {q.explanation}
                     </p>
-                    {q.postTitle && (
+                    {q.isNews || q.toiUrl ? (
+                      <a
+                        href={q.toiUrl || 'https://timesofindia.indiatimes.com/business'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-2xs transition-all cursor-pointer mt-1"
+                      >
+                        <Globe2 className="w-3.5 h-3.5" />
+                        <span>Read Full Article on Times of India</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    ) : q.postTitle ? (
                       <button
                         onClick={() => handleReadSourcePost(q)}
                         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs shadow-2xs transition-all cursor-pointer mt-1"
@@ -352,7 +348,7 @@ export const QuizView = () => {
                         <span>Open Source Post: "{q.postTitle}"</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               );
@@ -446,22 +442,37 @@ export const QuizView = () => {
           <div className="p-5 rounded-2xl bg-amber-50/80 border border-amber-200 space-y-3 animate-fadeIn">
             <div className="flex items-center gap-2 text-amber-900 text-xs font-bold uppercase tracking-wider">
               <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-              <span>Did you forget about it? Read it here:</span>
+              <span>
+                {currentQ.isNews ? 'Did you forget this news? Read it here:' : 'Did you forget about it? Read it here:'}
+              </span>
             </div>
 
-            <p className="text-xs text-amber-950 leading-relaxed font-medium">
+            <p className="text-xs text-amber-950 leading-relaxed font-medium whitespace-pre-line">
               {currentQ.explanation}
             </p>
 
             <div className="pt-1">
-              <button
-                onClick={() => handleReadSourcePost(currentQ)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn transition-all transform active:scale-95 cursor-pointer"
-              >
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>Open Source: "{currentQ.postTitle}"</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              {currentQ.isNews || currentQ.toiUrl ? (
+                <a
+                  href={currentQ.toiUrl || 'https://timesofindia.indiatimes.com/business'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-btn transition-all transform active:scale-95 cursor-pointer"
+                >
+                  <Globe2 className="w-3.5 h-3.5" />
+                  <span>Read Full Article on Times of India</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              ) : (
+                <button
+                  onClick={() => handleReadSourcePost(currentQ)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn transition-all transform active:scale-95 cursor-pointer"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Open Source Post: "{currentQ.postTitle}"</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </div>
         )}
