@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 
 export const DictionaryView = () => {
   const { concepts, posts, openPostDetail, setIsNewConceptModalOpen } = useApp();
+  const { requireAuth } = useAuth();
 
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
@@ -52,7 +53,7 @@ export const DictionaryView = () => {
   const handleOpenRelatedPost = (postId) => {
     const post = posts.find((p) => p.id === postId);
     if (post) {
-      openPostDetail(post);
+      requireAuth(() => openPostDetail(post));
     }
   };
 
@@ -70,8 +71,8 @@ export const DictionaryView = () => {
         </div>
 
         <button
-          onClick={() => setIsNewConceptModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn transition-all flex items-center gap-2 self-start sm:self-auto"
+          onClick={() => requireAuth(() => setIsNewConceptModalOpen(true))}
+          className="px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn transition-all flex items-center gap-2 self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Add New Term</span>

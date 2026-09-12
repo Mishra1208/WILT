@@ -332,7 +332,7 @@ export const KnowledgeQuestView = () => {
               {/* Card Footer Action Bar */}
               <div className="p-5 sm:p-6 pt-0 flex items-center justify-between gap-3 border-t border-slate-100 mt-4">
                 <button
-                  onClick={() => toggleSaveNews(article)}
+                  onClick={() => requireAuth(() => toggleSaveNews(article))}
                   className={cn(
                     "px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border",
                     isSaved
