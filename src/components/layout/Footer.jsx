@@ -85,21 +85,13 @@ export const Footer = () => {
                 <span>Campus Network Operational · 2026 Edition</span>
               </div>
 
-              <button
-                onClick={handleCopyEmail}
+              <a
+                href="mailto:wilt.support@gmail.com"
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-primary-50/70 border border-slate-200 text-slate-700 text-[11px] font-semibold transition-all cursor-pointer group self-start"
-                title="Click to copy WILT support email"
               >
                 <Mail className="w-3.5 h-3.5 text-primary-600 shrink-0" />
                 <span>Support: <strong className="text-slate-900 font-bold group-hover:text-primary-600">wilt.support@gmail.com</strong></span>
-                {emailCopied ? (
-                  <span className="ml-1 px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-extrabold flex items-center gap-1 animate-fadeIn">
-                    <Check className="w-3 h-3 text-emerald-600" /> Email Copied!
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-slate-400 font-normal group-hover:text-primary-500">(Click to copy)</span>
-                )}
-              </button>
+              </a>
             </div>
           </div>
 
