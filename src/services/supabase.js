@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://itokltjrkzqmbbagjnme.supabase.co';
+export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://sphxwnaiviqaujhravoo.supabase.co';
 export const SUPABASE_PUBLISHABLE_KEY = 
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 
   import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 
-  'sb_publishable_hqJIezaDpWiy6kHjoabvEg_3_scOStB';
+  'sb_publishable_HKYlHuCNLP4rSmMeKcqxxQ_I4VnI3Hw';
 
 // Initialize Supabase Client
 export const supabase = createClient(
