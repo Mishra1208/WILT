@@ -19,7 +19,7 @@ import { useAuth } from '../../context/AuthContext';
 
 export const Sidebar = () => {
   const { currentView, setCurrentView, setIsNewPostModalOpen, isSidebarOpen, toggleSidebar, openReportBugModal } = useApp();
-  const { user, isLoggedIn, setIsAuthModalOpen } = useAuth();
+  const { user, isLoggedIn, setIsAuthModalOpen, requireAuth, openAuth } = useAuth();
 
   const learningNav = [
     { id: 'notepad', label: 'Notepad Slate', icon: PenTool },
@@ -46,9 +46,18 @@ export const Sidebar = () => {
   }
 
   const handleNavClick = (id) => {
-    setCurrentView(id);
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      toggleSidebar();
+    if (id === 'notepad' || id === 'quiz') {
+      requireAuth(() => {
+        setCurrentView(id);
+        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+          toggleSidebar();
+        }
+      });
+    } else {
+      setCurrentView(id);
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        toggleSidebar();
+      }
     }
   };
 

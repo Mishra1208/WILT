@@ -5,27 +5,32 @@ import { useAuth } from '../../context/AuthContext';
 
 export const PostCard = ({ post }) => {
   const { openPostDetail, toggleLike, isPostSaved, toggleSavePost } = useApp();
-  const { user, setUser, toggleUserLikePost } = useAuth();
+  const { user, setUser, toggleUserLikePost, requireAuth } = useAuth();
 
   const isLiked = user?.likedPosts?.includes(post.id);
   const isSaved = isPostSaved(post.id) || (user?.savedPosts && user.savedPosts.includes(post.id));
 
   const handleLike = (e) => {
     e.stopPropagation();
-    if (!user) return;
-    toggleLike(post.id, user);
-    toggleUserLikePost(post.id);
+    requireAuth(() => {
+      if (user) {
+        toggleLike(post.id, user);
+        toggleUserLikePost(post.id);
+      }
+    });
   };
 
   const handleSave = (e) => {
     e.stopPropagation();
-    toggleSavePost(post.id);
-    if (user) {
-      const updatedSaved = isSaved
-        ? (user.savedPosts || []).filter((id) => id !== post.id)
-        : [...(user.savedPosts || []), post.id];
-      setUser({ ...user, savedPosts: updatedSaved });
-    }
+    requireAuth(() => {
+      toggleSavePost(post.id);
+      if (user) {
+        const updatedSaved = isSaved
+          ? (user.savedPosts || []).filter((id) => id !== post.id)
+          : [...(user.savedPosts || []), post.id];
+        setUser({ ...user, savedPosts: updatedSaved });
+      }
+    });
   };
 
   // Clean trust source & reference badges
@@ -39,7 +44,7 @@ export const PostCard = ({ post }) => {
 
   return (
     <div
-      onClick={() => openPostDetail(post)}
+      onClick={() => requireAuth(() => openPostDetail(post))}
       className="group p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/80 hover:border-primary-400/80 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_-4px_rgba(79,70,229,0.08)] transition-all duration-200 cursor-pointer flex flex-col justify-between"
     >
       <div className="space-y-3.5">

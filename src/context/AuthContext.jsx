@@ -13,6 +13,8 @@ export const AuthProvider = ({ children }) => {
   const { user: clerkUser, isLoaded: isClerkLoaded, isSignedIn } = useUser();
   const { signOut: clerkSignOut, openSignIn } = useClerk();
 
+  const isRealLoggedIn = Boolean(isClerkLoaded && isSignedIn && clerkUser);
+
   // Synchronize Clerk user state when signed in
   useEffect(() => {
     if (isClerkLoaded) {
@@ -41,7 +43,8 @@ export const AuthProvider = ({ children }) => {
           quizzesCompleted: 0,
           streakDays: 1,
           savedPosts: [],
-          likedPosts: []
+          likedPosts: [],
+          isGuest: false
         };
 
         setUser(authenticatedUser);
@@ -51,19 +54,32 @@ export const AuthProvider = ({ children }) => {
         setIsAuthModalOpen(false);
       } else {
         const guest = getOrCreateGuestUser();
-        setUser(guest);
+        setUser({ ...guest, isGuest: true });
       }
     }
   }, [isClerkLoaded, isSignedIn, clerkUser]);
 
   const openAuth = () => {
+    setIsAuthModalOpen(true);
+  };
+
+  const triggerClerkSignIn = () => {
     try {
       if (openSignIn) {
         openSignIn();
-        return;
       }
     } catch (e) {}
-    setIsAuthModalOpen(true);
+    setIsAuthModalOpen(false);
+  };
+
+  const requireAuth = (onSuccess) => {
+    if (isRealLoggedIn) {
+      if (onSuccess) onSuccess();
+      return true;
+    } else {
+      setIsAuthModalOpen(true);
+      return false;
+    }
   };
 
   const login = ({ university, major, avatar, email, phone }) => {
@@ -176,14 +192,16 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        isLoggedIn: !!user,
+        isLoggedIn: isRealLoggedIn,
         login,
         logout,
         addXP,
         toggleUserLikePost,
         openAuth,
+        triggerClerkSignIn,
+        requireAuth,
         isAuthModalOpen,
-        setIsAuthModalOpen: openAuth,
+        setIsAuthModalOpen,
         setUser
       }}
     >

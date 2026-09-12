@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 
 export const Header = () => {
   const { searchQuery, setSearchQuery, setCurrentView, isSidebarOpen, toggleSidebar } = useApp();
-  const { user } = useAuth();
+  const { user, requireAuth } = useAuth();
 
   return (
     <header className="h-16 border-b border-slate-200/80 bg-white/80 backdrop-blur-md px-3.5 sm:px-6 flex items-center justify-between sticky top-0 z-30">
@@ -45,8 +45,8 @@ export const Header = () => {
       <div className="flex items-center gap-3">
         {/* Weekly Quiz CTA */}
         <button
-          onClick={() => setCurrentView('quiz')}
-          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-100 transition-colors"
+          onClick={() => requireAuth(() => setCurrentView('quiz'))}
+          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-100 transition-colors cursor-pointer"
         >
           <Sparkles className="w-3.5 h-3.5 text-primary-600" />
           <span>Weekly Quiz (+150 XP)</span>

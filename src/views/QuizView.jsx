@@ -19,7 +19,7 @@ import { getStoredLeaderboard } from '../services/storage';
 
 export const QuizView = () => {
   const { posts, openPostDetail, setCurrentView, setLeaderboard } = useApp();
-  const { user, addXP } = useAuth();
+  const { user, addXP, requireAuth } = useAuth();
 
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -32,6 +32,7 @@ export const QuizView = () => {
   const [userAnswers, setUserAnswers] = useState({});
 
   const startNewQuiz = () => {
+    if (!requireAuth()) return;
     const questions = generateWeeklyQuiz(posts, 5);
     setQuizQuestions(questions);
     setCurrentIdx(0);

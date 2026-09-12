@@ -21,10 +21,12 @@ import {
 import { KNOWLEDGE_QUEST_CATEGORIES, KNOWLEDGE_QUEST_ARTICLES, KNOWLEDGE_QUEST_QUIZ, SECONDARY_FALLBACK_IMAGES } from '../data/knowledgeQuestData';
 import { fetchLiveBusinessNews, getNewsFallbackSvg } from '../services/newsService';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
 
 export const KnowledgeQuestView = () => {
   const { toggleSaveNews, isNewsSaved } = useApp();
+  const { requireAuth } = useAuth();
   const [articles, setArticles] = useState(KNOWLEDGE_QUEST_ARTICLES);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -153,7 +155,7 @@ export const KnowledgeQuestView = () => {
             <span>Times of India Business Feed</span>
           </div>
           <button
-            onClick={() => setIsQuizModalOpen(true)}
+            onClick={() => requireAuth(() => setIsQuizModalOpen(true))}
             className="px-3.5 py-1.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer text-xs"
           >
             <HelpCircle className="w-3.5 h-3.5" />

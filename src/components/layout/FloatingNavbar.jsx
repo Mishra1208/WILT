@@ -1,14 +1,23 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { Menu, X } from 'lucide-react';
 
 export const FloatingNavbar = () => {
   const { currentView, setCurrentView } = useApp();
+  const { requireAuth } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavClick = (view) => {
-    setCurrentView(view);
-    setMobileMenuOpen(false);
+    if (view === 'notepad' || view === 'quiz') {
+      requireAuth(() => {
+        setCurrentView(view);
+        setMobileMenuOpen(false);
+      });
+    } else {
+      setCurrentView(view);
+      setMobileMenuOpen(false);
+    }
   };
 
   return (

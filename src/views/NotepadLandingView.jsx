@@ -28,7 +28,7 @@ import { cn } from '../lib/utils';
 
 export const NotepadLandingView = () => {
   const { createPost, setCurrentView } = useApp();
-  const { user } = useAuth();
+  const { user, requireAuth } = useAuth();
 
   // Layout & Form States
   const [isExpanded, setIsExpanded] = useState(false);
@@ -141,6 +141,7 @@ export const NotepadLandingView = () => {
   // Step 1: Open Topic / Category Selection Modal
   const handleOpenModal = (e) => {
     if (e) e.preventDefault();
+    if (!requireAuth()) return;
     if (!text.trim() && !title.trim()) return;
 
     setModerationError(null);
