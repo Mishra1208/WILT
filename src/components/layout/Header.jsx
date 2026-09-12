@@ -45,7 +45,7 @@ export const Header = () => {
       <div className="flex items-center gap-3">
         {/* Weekly Quiz CTA */}
         <button
-          onClick={() => requireAuth(() => setCurrentView('quiz'))}
+          onClick={() => setCurrentView('quiz')}
           className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-100 transition-colors cursor-pointer"
         >
           <Sparkles className="w-3.5 h-3.5 text-primary-600" />

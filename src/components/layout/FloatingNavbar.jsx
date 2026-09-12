@@ -9,15 +9,8 @@ export const FloatingNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavClick = (view) => {
-    if (view === 'notepad' || view === 'quiz') {
-      requireAuth(() => {
-        setCurrentView(view);
-        setMobileMenuOpen(false);
-      });
-    } else {
-      setCurrentView(view);
-      setMobileMenuOpen(false);
-    }
+    setCurrentView(view);
+    setMobileMenuOpen(false);
   };
 
   return (

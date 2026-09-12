@@ -46,18 +46,9 @@ export const Sidebar = () => {
   }
 
   const handleNavClick = (id) => {
-    if (id === 'notepad' || id === 'quiz') {
-      requireAuth(() => {
-        setCurrentView(id);
-        if (typeof window !== 'undefined' && window.innerWidth < 768) {
-          toggleSidebar();
-        }
-      });
-    } else {
-      setCurrentView(id);
-      if (typeof window !== 'undefined' && window.innerWidth < 768) {
-        toggleSidebar();
-      }
+    setCurrentView(id);
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      toggleSidebar();
     }
   };
 
