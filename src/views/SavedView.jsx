@@ -13,6 +13,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import { PostCard } from '../components/cards/PostCard';
 import { getNewsFallbackSvg } from '../services/newsService';
 import { SECONDARY_FALLBACK_IMAGES } from '../data/knowledgeQuestData';
@@ -27,6 +28,7 @@ export const SavedView = () => {
     toggleSaveNews, 
     setCurrentView 
   } = useApp();
+  const { isLoggedIn, openAuth } = useAuth();
 
   const [activeTab, setActiveTab] = useState('posts'); // 'posts' | 'news'
   const [copiedId, setCopiedId] = useState(null);
@@ -38,6 +40,32 @@ export const SavedView = () => {
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2500);
   };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="max-w-4xl mx-auto py-16 px-4 text-center space-y-5 animate-fadeIn select-none">
+        <div className="w-16 h-16 rounded-3xl bg-indigo-50 border border-indigo-100 text-indigo-600 mx-auto flex items-center justify-center shadow-sm">
+          <Bookmark className="w-8 h-8" />
+        </div>
+
+        <div className="space-y-2">
+          <h2 className="text-2xl font-black text-slate-900 font-display">
+            Sign In to Access Your Saved Vault
+          </h2>
+          <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed font-medium">
+            Your saved community notes, bookmarks, and placement talking points are securely synced to your account. Log in to view or manage your saved items.
+          </p>
+        </div>
+
+        <button
+          onClick={openAuth}
+          className="px-6 py-3 rounded-2xl bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-indigo-500/20 transition-all hover:scale-[1.02] cursor-pointer inline-flex items-center gap-2"
+        >
+          <span>Sign In / Create Account</span>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-fadeIn pb-16 px-4 sm:px-6 py-6">
