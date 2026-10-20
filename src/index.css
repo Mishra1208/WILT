@@ -2,21 +2,147 @@
 @tailwind components;
 @tailwind utilities;
 
+
+/* ---------------------------------------------------------------
+   WILT palette — change these values to re-theme the whole app.
+   (space-separated RGB so Tailwind opacity modifiers work)
+   --------------------------------------------------------------- */
+/* Default palette: Oxford navy + gold (app frame, Home, Discover, Dictionary…) */
 :root {
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --brand-50:239 246 255;
+  --brand-100:219 234 254;
+  --brand-200:191 219 254;
+  --brand-300:147 197 253;
+  --brand-400:96 165 250;
+  --brand-500:59 130 246;
+  --brand-600:37 99 235;
+  --brand-700:29 78 216;
+  --brand-800:30 64 175;
+  --brand-900:30 58 138;
+  --brand-950:23 37 84;
+  --brand2-50:240 249 255;
+  --brand2-100:224 242 254;
+  --brand2-200:186 230 253;
+  --brand2-300:125 211 252;
+  --brand2-400:56 189 248;
+  --brand2-500:14 165 233;
+  --brand2-600:2 132 199;
+  --brand2-700:3 105 161;
+  --brand2-800:7 89 133;
+  --brand2-900:12 74 110;
+  --brand2-950:8 47 73;
+  --night:11 29 54;
+  --night-deep:6 17 31;
+  --night-dusk:30 58 138;
+  --ink:14 26 43;
+  --haze:245 246 248;
+  --accent-50:255 248 230;
+  --accent-100:254 237 192;
+  --accent-400:251 201 79;
+  --accent-500:245 179 35;
+  --accent-600:204 143 8;
+  --accent-700:143 99 4;
+}
+
+/* Quiz & Leaderboard: Library teal + marigold */
+[data-theme="library"] {
+  --brand-50:240 253 250;
+  --brand-100:204 251 241;
+  --brand-200:153 246 228;
+  --brand-300:94 234 212;
+  --brand-400:45 212 191;
+  --brand-500:20 184 166;
+  --brand-600:13 148 136;
+  --brand-700:15 118 110;
+  --brand-800:17 94 89;
+  --brand-900:19 78 74;
+  --brand-950:4 47 46;
+  --brand2-50:236 253 245;
+  --brand2-100:209 250 229;
+  --brand2-200:167 243 208;
+  --brand2-300:110 231 183;
+  --brand2-400:52 211 153;
+  --brand2-500:16 185 129;
+  --brand2-600:5 150 105;
+  --brand2-700:4 120 87;
+  --brand2-800:6 95 70;
+  --brand2-900:6 78 59;
+  --brand2-950:2 44 34;
+  --night:11 46 46;
+  --night-deep:6 27 28;
+  --night-dusk:15 94 88;
+  --ink:14 26 43;
+  --haze:245 246 248;
+  --accent-50:255 247 230;
+  --accent-100:253 235 194;
+  --accent-400:247 194 91;
+  --accent-500:239 169 46;
+  --accent-600:201 134 15;
+  --accent-700:143 93 6;
+}
+
+/* Knowledge Quest (business news): Collegiate crimson + gold */
+[data-theme="crest"] {
+  --brand-50:255 241 242;
+  --brand-100:255 228 230;
+  --brand-200:254 205 211;
+  --brand-300:253 164 175;
+  --brand-400:251 113 133;
+  --brand-500:244 63 94;
+  --brand-600:225 29 72;
+  --brand-700:190 18 60;
+  --brand-800:159 18 57;
+  --brand-900:136 19 55;
+  --brand-950:76 5 25;
+  --brand2-50:254 242 242;
+  --brand2-100:254 226 226;
+  --brand2-200:254 202 202;
+  --brand2-300:252 165 165;
+  --brand2-400:248 113 113;
+  --brand2-500:239 68 68;
+  --brand2-600:220 38 38;
+  --brand2-700:185 28 28;
+  --brand2-800:153 27 27;
+  --brand2-900:127 29 29;
+  --brand2-950:69 10 10;
+  --night:58 13 28;
+  --night-deep:34 6 15;
+  --night-dusk:127 29 58;
+  --ink:14 26 43;
+  --haze:245 246 248;
+  --accent-50:251 245 227;
+  --accent-100:244 230 184;
+  --accent-400:226 194 106;
+  --accent-500:212 167 44;
+  --accent-600:173 132 24;
+  --accent-700:122 92 14;
+}
+
+:root {
+  --font-sans: 'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #FAFAFB;
-  color: #0F172A;
+  background-color: rgb(var(--haze));
+  color: rgb(var(--ink));
+  font-feature-settings: 'ss01', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .font-display {
-  font-family: 'Outfit', 'Syne', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Schibsted Grotesk', -apple-system, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+h1, h2 {
+  letter-spacing: -0.03em;
+}
+
+.font-serif {
+  font-optical-sizing: auto;
 }
 
 /* Custom Clean Scrollbar */
@@ -81,4 +207,87 @@ iframe {
 /* Long URLs / references in posts must wrap instead of pushing the page sideways */
 body {
   overflow-wrap: break-word;
+}
+
+/* =====================================================================
+   WILT design layer — flat, solid, typographic
+   ===================================================================== */
+@layer components {
+  /* Solid ink panel (sidebar, results card). No gradients, no glow. */
+  .night-panel {
+    position: relative;
+    color: #fff;
+    background: rgb(var(--night));
+  }
+
+  /* Plain white surface (kept under the old name so existing markup works) */
+  .glass {
+    background: #fff;
+  }
+
+  /* Cards: quiet at rest; the border darkens when you point at them */
+  .card-lift {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card-lift:hover {
+    border-color: rgb(var(--ink) / 0.28);
+    box-shadow: 0 8px 24px -14px rgba(16, 24, 40, 0.25);
+  }
+
+  /* Primary button: solid brand colour */
+  .btn-iris {
+    background: rgb(var(--brand-700));
+    color: #fff;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+  }
+  .btn-iris:hover {
+    background: rgb(var(--brand-800));
+  }
+  .btn-iris:active {
+    transform: translateY(1px);
+  }
+
+  /* The highlighter — WILT's one signature mark */
+  .hl {
+    background-image: linear-gradient(transparent 58%, #FFE36E 58%, #FFE36E 92%, transparent 92%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    padding: 0 0.08em;
+  }
+  .hl-draw {
+    background-size: 0% 100%;
+    animation: hl-draw 0.9s 0.35s cubic-bezier(0.6, 0, 0.2, 1) forwards;
+  }
+
+  /* Ruled paper for the writing slate */
+  .ruled {
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 35px, #EDF0F4 35px, #EDF0F4 36px);
+    background-position: 0 6px;
+  }
+}
+
+@keyframes hl-draw {
+  to { background-size: 100% 100%; }
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid rgb(var(--brand-600));
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@keyframes aurora {
+  0% { transform: translate3d(-8%, -6%, 0) rotate(0deg) scale(1); }
+  100% { transform: translate3d(8%, 6%, 0) rotate(12deg) scale(1.15); }
 }

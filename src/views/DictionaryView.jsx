@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { BookOpen, Search, Plus, ArrowRight, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { PageHero, HeroAction } from '../components/widgets/PageHero';
+import { topicColor } from '../lib/topicColor';
 import { useAuth } from '../context/AuthContext';
 
 export const DictionaryView = () => {
@@ -58,89 +60,72 @@ export const DictionaryView = () => {
   };
 
   return (
-    <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8 animate-fadeIn">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Community Glossary
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Search any finance or tech concept and get simple, peer-written explanations.
-          </p>
+    <div className="px-5 sm:px-8 py-8 sm:py-10 max-w-7xl mx-auto space-y-8">
+      <PageHero
+        icon={BookOpen}
+        title="Dictionary"
+        description="Finance and tech terms explained in plain English by your classmates, with formulas where they help."
+        aside={
+          <HeroAction onClick={() => requireAuth(() => setIsNewConceptModalOpen(true))} icon={Plus}>Add a term</HeroAction>
+        }
+      >
+        <div className="relative">
+          <Search className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search a term, e.g. Repo Rate, EBITDA, BFS"
+            className="w-full pl-10 pr-4 py-3 text-[16px] rounded-md bg-white border border-line text-ink placeholder-muted focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-ink/30"
+          />
         </div>
-
-        <button
-          onClick={() => requireAuth(() => setIsNewConceptModalOpen(true))}
-          className="px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn transition-all flex items-center gap-2 self-start sm:self-auto cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Term</span>
-        </button>
-      </div>
-
-      {/* Search Input */}
-      <div className="relative">
-        <Search className="w-4 h-4 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search any concept (e.g. Repo Rate, EBITDA, BFS, Fixed Assets)..."
-          className="w-full pl-11 pr-4 py-3 text-xs sm:text-sm rounded-2xl bg-white border border-slate-200 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 shadow-soft transition-all"
-        />
-      </div>
-
-      {/* A-Z Alphabet Bar */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
-        {alphabet.map((letter) => {
-          const isSelected = activeLetter === letter;
-          return (
-            <button
-              key={letter}
-              onClick={() => setActiveLetter(letter)}
-              className={`w-7 h-7 flex-shrink-0 rounded-lg text-xs font-mono font-bold transition-all ${
-                isSelected
-                  ? 'bg-primary-600 text-white shadow-btn scale-105'
-                  : 'bg-white border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300'
-              }`}
-            >
-              {letter}
-            </button>
-          );
-        })}
-      </div>
+        <div className="flex items-center gap-0.5 overflow-x-auto no-scrollbar py-1 mt-3">
+          {alphabet.map((letter) => {
+            const isSelected = activeLetter === letter;
+            return (
+              <button
+                key={letter}
+                onClick={() => setActiveLetter(letter)}
+                className={`min-w-[2rem] h-8 px-2 flex-shrink-0 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                  isSelected ? 'bg-ink text-white' : 'text-muted hover:text-ink hover:bg-white'
+                }`}
+              >
+                {letter}
+              </button>
+            );
+          })}
+        </div>
+      </PageHero>
 
       {/* Concepts Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {filteredConcepts.map((concept) => (
           <div
             key={concept.id}
-            className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-soft hover:shadow-hover hover:border-primary-200 transition-all flex flex-col justify-between"
+            className="card-lift p-5 sm:p-6 rounded-xl bg-white border border-line flex flex-col justify-between min-w-0"
           >
             <div>
               <div className="flex items-start justify-between gap-3 mb-3 min-w-0">
                 <div className="min-w-0">
-                  <h3 className="text-lg font-bold text-slate-900 break-words">
+                  <h3 className="text-xl font-semibold text-ink break-words tracking-[-0.02em]">
                     {concept.term}
                   </h3>
-                  <span className="text-[11px] text-slate-500 font-mono">
-                    Contributed by @{concept.contributor || 'peer'}
+                  <span className="text-xs text-slate-500">
+                    Added by @{concept.contributor || 'peer'}
                   </span>
                 </div>
 
-                <span className="shrink-0 whitespace-nowrap text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                <span className={`shrink-0 whitespace-nowrap text-[13px] font-semibold ${topicColor(concept.category || '').text}`}>
                   {concept.category}
                 </span>
               </div>
 
               {concept.plainExplanation && (
-                <div className="p-3.5 rounded-2xl bg-primary-50/70 border border-primary-100 mb-3.5">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-primary-700 flex items-center gap-1 mb-0.5">
-                    <Sparkles className="w-3 h-3 text-primary-600" />
-                    <span>In Plain English</span>
+                <div className="pl-3 border-l-2 border-highlight mb-3.5">
+                  <div className="text-[13px] font-semibold text-ink flex items-center gap-1 mb-1">
+                                        <span>In plain English</span>
                   </div>
-                  <p className="text-xs text-primary-950 leading-relaxed font-medium">
+                  <p className="font-serif text-[17px] text-ink/85 leading-snug">
                     {concept.plainExplanation}
                   </p>
                 </div>

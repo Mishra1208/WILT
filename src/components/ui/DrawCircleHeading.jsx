@@ -11,7 +11,7 @@ export const DrawCircleHeading = ({
       <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-normal inline-block">
         {prefix && <span>{prefix} </span>}
         <span className="relative inline-block mx-1.5 my-1">
-          <span className="relative z-10 px-2 py-0.5 bg-gradient-to-r from-primary-700 via-indigo-600 to-amber-600 bg-clip-text text-transparent">
+          <span className="relative z-10 px-2 py-0.5 bg-gradient-to-r from-primary-700 via-primary-600 to-amber-600 bg-clip-text text-transparent">
             {highlight}
           </span>
           <svg

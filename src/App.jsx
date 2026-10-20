@@ -100,6 +100,13 @@ export function App() {
   }, [currentView]);
 
   const isLandingMode = currentView === 'notepad';
+  // Each area gets its own palette (see src/index.css): practice = teal, news = crimson
+  const sectionTheme =
+    currentView === 'quiz' || currentView === 'leaderboard'
+      ? 'library'
+      : currentView === 'knowledge-quest' || currentView === 'quest'
+        ? 'crest'
+        : undefined;
 
   const renderLandingView = () => {
     switch (currentView) {
@@ -159,7 +166,7 @@ export function App() {
     <>
       {isLandingMode ? (
         /* LANDING EXPERIENCE: Floating Navbar + Centered View + Footer */
-        <div className="min-h-screen bg-[#FAFAFB] text-slate-900 font-sans flex flex-col justify-between selection:bg-indigo-100 selection:text-indigo-900">
+        <div className="min-h-screen text-ink font-sans flex flex-col justify-between selection:bg-primary-100 selection:text-primary-900">
           <FloatingNavbar />
           <main className="flex-1 min-w-0">
             <Suspense fallback={<ViewFallback />}>{renderLandingView()}</Suspense>
@@ -168,7 +175,7 @@ export function App() {
         </div>
       ) : (
         /* FULL DASHBOARD EXPERIENCE: Sticky Sidebar + Sticky Header + Full Page Scrolling + Footer */
-        <div className="min-h-screen bg-[#FAFAFB] text-slate-900 font-sans flex selection:bg-indigo-100 selection:text-indigo-900">
+        <div className="min-h-screen text-ink font-sans flex selection:bg-primary-100 selection:text-primary-900">
           {/* Sticky Sidebar */}
           <div className="sticky top-0 h-screen-safe flex-shrink-0 z-50 md:z-30">
             <Sidebar />
@@ -178,7 +185,7 @@ export function App() {
           <div className="flex-1 min-w-0 flex flex-col justify-between min-h-screen">
             <div>
               <Header />
-              <main className="flex-1 min-w-0">
+              <main className="flex-1 min-w-0" data-theme={sectionTheme}>
                 <Suspense fallback={<ViewFallback />}>{renderDashboardView()}</Suspense>
               </main>
             </div>

@@ -161,7 +161,7 @@ export const AboutView = () => {
             Built for students who want to{' '}
             <span className="relative inline-block">
               {/* Masked Gradient Text */}
-              <span className="bg-gradient-to-r from-indigo-700 via-primary-600 to-coral-500 bg-clip-text text-transparent animate-gradient-x">
+              <span className="bg-gradient-to-r from-primary-700 via-primary-600 to-coral-500 bg-clip-text text-transparent animate-gradient-x">
                 learn in seconds
               </span>
 
@@ -276,7 +276,7 @@ export const AboutView = () => {
 
                 {/* University Badge */}
                 <div className="mt-3 inline-block">
-                  <span className="px-3.5 py-1.5 rounded-xl bg-indigo-50/90 border border-indigo-100/90 text-xs font-extrabold text-indigo-950 inline-flex items-center gap-1.5 shadow-2xs">
+                  <span className="px-3.5 py-1.5 rounded-xl bg-primary-50/90 border border-primary-100/90 text-xs font-extrabold text-primary-950 inline-flex items-center gap-1.5 shadow-2xs">
                     🏫 {creator.university}
                   </span>
                 </div>
@@ -396,28 +396,25 @@ export const AboutView = () => {
       </div>
 
       {/* BOTTOM BANNER */}
-      <div className="p-6 sm:p-10 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-primary-950 text-white text-center space-y-4 shadow-hover">
-        <span className="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-bold">
-          Start Today • Retain Forever
-        </span>
-        <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+      <div className="p-6 sm:p-10 rounded-xl bg-night text-white text-center space-y-4">
+        <h3 className="text-2xl sm:text-3xl font-bold tracking-[-0.03em]">
           Ready to post what you learned today?
         </h3>
-        <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+        <p className="font-serif text-lg text-white/70 max-w-md mx-auto">
           Start typing in the digital notepad or explore lessons shared by peers across finance, tech, and business colleges.
         </p>
         <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
           <button
             onClick={() => setCurrentView('notepad')}
-            className="px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs shadow-btn"
+            className="px-6 py-3 rounded-md bg-highlight hover:bg-[#FFEA8F] text-night font-semibold text-[15px]"
           >
-            Launch Notepad Slate 📝
+            Write today's note
           </button>
           <button
             onClick={() => setCurrentView('discover')}
-            className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs"
+            className="px-6 py-3 rounded-md border border-white/25 hover:bg-white/10 text-white font-semibold text-[15px]"
           >
-            Explore Feed ➔
+            Browse notes
           </button>
         </div>
       </div>

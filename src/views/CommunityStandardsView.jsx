@@ -27,7 +27,7 @@ export const CommunityStandardsView = () => {
 
       {/* Header */}
       <div className="space-y-3 border-b border-slate-200/80 pb-6">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 border border-primary-100 text-primary-700 text-xs font-bold">
           <Users className="w-3.5 h-3.5" />
           <span>Collegiate Code of Conduct</span>
         </div>

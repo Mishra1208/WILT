@@ -1,11 +1,24 @@
 import React, { useState } from 'react';
+import { SignInButton, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { Menu, X } from 'lucide-react';
 
+const LINKS = [
+  { id: 'knowledge-quest', label: 'Knowledge Quest' },
+  { id: 'discover', label: 'Learning hub' },
+  { id: 'quiz', label: 'Weekly quiz' },
+  { id: 'leaderboard', label: 'Leaderboard' },
+  { id: 'about', label: 'About' }
+];
+
+/**
+ * Top bar for the landing page. It sits on the deep-indigo hero, so it's dark
+ * and translucent rather than white.
+ */
 export const FloatingNavbar = () => {
   const { currentView, setCurrentView } = useApp();
-  const { requireAuth } = useAuth();
+  const { user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavClick = (view) => {
@@ -14,111 +27,75 @@ export const FloatingNavbar = () => {
   };
 
   return (
-    <header className="w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between z-40 select-none relative">
-      {/* Original WILT Brand Logo */}
-      <div 
-        onClick={() => handleNavClick('notepad')}
-        className="flex items-center gap-2.5 cursor-pointer group"
-      >
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-600 to-indigo-700 text-white font-extrabold text-base flex items-center justify-center shadow-btn group-hover:scale-105 transition-transform">
-          W
-        </div>
-        <div className="flex flex-col">
-          <span className="font-extrabold text-lg tracking-tight text-slate-900 leading-none">
-            WILT
-          </span>
-          <span className="text-[11px] font-bold text-primary-600 uppercase tracking-widest leading-tight">
-            What I Learned Today
-          </span>
-        </div>
-      </div>
-
-      {/* Desktop Navigation Links */}
-      <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-xs font-bold tracking-[0.12em] text-slate-700 uppercase">
-        <button
-          onClick={() => handleNavClick('knowledge-quest')}
-          className={`hover:text-primary-600 transition-colors ${
-            currentView === 'knowledge-quest' ? 'text-primary-600 font-extrabold' : ''
-          }`}
-        >
-          <span>KNOWLEDGE QUEST</span>
-        </button>
-
-        <button
-          onClick={() => handleNavClick('discover')}
-          className={`hover:text-primary-600 transition-colors ${
-            currentView === 'discover' ? 'text-primary-600 font-extrabold' : ''
-          }`}
-        >
-          LEARNING HUB
-        </button>
-
-        <button
-          onClick={() => handleNavClick('quiz')}
-          className={`hover:text-primary-600 transition-colors ${
-            currentView === 'quiz' ? 'text-primary-600 font-extrabold' : ''
-          }`}
-        >
-          YOUR STATUS
-        </button>
-
-        <button
-          onClick={() => handleNavClick('about')}
-          className={`hover:text-primary-600 transition-colors ${
-            currentView === 'about' ? 'text-primary-600 font-extrabold' : ''
-          }`}
-        >
-          ABOUT US
-        </button>
-      </nav>
-
-      {/* Mobile Hamburger Menu Button */}
-      <button
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className="md:hidden p-2 text-slate-700 hover:text-primary-600 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none"
-        aria-label="Toggle Navigation Menu"
-      >
-        {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+    <header className="sticky top-0 w-full bg-white/95 backdrop-blur border-b border-line px-4 sm:px-8 h-16 flex items-center justify-between z-40 select-none">
+      <button onClick={() => handleNavClick('notepad')} className="text-left cursor-pointer">
+        <span className="block text-[22px] font-extrabold tracking-[-0.04em] text-ink leading-none">
+          wilt<span className="text-[#E0B400]">.</span>
+        </span>
       </button>
 
-      {/* Mobile Navigation Drawer Dropdown */}
+      <nav className="hidden md:flex items-center gap-1 text-[15px] font-medium" aria-label="Main">
+        {LINKS.map((l) => (
+          <button
+            key={l.id}
+            onClick={() => handleNavClick(l.id)}
+            className={`px-3 py-2 rounded-md transition-colors cursor-pointer ${
+              currentView === l.id ? 'text-ink' : 'text-muted hover:text-ink'
+            }`}
+          >
+            {l.label}
+          </button>
+        ))}
+      </nav>
+
+      <div className="flex items-center gap-2">
+        <SignedOut>
+          <SignInButton mode="modal">
+            <button className="hidden sm:inline-flex px-4 py-2 rounded-md text-sm font-semibold bg-ink text-white hover:bg-ink/90 transition-colors cursor-pointer">
+              Sign in
+            </button>
+          </SignInButton>
+        </SignedOut>
+        <SignedIn>
+          <button
+            onClick={() => handleNavClick('leaderboard')}
+            className="hidden sm:inline-flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-md border border-line text-sm font-semibold text-ink hover:bg-haze transition-colors cursor-pointer"
+          >
+            <img src={user?.avatar} alt="" className="w-6 h-6 rounded-full bg-haze" />
+            <span>
+              {user?.xp || 0} <span className="text-muted font-medium">XP</span>
+            </span>
+          </button>
+        </SignedIn>
+
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden p-2 text-ink hover:bg-haze rounded-md transition-colors"
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
       {mobileMenuOpen && (
-        <div className="absolute top-full left-0 right-0 bg-white border-b border-slate-200 shadow-xl py-4 px-6 flex flex-col gap-4 md:hidden z-50 animate-in fade-in slide-in-from-top-2">
-          <button
-            onClick={() => handleNavClick('discover')}
-            className={`text-left text-xs font-extrabold tracking-wider uppercase py-2 border-b border-slate-100 ${
-              currentView === 'discover' ? 'text-primary-600' : 'text-slate-700'
-            }`}
-          >
-            DISCOVER
-          </button>
-
-          <button
-            onClick={() => handleNavClick('discover')}
-            className={`text-left text-xs font-extrabold tracking-wider uppercase py-2 border-b border-slate-100 ${
-              currentView === 'discover' ? 'text-primary-600' : 'text-slate-700'
-            }`}
-          >
-            LEARNING HUB
-          </button>
-
-          <button
-            onClick={() => handleNavClick('quiz')}
-            className={`text-left text-xs font-extrabold tracking-wider uppercase py-2 border-b border-slate-100 ${
-              currentView === 'quiz' ? 'text-primary-600' : 'text-slate-700'
-            }`}
-          >
-            YOUR STATUS
-          </button>
-
-          <button
-            onClick={() => handleNavClick('about')}
-            className={`text-left text-xs font-extrabold tracking-wider uppercase py-2 ${
-              currentView === 'about' ? 'text-primary-600' : 'text-slate-700'
-            }`}
-          >
-            ABOUT US
-          </button>
+        <div className="absolute top-full left-0 right-0 bg-white border-b border-line shadow-lift py-3 px-4 flex flex-col md:hidden z-50">
+          {LINKS.map((l) => (
+            <button
+              key={l.id}
+              onClick={() => handleNavClick(l.id)}
+              className={`text-left text-base font-medium px-3 py-3 rounded-md transition-colors ${
+                currentView === l.id ? 'bg-haze text-ink' : 'text-ink/80 hover:bg-haze'
+              }`}
+            >
+              {l.label}
+            </button>
+          ))}
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="mt-2 w-full py-3 rounded-md text-sm font-semibold bg-ink text-white">Sign in</button>
+            </SignInButton>
+          </SignedOut>
         </div>
       )}
     </header>

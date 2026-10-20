@@ -7,19 +7,64 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['Schibsted Grotesk', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['Schibsted Grotesk', '-apple-system', 'sans-serif'],
+        serif: ['Newsreader', 'Georgia', 'serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
       colors: {
+        // Every brand colour is a CSS variable (see src/index.css → :root),
+        // so the whole palette can be changed in one place.
         primary: {
-          50: '#EEF2FF',
-          100: '#E0E7FF',
-          200: '#C7D2FE',
-          500: '#6366F1',
-          600: '#4F46E5',
-          700: '#4338CA',
-          800: '#3730A3',
+          50: 'rgb(var(--brand-50) / <alpha-value>)',
+          100: 'rgb(var(--brand-100) / <alpha-value>)',
+          200: 'rgb(var(--brand-200) / <alpha-value>)',
+          300: 'rgb(var(--brand-300) / <alpha-value>)',
+          400: 'rgb(var(--brand-400) / <alpha-value>)',
+          500: 'rgb(var(--brand-500) / <alpha-value>)',
+          600: 'rgb(var(--brand-600) / <alpha-value>)',
+          700: 'rgb(var(--brand-700) / <alpha-value>)',
+          800: 'rgb(var(--brand-800) / <alpha-value>)',
+          900: 'rgb(var(--brand-900) / <alpha-value>)',
+          950: 'rgb(var(--brand-950) / <alpha-value>)',
         },
+        iris: {
+          50: 'rgb(var(--brand2-50) / <alpha-value>)',
+          100: 'rgb(var(--brand2-100) / <alpha-value>)',
+          200: 'rgb(var(--brand2-200) / <alpha-value>)',
+          300: 'rgb(var(--brand2-300) / <alpha-value>)',
+          400: 'rgb(var(--brand2-400) / <alpha-value>)',
+          500: 'rgb(var(--brand2-500) / <alpha-value>)',
+          600: 'rgb(var(--brand2-600) / <alpha-value>)',
+          700: 'rgb(var(--brand2-700) / <alpha-value>)',
+          800: 'rgb(var(--brand2-800) / <alpha-value>)',
+          900: 'rgb(var(--brand2-900) / <alpha-value>)',
+          950: 'rgb(var(--brand2-950) / <alpha-value>)',
+        },
+        ink: 'rgb(var(--ink) / <alpha-value>)',
+        night: {
+          DEFAULT: 'rgb(var(--night) / <alpha-value>)',
+          deep: 'rgb(var(--night-deep) / <alpha-value>)',
+          dusk: 'rgb(var(--night-dusk) / <alpha-value>)',
+        },
+        marigold: {
+          50: 'rgb(var(--accent-50) / <alpha-value>)',
+          100: 'rgb(var(--accent-100) / <alpha-value>)',
+          400: 'rgb(var(--accent-400) / <alpha-value>)',
+          500: 'rgb(var(--accent-500) / <alpha-value>)',
+          600: 'rgb(var(--accent-600) / <alpha-value>)',
+          700: 'rgb(var(--accent-700) / <alpha-value>)',
+        },
+        mint: {
+          50: '#E8FBF4',
+          500: '#12B886',
+          600: '#0E9A70',
+          700: '#0B7A59',
+        },
+        haze: 'rgb(var(--haze) / <alpha-value>)',
+        line: '#E3E6EB',          // hairlines
+        muted: '#5A6372',         // secondary text
+        highlight: '#FFE36E',     // the highlighter
         coral: {
           50: '#FFF7ED',
           500: '#F97316',
@@ -41,9 +86,29 @@ export default {
       boxShadow: {
         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02)',
         'hover': '0 12px 30px -4px rgba(0, 0, 0, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.04)',
-        'btn': '0 4px 14px 0 rgba(79, 70, 229, 0.25)',
+        'btn': '0 1px 2px rgba(16, 24, 40, 0.08)',
+        'lift': '0 12px 32px -12px rgba(16, 24, 40, 0.18)',
+        'glass': '0 1px 2px rgba(16, 24, 40, 0.04)',
+        'glow': '0 0 0 3px rgb(var(--brand-500) / 0.15)',
       },
       keyframes: {
+        aurora: {
+          '0%': { transform: 'translate3d(-8%, -6%, 0) rotate(0deg) scale(1)' },
+          '100%': { transform: 'translate3d(8%, 6%, 0) rotate(12deg) scale(1.15)' },
+        },
+        rise: {
+          '0%': { opacity: '0', transform: 'translateY(18px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        pop: {
+          '0%': { transform: 'scale(0.96)' },
+          '60%': { transform: 'scale(1.02)' },
+          '100%': { transform: 'scale(1)' },
+        },
+        flicker: {
+          '0%, 100%': { transform: 'scale(1) rotate(-2deg)', filter: 'drop-shadow(0 0 0 rgba(255,176,32,0))' },
+          '50%': { transform: 'scale(1.08) rotate(2deg)', filter: 'drop-shadow(0 0 6px rgba(255,176,32,0.6))' },
+        },
         'gradient-x': {
           '0%, 100%': {
             'background-size': '200% 200%',
@@ -57,6 +122,10 @@ export default {
       },
       animation: {
         'gradient-x': 'gradient-x 4s ease infinite',
+        'aurora-drift': 'aurora 18s ease-in-out infinite alternate',
+        'rise': 'rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both',
+        'pop': 'pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.3) both',
+        'flicker': 'flicker 2.4s ease-in-out infinite',
       },
     },
   },

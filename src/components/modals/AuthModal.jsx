@@ -24,7 +24,7 @@ export const AuthModal = () => {
         className="bg-white rounded-3xl max-w-md w-full shadow-2xl p-6 sm:p-7 relative border border-slate-200/90 overflow-hidden animate-in zoom-in-95 duration-200"
       >
         {/* Top Decorative Gradient Accent Bar */}
-        <div className="h-2 bg-gradient-to-r from-primary-600 via-indigo-600 to-amber-500 absolute top-0 left-0 right-0" />
+        <div className="h-2 bg-gradient-to-r from-primary-600 via-primary-600 to-amber-500 absolute top-0 left-0 right-0" />
 
         {/* Close Modal X Button */}
         <button
@@ -37,15 +37,15 @@ export const AuthModal = () => {
 
         {/* Modal Header Icon & Badge */}
         <div className="flex flex-col items-center text-center pt-2 space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/25 relative group">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary-600 to-primary-600 text-white flex items-center justify-center shadow-lg shadow-primary-500/25 relative group">
             <Lock className="w-7 h-7" />
             <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center text-[11px] font-black shadow-xs">
               <Sparkles className="w-3 h-3 fill-slate-950 text-slate-950" />
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-[11px] font-black uppercase tracking-wider">
-            <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 border border-primary-100 text-primary-700 text-[11px] font-black uppercase tracking-wider">
+            <ShieldCheck className="w-3.5 h-3.5 text-primary-600" />
             <span>Official Student Login</span>
           </div>
 
@@ -75,8 +75,8 @@ export const AuthModal = () => {
           </div>
 
           <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 font-bold">
-              <MessageSquareQuote className="w-3.5 h-3.5 text-indigo-600" />
+            <div className="w-6 h-6 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center shrink-0 font-bold">
+              <MessageSquareQuote className="w-3.5 h-3.5 text-primary-600" />
             </div>
             <span><strong className="text-slate-900">Read Community Posts:</strong> Explore talking points & answers</span>
           </div>
@@ -93,7 +93,7 @@ export const AuthModal = () => {
         <div className="space-y-2.5 pt-1">
           <button
             onClick={triggerClerkSignIn}
-            className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] cursor-pointer"
+            className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-primary-600 to-primary-600 hover:from-primary-700 hover:to-primary-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary-500/25 transition-all hover:scale-[1.02] cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-amber-300" />
             <span>Sign In / Create Account with Clerk</span>

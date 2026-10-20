@@ -35,7 +35,7 @@ export const MaskedHeading = () => {
               duration={0.7}
               from={{ opacity: 0, y: 35 }}
               to={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-r from-indigo-600 via-primary-600 to-cyan-500 bg-clip-text text-transparent animate-gradient-x bg-[length:200%_auto] inline-block overflow-visible"
+              className="bg-gradient-to-r from-primary-600 via-primary-600 to-cyan-500 bg-clip-text text-transparent animate-gradient-x bg-[length:200%_auto] inline-block overflow-visible"
               onAnimationComplete={() => setAnimateScribble(true)}
             />
 

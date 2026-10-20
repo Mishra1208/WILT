@@ -18,6 +18,8 @@ import { useAuth } from '../context/AuthContext';
 import { generateWeeklyQuiz } from '../services/quizEngine';
 import { saveQuizAttemptToSupabase } from '../services/supabase';
 import { getStoredLeaderboard } from '../services/storage';
+import { PageHero, HeroStat, HeroAction } from '../components/widgets/PageHero';
+import { ScoreRing } from '../components/widgets/ScoreRing';
 
 export const QuizView = () => {
   const { posts, openPostDetail, setCurrentView, setLeaderboard } = useApp();
@@ -144,55 +146,36 @@ export const QuizView = () => {
   // Quiz Lobby
   if (!quizStarted) {
     return (
-      <div className="p-4 sm:p-8 max-w-3xl mx-auto space-y-6 animate-fadeIn">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5 font-display">
-            <span>Weekly Recall Challenge</span>
-            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-coral-50 text-coral-600 border border-coral-100 font-mono">
-              Week 34
-            </span>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
-            5 randomized MCQs selected from community peer learning cards & Times of India breaking business news. Test your retention and rank on the campus leaderboard.
-          </p>
-        </div>
-
-        <div className="p-5 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
-          <div className="grid grid-cols-3 gap-2 sm:gap-4">
-            <div className="p-2.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-              <div className="text-[11px] font-bold text-slate-500 uppercase">Questions</div>
-              <div className="text-sm sm:text-xl font-extrabold leading-tight text-slate-900 mt-1">5 MCQs</div>
-            </div>
-            <div className="p-2.5 sm:p-4 rounded-2xl bg-coral-50 border border-coral-100 text-center">
-              <div className="text-[11px] font-bold text-coral-600 uppercase">Reward</div>
-              <div className="text-sm sm:text-xl font-extrabold leading-tight text-coral-600 mt-1">Up to 150 XP</div>
-            </div>
-            <div className="p-2.5 sm:p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-center">
-              <div className="text-[11px] font-bold text-emerald-700 uppercase">Smart Review</div>
-              <div className="text-sm sm:text-xl font-extrabold leading-tight text-emerald-600 mt-1">Instant Link</div>
-            </div>
+      <div className="px-5 sm:px-8 py-8 sm:py-10 max-w-4xl mx-auto space-y-10">
+        <PageHero
+          title="Weekly quiz"
+          description="Five questions from your classmates' notes and this week's business news. Each correct answer is worth 30 XP."
+          aside={<HeroAction onClick={startNewQuiz} icon={Sparkles}>Start quiz</HeroAction>}
+        >
+          <div className="flex">
+            <HeroStat value="5" label="questions" />
+            <HeroStat value="150" label="XP available" />
+            <HeroStat value={user?.xp || 0} label="your XP" />
           </div>
+        </PageHero>
 
-          <div className="p-4 rounded-2xl bg-primary-50/70 border border-primary-100 text-xs text-primary-900 flex items-start gap-3">
-            <HelpCircle className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
-            <div className="leading-relaxed font-medium">
-              <span className="font-bold">Active recall rule:</span> If you answer any question incorrectly, our recall engine will instantly display <span className="font-bold underline">"Did you forget about it? Read full article / post"</span> with a direct link to the original news article or peer post.
-            </div>
-          </div>
+        <ol className="grid grid-cols-1 sm:grid-cols-3 border-t border-line">
+          {[
+            { title: 'Read the question', body: 'Every question comes from a real note or news story.' },
+            { title: 'Pick an answer', body: 'Choose one of four options, then check it.' },
+            { title: 'Learn from misses', body: 'Get one wrong and we link you to the original source.' }
+          ].map(({ title, body }, i) => (
+            <li key={title} className="pt-5 pb-2 sm:pr-6 border-b sm:border-b-0 border-line">
+              <span className="text-sm font-semibold text-primary-700 tabular-nums">Step {i + 1}</span>
+              <h3 className="mt-1 text-lg font-semibold text-ink">{title}</h3>
+              <p className="mt-1 font-serif text-[17px] text-muted leading-snug">{body}</p>
+            </li>
+          ))}
+        </ol>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-slate-100">
-            <div className="text-xs text-slate-600 font-mono font-bold">
-              Playing as: <span className="text-primary-600">@{user?.username || 'scholar'}</span> • {user?.xp || 0} XP
-            </div>
-            <button
-              onClick={startNewQuiz}
-              className="px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Start Challenge</span>
-            </button>
-          </div>
-        </div>
+        <p className="text-[15px] text-muted">
+          Playing as <span className="font-semibold text-ink">@{user?.username || 'scholar'}</span>
+        </p>
       </div>
     );
   }
@@ -203,71 +186,55 @@ export const QuizView = () => {
     const xpWon = score * XP_PER_CORRECT;
 
     return (
-      <div className="p-4 sm:p-8 max-w-3xl mx-auto space-y-6 animate-fadeIn pb-16">
-        <div className="p-5 sm:p-10 rounded-3xl bg-white border border-slate-200/80 shadow-soft text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mx-auto">
-            <Trophy className="w-8 h-8" />
+      <div className="px-5 sm:px-8 py-8 max-w-3xl mx-auto space-y-8 pb-16">
+        <section className="night-panel rounded-2xl p-6 sm:p-10 text-center">
+          <ScoreRing score={score} total={quizQuestions.length} />
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mt-6 tracking-[-0.035em]">
+            {score === quizQuestions.length ? 'Perfect round' : score >= Math.ceil(quizQuestions.length * 0.6) ? 'Nice work' : score > 0 ? 'Keep going' : 'Review and try again'}
+          </h2>
+          <p className="font-serif text-lg text-white/70 mt-2">
+            {score === 0 ? 'No XP this time. Check the sources below, then have another go.' : 'Your score has been added to the leaderboard.'}
+          </p>
+
+          <div className="mt-7 grid grid-cols-3 max-w-md mx-auto divide-x divide-white/15">
+            {[
+              [`${accuracy}%`, 'accuracy'],
+              [`+${xpWon}`, 'XP earned'],
+              [user?.xp || 0, 'total XP']
+            ].map(([v, l]) => (
+              <div key={l}>
+                <div className="text-2xl font-bold text-white tabular-nums">{v}</div>
+                <div className="text-sm text-white/60 mt-0.5">{l}</div>
+              </div>
+            ))}
           </div>
 
-          <div>
-            <h2 className="text-2xl font-extrabold text-slate-900 font-display">
-              Quiz Completed!
-            </h2>
-            <p className="text-xs text-slate-500 mt-1 font-medium">
-              Your results and score have been saved to your campus standing.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 py-5 border-y border-slate-100">
-            <div>
-              <div className="text-[11px] text-slate-500 uppercase font-bold">Score</div>
-              <div className="text-xl sm:text-3xl font-extrabold text-slate-900 mt-1 font-mono">
-                {score} / {quizQuestions.length}
-              </div>
-              <span className={`text-xs font-bold ${accuracy >= 60 ? 'text-emerald-600' : accuracy >= 40 ? 'text-amber-600' : 'text-red-600'}`}>{accuracy}% accuracy</span>
-            </div>
-            <div>
-              <div className="text-[11px] text-slate-500 uppercase font-bold">XP Gained</div>
-              <div className="text-xl sm:text-3xl font-extrabold text-coral-600 mt-1 font-mono">
-                +{xpWon}
-              </div>
-              <span className="text-xs text-slate-500 font-mono font-bold">Total: {user?.xp || 0} XP</span>
-            </div>
-            <div>
-              <div className="text-[11px] text-slate-500 uppercase font-bold">Leaderboard Rank</div>
-              <div className="text-xl sm:text-3xl font-extrabold text-slate-900 mt-1 font-mono">
-                #{user?.rank || 1}
-              </div>
-              <span className="text-xs text-primary-600 font-bold">{user?.tier || 'Scholar'}</span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center gap-3">
+          <div className="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
             <button
               onClick={startNewQuiz}
-              className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer"
+              className="px-5 py-3 rounded-md border border-white/25 hover:bg-white/10 text-white text-[15px] font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
-              <span>Practice Again</span>
+              Play again
             </button>
             <button
               onClick={() => setCurrentView('leaderboard')}
-              className="px-6 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn flex items-center gap-2 transition-all cursor-pointer"
+              className="px-6 py-3 rounded-md bg-highlight text-night text-[15px] font-semibold flex items-center justify-center gap-2 hover:bg-[#FFEA8F] transition-colors cursor-pointer"
             >
               <Trophy className="w-4 h-4" />
-              <span>View Campus Leaderboard</span>
+              See leaderboard
             </button>
           </div>
-        </div>
+        </section>
 
         {/* FULL QUESTIONS & ANSWERS RECALL REVIEW */}
         <div className="space-y-4 pt-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-extrabold text-slate-900 font-display">
-              Detailed Questions & Active Recall Review
+            <h3 className="text-2xl font-bold text-ink">
+              Your answers
             </h3>
-            <span className="text-xs text-slate-500 font-mono">
-              {quizQuestions.length} Questions Reviewed
+            <span className="text-sm text-slate-600">
+              {score} of {quizQuestions.length} correct
             </span>
           </div>
 
@@ -277,13 +244,13 @@ export const QuizView = () => {
               const isUserCorrect = userChoice === q.correctIndex;
 
               return (
-                <div key={qIdx} className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+                <div key={qIdx} className="p-5 sm:p-6 rounded-xl bg-white border border-line space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-primary-600 font-mono uppercase">
-                      Q{qIdx + 1} • {q.category}
+                    <span className="text-sm font-semibold text-primary-700">
+                      Question {qIdx + 1} <span className="text-slate-500 font-medium">· {q.category}</span>
                     </span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1.5 ${
-                      isUserCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${
+                      isUserCorrect ? 'bg-mint-50 text-mint-700' : 'bg-rose-50 text-rose-700'
                     }`}>
                       {isUserCorrect ? (
                         <>
@@ -299,7 +266,7 @@ export const QuizView = () => {
                     </span>
                   </div>
 
-                  <h4 className="text-sm sm:text-base font-extrabold text-slate-900 leading-snug whitespace-pre-line">
+                  <h4 className="font-display text-lg font-bold text-ink leading-snug whitespace-pre-line">
                     {q.question}
                   </h4>
 
@@ -308,21 +275,21 @@ export const QuizView = () => {
                       const isCorrect = optIdx === q.correctIndex;
                       const isSelected = optIdx === userChoice;
 
-                      let optStyle = "bg-slate-50 text-slate-700 border-slate-200";
+                      let optStyle = "bg-white text-slate-700 border-slate-200";
                       if (isCorrect) {
-                        optStyle = "bg-emerald-50 border-emerald-400 text-emerald-900 font-bold";
+                        optStyle = "bg-mint-50 border-mint-500 text-mint-700 font-semibold";
                       } else if (isSelected && !isCorrect) {
-                        optStyle = "bg-rose-50 border-rose-300 text-rose-900 line-through";
+                        optStyle = "bg-rose-50 border-rose-300 text-rose-800 line-through";
                       }
 
                       return (
-                        <div key={optIdx} className={`p-3 rounded-xl border text-xs sm:text-sm flex items-center justify-between ${optStyle}`}>
+                        <div key={optIdx} className={`p-3 rounded-xl border text-sm flex items-center justify-between gap-3 ${optStyle}`}>
                           <div className="flex items-center gap-2.5">
-                            <span className="font-mono font-bold">{String.fromCharCode(65 + optIdx)}.</span>
+                            <span className="font-bold">{String.fromCharCode(65 + optIdx)}</span>
                             <span>{opt}</span>
                           </div>
-                          {isCorrect && <span className="text-[11px] uppercase font-extrabold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded">Correct Answer ✓</span>}
-                          {isSelected && !isCorrect && <span className="text-[11px] uppercase font-extrabold text-rose-700 bg-rose-100/70 px-2 py-0.5 rounded">Your Choice ✗</span>}
+                          {isCorrect && <span className="shrink-0 text-xs font-semibold text-white bg-mint-500 px-2 py-0.5 rounded-full">Correct</span>}
+                          {isSelected && !isCorrect && <span className="shrink-0 text-xs font-semibold text-white bg-rose-400 px-2 py-0.5 rounded-full no-underline">Your answer</span>}
                         </div>
                       );
                     })}
@@ -338,7 +305,7 @@ export const QuizView = () => {
                         href={q.toiUrl || 'https://timesofindia.indiatimes.com/business'}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-2xs transition-all cursor-pointer mt-1"
+                        className="btn-iris inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-semibold text-xs shadow-2xs transition-all cursor-pointer mt-1"
                       >
                         <Globe2 className="w-3.5 h-3.5" />
                         <span>Read Full Article on Times of India</span>
@@ -347,7 +314,7 @@ export const QuizView = () => {
                     ) : q.postTitle ? (
                       <button
                         onClick={() => handleReadSourcePost(q)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs shadow-2xs transition-all cursor-pointer mt-1"
+                        className="btn-iris inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-semibold text-xs shadow-2xs transition-all cursor-pointer mt-1"
                       >
                         <BookOpen className="w-3.5 h-3.5" />
                         <span>Open Source Post: "{q.postTitle}"</span>
@@ -369,32 +336,41 @@ export const QuizView = () => {
   const isWrong = isAnswerSubmitted && selectedOption !== currentQ.correctIndex;
 
   return (
-    <div className="p-4 sm:p-8 max-w-3xl mx-auto space-y-6 animate-fadeIn">
-      {/* Question Header */}
-      <div className="flex items-center justify-between text-xs">
-        <span className="font-bold text-primary-600 uppercase tracking-wider">
-          Question {currentIdx + 1} of {quizQuestions.length}
-        </span>
-        <span className="font-mono font-bold text-slate-700">
-          Score: {score}
-        </span>
-      </div>
-
-      {/* Progress bar */}
-      <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-primary-600 transition-all duration-300 rounded-full"
-          style={{ width: `${((currentIdx + 1) / quizQuestions.length) * 100}%` }}
-        />
+    <div className="px-5 sm:px-8 py-8 max-w-3xl mx-auto space-y-6">
+      {/* Progress: one segment per question, coloured by result */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-semibold text-ink">
+            Question {currentIdx + 1} <span className="text-slate-500 font-medium">of {quizQuestions.length}</span>
+          </span>
+          <span className="font-semibold text-ink">
+            {score} <span className="text-slate-500 font-medium">correct</span>
+          </span>
+        </div>
+        <div className="flex gap-1.5" aria-hidden="true">
+          {quizQuestions.map((q, i) => {
+            const answered = userAnswers[i] !== undefined;
+            const right = answered && userAnswers[i] === q.correctIndex;
+            return (
+              <div
+                key={i}
+                className={`h-2 flex-1 rounded-full transition-colors duration-300 ${
+                  answered ? (right ? 'bg-mint-500' : 'bg-rose-400') : i === currentIdx ? 'bg-primary-500' : 'bg-slate-200'
+                }`}
+              />
+            );
+          })}
+        </div>
       </div>
 
       {/* Question Card */}
-      <div className="p-5 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
+      <div key={currentIdx} className="animate-rise p-5 sm:p-8 rounded-xl bg-white border border-line space-y-6">
         <div>
-          <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary-50 text-primary-700 border border-primary-100">
-            {currentQ.category}
+          <span className={`inline-flex items-center gap-1.5 text-[13px] font-semibold ${currentQ.isNews ? 'text-[#B4233C]' : 'text-primary-700'}`}>
+            {currentQ.isNews ? <Globe2 className="w-3.5 h-3.5" /> : <BookOpen className="w-3.5 h-3.5" />}
+            {currentQ.isNews ? 'Business news' : 'Peer post'} · {currentQ.category}
           </span>
-          <h3 className="text-lg sm:text-xl font-bold text-slate-900 mt-2.5 leading-snug whitespace-pre-line">
+          <h3 className="text-[22px] sm:text-[26px] font-semibold text-ink mt-2 leading-snug tracking-[-0.02em] whitespace-pre-line">
             {currentQ.question}
           </h3>
         </div>
@@ -403,18 +379,22 @@ export const QuizView = () => {
         <div className="space-y-2.5">
           {currentQ.options.map((option, idx) => {
             const isThisSelected = selectedOption === idx;
-            let style = "bg-slate-50 border-slate-200 text-slate-800 hover:bg-slate-100 hover:border-slate-300";
+            let style = "bg-white border-line text-ink hover:border-ink/30";
+            let badge = "bg-slate-100 text-slate-600";
 
             if (isAnswerSubmitted) {
               if (idx === currentQ.correctIndex) {
-                style = "bg-emerald-50 border-emerald-400 text-emerald-900 font-bold";
+                style = "bg-mint-50 border-mint-500 text-mint-700 font-semibold animate-pop";
+                badge = "bg-mint-500 text-white";
               } else if (isThisSelected && idx !== currentQ.correctIndex) {
-                style = "bg-rose-50 border-rose-300 text-rose-900";
+                style = "bg-rose-50 border-rose-300 text-rose-800";
+                badge = "bg-rose-400 text-white";
               } else {
-                style = "opacity-40 border-slate-200";
+                style = "opacity-50 border-slate-200 bg-white";
               }
             } else if (isThisSelected) {
-              style = "bg-primary-50 border-primary-500 text-primary-900 font-bold shadow-sm";
+              style = "bg-primary-50 border-primary-600 text-ink font-medium";
+              badge = "bg-primary-600 text-white";
             }
 
             return (
@@ -422,17 +402,17 @@ export const QuizView = () => {
                 key={idx}
                 disabled={isAnswerSubmitted}
                 onClick={() => handleSelectOption(idx)}
-                className={`w-full text-left p-4 rounded-2xl border text-xs sm:text-sm transition-all flex items-center justify-between gap-3 cursor-pointer ${style}`}
+                className={`w-full text-left p-4 rounded-lg border text-[16px] transition-colors flex items-center justify-between gap-3 cursor-pointer ${style}`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold bg-white border border-current flex-shrink-0">
+                  <span className={`w-7 h-7 rounded-md flex items-center justify-center text-sm font-semibold flex-shrink-0 transition-colors ${badge}`}>
                     {String.fromCharCode(65 + idx)}
                   </span>
                   <span>{option}</span>
                 </div>
 
                 {isAnswerSubmitted && idx === currentQ.correctIndex && (
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-mint-600 flex-shrink-0" />
                 )}
                 {isAnswerSubmitted && isThisSelected && idx !== currentQ.correctIndex && (
                   <XCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
@@ -444,15 +424,15 @@ export const QuizView = () => {
 
         {/* RECALL CALLOUT BANNER ON WRONG ANSWER */}
         {isWrong && (
-          <div className="p-5 rounded-2xl bg-amber-50/80 border border-amber-200 space-y-3 animate-fadeIn">
-            <div className="flex items-center gap-2 text-amber-900 text-xs font-bold uppercase tracking-wider">
-              <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+          <div className="p-5 rounded-lg bg-[#FFF9DB] border border-[#F3E2A0] space-y-3">
+            <div className="flex items-center gap-2 text-ink text-[15px] font-semibold">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>
                 {currentQ.isNews ? 'Did you forget this news? Read it here:' : 'Did you forget about it? Read it here:'}
               </span>
             </div>
 
-            <p className="text-xs text-amber-950 leading-relaxed font-medium whitespace-pre-line">
+            <p className="font-serif text-[17px] text-ink/85 leading-snug whitespace-pre-line">
               {currentQ.explanation}
             </p>
 
@@ -462,7 +442,7 @@ export const QuizView = () => {
                   href={currentQ.toiUrl || 'https://timesofindia.indiatimes.com/business'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-btn transition-all transform active:scale-95 cursor-pointer"
+                  className="btn-iris inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer"
                 >
                   <Globe2 className="w-3.5 h-3.5" />
                   <span>Read Full Article on Times of India</span>
@@ -471,7 +451,7 @@ export const QuizView = () => {
               ) : (
                 <button
                   onClick={() => handleReadSourcePost(currentQ)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn transition-all transform active:scale-95 cursor-pointer"
+                  className="btn-iris inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer"
                 >
                   <BookOpen className="w-3.5 h-3.5" />
                   <span>Open Source Post: "{currentQ.postTitle}"</span>
@@ -488,16 +468,16 @@ export const QuizView = () => {
             <button
               disabled={selectedOption === null}
               onClick={handleSubmitAnswer}
-              className="px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold shadow-btn disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              className="btn-iris px-6 py-3 rounded-md text-[15px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              Check Answer
+              Check answer
             </button>
           ) : (
             <button
               onClick={handleNextQuestion}
-              className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow transition-all flex items-center gap-2 cursor-pointer"
+              className="px-6 py-3 rounded-md bg-ink hover:bg-ink/90 text-white text-[15px] font-semibold transition-colors flex items-center gap-2 cursor-pointer"
             >
-              <span>{currentIdx + 1 === quizQuestions.length ? 'See Results' : 'Next Question'}</span>
+              <span>{currentIdx + 1 === quizQuestions.length ? 'See results' : 'Next question'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           )}

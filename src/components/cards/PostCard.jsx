@@ -1,5 +1,6 @@
 import React from 'react';
-import { Heart, Bookmark, Clock, ShieldCheck, Link as LinkIcon, MapPin, Sparkles } from 'lucide-react';
+import { Heart, Bookmark, Clock, ShieldCheck, Link as LinkIcon, MapPin, Sparkles, Lightbulb } from 'lucide-react';
+import { topicColor } from '../../lib/topicColor';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -42,110 +43,106 @@ export const PostCard = ({ post }) => {
 
   const locationText = refSourceAtt?.name || (post.sourceContext && post.sourceContext !== 'Verified Learner Post' ? post.sourceContext : (post.sourceUrl && !rawUrl ? post.sourceUrl : null));
 
+  const tone = topicColor(post.category || '');
+
+  const hasImage = post.attachments && post.attachments.some((a) => a.type === 'image' || a.url?.startsWith('blob:') || a.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i));
+  const imageUrl = hasImage
+    ? post.attachments.find((a) => a.type === 'image' || a.url?.startsWith('blob:') || a.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i))?.url
+    : null;
+  const takeaway = post.keyTakeaways && post.keyTakeaways[0] && post.keyTakeaways[0].trim() !== (post.title || '').trim() && post.keyTakeaways[0].trim() !== (post.summary || '').trim()
+    ? post.keyTakeaways[0]
+    : null;
+  const summary = post.summary && post.summary.trim() !== (post.title || '').trim() ? post.summary : null;
+
   return (
-    <div
+    <article
       onClick={() => requireAuth(() => openPostDetail(post))}
-      className="group p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/80 hover:border-primary-400/80 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_-4px_rgba(79,70,229,0.08)] transition-all duration-200 cursor-pointer flex flex-col justify-between min-w-0"
+      className="group card-lift p-5 sm:p-6 rounded-xl bg-white border border-line cursor-pointer flex flex-col min-w-0"
     >
-      <div className="space-y-3.5">
-        {/* Author Header & Topic Pill */}
-        <div className="flex items-center justify-between gap-3 min-w-0">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <img loading="lazy" decoding="async"
-              src={post.author?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"}
-              alt={post.author?.name}
-              className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-100"
-            />
-            <div className="leading-tight min-w-0">
-              <div className="text-xs font-extrabold text-slate-900 font-mono group-hover:text-primary-700 transition-colors truncate">
-                @{post.author?.username || 'learner'}
-              </div>
-            </div>
-          </div>
-
-          <span className="shrink-0 max-w-[50%] truncate text-[11px] font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 group-hover:bg-primary-50 group-hover:text-primary-700 transition-colors">
-            {post.category}
-          </span>
-        </div>
-
-        {/* Post Title */}
-        <h3 className="text-base font-extrabold text-slate-900 group-hover:text-primary-600 transition-colors leading-snug">
-          {post.title}
-        </h3>
-
-        {/* Summary / Teaser */}
-        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
-          {post.summary}
-        </p>
-
-        {/* Attached Image Thumbnail Preview */}
-        {post.attachments && post.attachments.some(a => a.type === 'image' || a.url?.startsWith('blob:') || a.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)) && (
-          <div className="rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-50">
-            <img loading="lazy" decoding="async"
-              src={post.attachments.find(a => a.type === 'image' || a.url?.startsWith('blob:') || a.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i))?.url}
-              alt="Attached photo"
-              className="w-full h-36 object-cover hover:scale-105 transition-transform duration-300"
-            />
-          </div>
-        )}
-
-        {/* Minimalist Core Takeaway (Clean hairline accent) */}
-        {post.keyTakeaways && post.keyTakeaways.length > 0 && (
-          <div className="py-1 px-3 rounded-xl bg-slate-50/80 border-l-2 border-primary-500 text-xs text-slate-700">
-            <span className="font-semibold line-clamp-1">
-              💡 {post.keyTakeaways[0]}
-            </span>
-          </div>
-        )}
-
-        {/* Source of Trust & Learning Location */}
-        {(trustDomain || locationText) && (
-          <div className="flex items-center gap-2 flex-wrap pt-0.5">
-            {locationText && (
-              <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200/80 shadow-2xs">
-                <MapPin className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-                <span className="truncate">{locationText}</span>
-              </div>
-            )}
-            {trustDomain && (
-              <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-800 bg-emerald-50/70 px-2.5 py-1 rounded-xl border border-emerald-100/80">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-                <span className="truncate underline font-mono">{trustDomain}</span>
-              </div>
-            )}
-          </div>
-        )}
+      {/* Topic + read time */}
+      <div className="flex items-center justify-between gap-3 text-[13px]">
+        <span className={`inline-flex items-center gap-1.5 font-semibold truncate ${tone.text}`}>
+          <span className={`w-2 h-2 rounded-[2px] shrink-0 ${tone.dot}`} />
+          {post.category}
+        </span>
+        <span className="text-muted shrink-0">{post.readTime}</span>
       </div>
 
-      {/* Card Footer Actions */}
-      <div className="flex items-center justify-between pt-3.5 mt-3.5 border-t border-slate-100 text-xs text-slate-500">
-        <div className="flex items-center gap-4">
+      <h3 className="mt-3 text-[19px] font-semibold text-ink leading-snug tracking-[-0.01em] group-hover:underline decoration-line underline-offset-4">
+        {post.title}
+      </h3>
+
+      {summary && (
+        <p className="mt-2 font-serif text-[17px] text-muted line-clamp-3 leading-snug">{summary}</p>
+      )}
+
+      {imageUrl && (
+        <div className="mt-4 rounded-lg overflow-hidden border border-line bg-haze">
+          <img loading="lazy" decoding="async" src={imageUrl} alt="" className="w-full h-36 object-cover" />
+        </div>
+      )}
+
+      {takeaway && (
+        <p className="mt-4 pl-3 border-l-2 border-highlight font-serif italic text-[16px] text-ink/85 line-clamp-2 leading-snug">
+          {takeaway}
+        </p>
+      )}
+
+      <div className="flex-1" />
+
+      {(trustDomain || locationText) && (
+        <div className="mt-4 flex items-center gap-x-3 gap-y-1 flex-wrap text-[13px] text-muted min-w-0">
+          {trustDomain && (
+            <span className="inline-flex items-center gap-1 min-w-0">
+              <ShieldCheck className="w-3.5 h-3.5 text-mint-600 shrink-0" />
+              <span className="truncate">{trustDomain}</span>
+            </span>
+          )}
+          {locationText && (
+            <span className="inline-flex items-center gap-1 min-w-0">
+              <MapPin className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{locationText}</span>
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Author + actions */}
+      <div className="mt-4 pt-4 border-t border-line flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <img
+            loading="lazy"
+            decoding="async"
+            src={post.author?.avatar || ''}
+            alt=""
+            onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }}
+            className="w-6 h-6 rounded-full bg-haze shrink-0"
+          />
+          <span className="text-[13px] font-medium text-ink truncate">@{post.author?.username || 'learner'}</span>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={handleLike}
-            className={`flex items-center gap-1.5 transition-colors ${
-              isLiked ? 'text-rose-500 font-bold' : 'hover:text-slate-700'
+            aria-label={isLiked ? 'Unlike' : 'Like'}
+            className={`flex items-center gap-1 px-2 py-1 rounded-md text-[13px] font-medium transition-colors ${
+              isLiked ? 'text-rose-600' : 'text-muted hover:text-ink hover:bg-haze'
             }`}
           >
-            <Heart className={`w-4 h-4 ${isLiked ? 'fill-rose-500' : ''}`} />
-            <span className="text-xs font-semibold">{post.likes}</span>
+            <Heart key={isLiked ? 'on' : 'off'} className={`w-4 h-4 ${isLiked ? 'fill-rose-500 animate-pop' : ''}`} />
+            {post.likes}
           </button>
-
           <button
             onClick={handleSave}
-            className={`flex items-center gap-1.5 transition-colors ${
-              isSaved ? 'text-primary-600 font-bold' : 'hover:text-slate-700'
+            aria-label={isSaved ? 'Remove from saved' : 'Save'}
+            className={`flex items-center gap-1 px-2 py-1 rounded-md text-[13px] font-medium transition-colors ${
+              isSaved ? 'text-primary-700' : 'text-muted hover:text-ink hover:bg-haze'
             }`}
           >
-            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-primary-600' : ''}`} />
-            <span className="text-xs font-semibold">{isSaved ? 'Saved' : 'Save'}</span>
+            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+            {isSaved ? 'Saved' : 'Save'}
           </button>
         </div>
-
-        <span className="flex items-center gap-1 text-[11px] text-slate-500 font-mono">
-          <Clock className="w-3.5 h-3.5" />
-          {post.readTime}
-        </span>
       </div>
-    </div>
+    </article>
   );
 };

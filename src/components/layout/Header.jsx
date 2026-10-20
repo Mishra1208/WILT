@@ -1,91 +1,75 @@
 import React from 'react';
-import { Search, Bell, Sparkles, User, PanelLeftOpen } from 'lucide-react';
+import { Search, Bell, PanelLeftOpen } from 'lucide-react';
 import { SignInButton, UserButton, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const Header = () => {
   const { searchQuery, setSearchQuery, setCurrentView, isSidebarOpen, toggleSidebar } = useApp();
-  const { user, requireAuth } = useAuth();
+  const { user } = useAuth();
 
   return (
-    <header className="h-16 border-b border-slate-200/80 bg-white/80 backdrop-blur-md px-3.5 sm:px-6 flex items-center justify-between sticky top-0 z-30">
-      {/* Search Input & Hamburger Toggle */}
-      <div className="flex items-center gap-2 sm:gap-3 flex-1 max-w-md pr-2">
-        {/* Smart Hamburger Toggle: Always visible on mobile, visible on desktop when sidebar collapsed */}
+    <header className="h-16 bg-white/95 backdrop-blur border-b border-line px-3.5 sm:px-8 flex items-center justify-between gap-3 sticky top-0 z-30">
+      <div className="flex items-center gap-2 sm:gap-3 flex-1 max-w-lg">
         <button
           onClick={toggleSidebar}
           title="Toggle Navigation Menu"
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-primary-50 text-slate-700 hover:text-primary-700 border border-slate-200 hover:border-primary-200 transition-all text-xs font-bold shadow-2xs group flex-shrink-0 cursor-pointer ${
+          aria-label="Open menu"
+          className={`p-2 rounded-md border border-line text-ink hover:bg-haze transition-colors flex-shrink-0 cursor-pointer ${
             isSidebarOpen ? 'md:hidden' : 'flex'
           }`}
         >
-          <PanelLeftOpen className="w-4 h-4 text-slate-500 group-hover:text-primary-600 transition-colors" />
-          <span className="hidden sm:inline">Menu</span>
+          <PanelLeftOpen className="w-4 h-4" />
         </button>
 
         <div className="relative w-full">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
-            placeholder="Search concepts, topics... (⌘K)"
+            placeholder="Search posts and terms"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 sm:pl-9 pr-3 sm:pr-12 py-1.5 sm:py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-medium placeholder-slate-500 focus:outline-none focus:border-primary-500 focus:bg-white transition-all shadow-2xs"
+            className="w-full pl-9 pr-3 sm:pr-12 py-2 rounded-md bg-haze border border-transparent text-[15px] text-ink placeholder-muted focus:outline-none focus:bg-white focus:border-line focus:ring-4 focus:ring-primary-500/10 transition-colors"
           />
-          <div className="hidden sm:flex absolute right-2.5 top-1/2 -translate-y-1/2 items-center gap-0.5">
-            <kbd className="px-1.5 py-0.5 text-[11px] font-semibold text-slate-500 bg-white border border-slate-200 rounded shadow-2xs">
-              ⌘K
-            </kbd>
-          </div>
+          <kbd className="hidden sm:block absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[11px] font-medium text-muted bg-white border border-line rounded">
+            ⌘K
+          </kbd>
         </div>
       </div>
 
-      {/* Header Actions */}
-      <div className="flex items-center gap-3">
-        {/* Weekly Quiz CTA */}
+      <div className="flex items-center gap-1.5 sm:gap-2">
         <button
           onClick={() => setCurrentView('quiz')}
-          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-100 transition-colors cursor-pointer"
+          className="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-semibold text-ink hover:bg-haze transition-colors cursor-pointer"
         >
-          <Sparkles className="w-3.5 h-3.5 text-primary-600" />
-          <span>Weekly Quiz (up to 150 XP)</span>
+          <span className="w-2 h-2 rounded-full bg-highlight ring-2 ring-highlight/30" />
+          Weekly quiz
         </button>
 
-        {/* Notifications */}
         <button
           onClick={() => setCurrentView('notifications')}
           aria-label="Notifications"
-          className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors relative"
+          className="p-2 rounded-md text-muted hover:text-ink hover:bg-haze transition-colors relative"
         >
-          <Bell className="w-4 h-4" />
-          <span className="w-2 h-2 rounded-full bg-coral-500 absolute top-1.5 right-1.5 ring-2 ring-white" />
+          <Bell className="w-[18px] h-[18px]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#B4233C] absolute top-2 right-2" />
         </button>
 
-        {/* Profile / Official Clerk Sign In */}
         <SignedIn>
-          <div className="flex items-center gap-2">
-            <div
-              onClick={() => setCurrentView('leaderboard')}
-              className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-colors"
-            >
-              <img loading="lazy" decoding="async"
-                src={user?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"}
-                alt={user?.name || "Scholar"}
-                className="w-6 h-6 rounded-full object-cover"
-              />
-              <span className="text-xs font-semibold text-slate-800 hidden sm:inline">
-                {user?.name ? user.name.split(' ')[0] : 'Scholar'}
-              </span>
-            </div>
-            <UserButton afterSignOutUrl="/" />
-          </div>
+          <button
+            onClick={() => setCurrentView('leaderboard')}
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-semibold text-ink hover:bg-haze transition-colors cursor-pointer"
+          >
+            <span className="tabular-nums">{user?.xp || 0}</span>
+            <span className="text-muted font-medium">XP</span>
+          </button>
+          <UserButton afterSignOutUrl="/" />
         </SignedIn>
 
         <SignedOut>
           <SignInButton mode="modal">
-            <button className="px-4 py-2 rounded-xl text-xs font-bold bg-primary-600 hover:bg-primary-700 text-white shadow-btn transition-all cursor-pointer">
-              Sign In
+            <button className="px-4 py-2 rounded-md text-sm font-semibold bg-ink text-white hover:bg-ink/90 transition-colors cursor-pointer">
+              Sign in
             </button>
           </SignInButton>
         </SignedOut>

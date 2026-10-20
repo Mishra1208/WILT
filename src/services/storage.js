@@ -284,6 +284,6 @@ export const getTierForXP = (xp = 0) => {
   if (xp >= 2500) return { tier: 'Mastermind', tierColor: 'from-amber-400 to-yellow-600' };
   if (xp >= 1800) return { tier: 'Grand Scholar', tierColor: 'from-slate-300 to-slate-500' };
   if (xp >= 1200) return { tier: 'Fellow Analyst', tierColor: 'from-amber-600 to-orange-700' };
-  if (xp >= 600) return { tier: 'Curious Scholar', tierColor: 'from-indigo-400 to-indigo-600' };
+  if (xp >= 600) return { tier: 'Curious Scholar', tierColor: 'from-primary-400 to-primary-600' };
   return { tier: 'Novice', tierColor: 'from-slate-400 to-slate-600' };
 };

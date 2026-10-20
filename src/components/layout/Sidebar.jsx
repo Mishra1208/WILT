@@ -16,13 +16,13 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { getTierProgress } from '../widgets/XpRing';
 
 export const Sidebar = () => {
-  const { currentView, setCurrentView, setIsNewPostModalOpen, isSidebarOpen, toggleSidebar, openReportBugModal } = useApp();
+  const { currentView, setCurrentView, setIsNewPostModalOpen, isSidebarOpen, toggleSidebar, openReportBugModal, leaderboard } = useApp();
   const { user, isLoggedIn, setIsAuthModalOpen, requireAuth, openAuth } = useAuth();
 
   const learningNav = [
-    { id: 'notepad', label: 'Notepad Slate', icon: PenTool },
     { id: 'knowledge-quest', label: 'Knowledge Quest', icon: Globe },
     { id: 'discover', label: 'Discover', icon: Compass },
     { id: 'dictionary', label: 'Dictionary', icon: BookOpen },
@@ -52,191 +52,122 @@ export const Sidebar = () => {
     }
   };
 
+  const myRank = isLoggedIn
+    ? (leaderboard || []).find((u) => u.id === user?.id || u.username === user?.username)?.rank
+    : null;
+  const { next, toNext } = getTierProgress(user?.xp || 0);
+
+  const { progress } = getTierProgress(user?.xp || 0);
+
+  const NavItem = ({ item }) => {
+    const Icon = item.icon;
+    const isActive = currentView === item.id;
+    return (
+      <button
+        onClick={() => (item.action ? item.action() : handleNavClick(item.id))}
+        aria-current={isActive ? 'page' : undefined}
+        className={`relative flex items-center gap-3 px-3 py-2 rounded-md text-[15px] transition-colors cursor-pointer ${
+          isActive ? 'bg-white/[0.09] text-white font-semibold' : 'text-white/65 hover:text-white hover:bg-white/[0.05] font-medium'
+        }`}
+      >
+        {isActive && <span className="absolute -left-3 top-1.5 bottom-1.5 w-[3px] rounded-r bg-highlight" />}
+        <Icon className={`w-[18px] h-[18px] ${isActive ? 'text-highlight' : ''}`} />
+        <span>{item.label}</span>
+      </button>
+    );
+  };
+
+  const NavGroup = ({ label, items }) => (
+    <div className="flex flex-col gap-0.5">
+      <div className="text-[13px] font-medium text-white/40 px-3 pb-1.5">{label}</div>
+      {items.map((item) => (
+        <NavItem key={item.id} item={item} />
+      ))}
+    </div>
+  );
+
   return (
     <>
-      {/* Dark Mobile Backdrop (Only rendered on mobile screens < md) */}
-      <div
-        onClick={toggleSidebar}
-        className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs z-40 md:hidden animate-fadeIn"
-      />
+      {/* Mobile backdrop */}
+      <div onClick={toggleSidebar} className="fixed inset-0 bg-night-deep/60 z-40 md:hidden" />
 
-      <aside className="fixed inset-y-0 left-0 md:sticky md:top-0 w-[min(18rem,85vw)] md:w-64 h-screen-safe max-h-screen-safe flex-shrink-0 flex flex-col justify-between border-r border-slate-200/80 bg-white select-none transition-all duration-300 animate-fadeIn z-50 md:z-30 overflow-hidden shadow-2xl md:shadow-none">
-        <div className="p-5 flex-1 flex flex-col gap-5 overflow-y-auto min-h-0">
-        {/* Brand Header with Close Button */}
-        <div className="flex items-center justify-between px-1 pt-1">
+      <aside className="fixed inset-y-0 left-0 md:sticky md:top-0 w-[min(17rem,85vw)] md:w-60 h-screen-safe max-h-screen-safe flex-shrink-0 flex flex-col justify-between bg-night select-none z-50 md:z-30 overflow-hidden shadow-2xl md:shadow-none">
+        <div className="px-3 py-4 flex-1 flex flex-col gap-6 overflow-y-auto min-h-0">
+          {/* Wordmark + close */}
+          <div className="flex items-center justify-between pl-3">
+            <button onClick={() => handleNavClick('notepad')} className="text-left cursor-pointer">
+              <span className="block text-[22px] font-extrabold tracking-[-0.04em] text-white leading-none">
+                wilt<span className="text-highlight">.</span>
+              </span>
+              <span className="block text-[12px] text-white/50 mt-1">What I Learned Today</span>
+            </button>
+            <button
+              onClick={toggleSidebar}
+              title="Close sidebar (⌘B)"
+              aria-label="Close sidebar"
+              className="p-2 rounded-md text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors"
+            >
+              <PanelLeftClose className="w-4 h-4" />
+            </button>
+          </div>
+
           <button
-            onClick={() => setCurrentView('notepad')}
-            className="flex items-center gap-2.5 text-left group"
+            onClick={() => handleNavClick('notepad')}
+            className="mx-0.5 flex items-center justify-center gap-2 py-2.5 rounded-md bg-highlight text-night text-[15px] font-semibold hover:bg-[#FFEA8F] transition-colors cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-xl bg-primary-600 text-white font-extrabold text-base flex items-center justify-center shadow-btn group-hover:scale-105 transition-transform">
-              W
-            </div>
-            <div>
-              <span className="font-extrabold text-xl tracking-tight text-slate-900 block leading-tight">
-                WILT
-              </span>
-              <span className="text-[11px] font-semibold text-primary-600 uppercase tracking-wider block">
-                What I Learned Today
-              </span>
-            </div>
+            <PenTool className="w-4 h-4" />
+            Write today's note
           </button>
 
-          {/* Close Sidebar Button */}
-          <button
-            onClick={toggleSidebar}
-            title="Close sidebar (⌘B)"
-            className="p-1.5 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-          >
-            <PanelLeftClose className="w-4 h-4" />
-          </button>
+          <NavGroup label="Learn" items={learningNav} />
+          <NavGroup label="Practice" items={recallNav} />
+          <NavGroup label="More" items={accountNav} />
         </div>
 
-        {/* LEARNING & DISCOVERY Section */}
-        <div className="flex flex-col gap-1">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-3">
-            Learning & Discovery
-          </div>
-          {learningNav.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentView === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                  isActive
-                    ? 'bg-primary-50 text-primary-700 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon
-                    className={`w-4 h-4 ${
-                      isActive ? 'text-primary-600' : 'text-slate-500'
-                    }`}
-                  />
-                  <span>{item.label}</span>
+        {/* Progress */}
+        <div className="p-3 border-t border-white/10">
+          {isLoggedIn ? (
+            <button
+              onClick={() => handleNavClick('leaderboard')}
+              className="w-full rounded-md p-2.5 text-left hover:bg-white/[0.05] transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2.5">
+                <img src={user?.avatar} alt="" className="w-8 h-8 rounded-full bg-white/10" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold text-white truncate">@{user?.username}</div>
+                  <div className="text-[13px] text-white/55">
+                    {user?.tier || 'Novice'}{myRank ? ` · #${myRank}` : ''}
+                  </div>
                 </div>
-                {item.badge && (
-                  <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-coral-50 text-coral-600 border border-coral-100">
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* RECALL & PERFORMANCE Section */}
-        <div className="flex flex-col gap-1 pt-2 border-t border-slate-100/80">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-3">
-            Recall & Performance
-          </div>
-          {recallNav.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentView === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                  isActive
-                    ? 'bg-primary-50 text-primary-700 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon
-                    className={`w-4 h-4 ${
-                      isActive ? 'text-primary-600' : 'text-slate-500'
-                    }`}
-                  />
-                  <span>{item.label}</span>
-                </div>
-                {item.badge && (
-                  <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-coral-50 text-coral-600 border border-coral-100">
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* ACCOUNT Section */}
-        <div className="flex flex-col gap-1 pt-2 border-t border-slate-100/80">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-3">
-            Account
-          </div>
-          {accountNav.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentView === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  if (item.action) {
-                    item.action();
-                  } else {
-                    handleNavClick(item.id);
-                  }
-                }}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-primary-50 text-primary-700 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <Icon
-                  className={`w-4 h-4 ${
-                    isActive ? 'text-primary-600' : 'text-slate-500'
-                  }`}
-                />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* User Footer Card */}
-      <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-        {isLoggedIn ? (
-          <div
-            onClick={() => handleNavClick('leaderboard')}
-            className="flex items-center justify-between p-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 cursor-pointer transition-all"
-          >
-            <div className="flex items-center gap-2.5 truncate">
-              <img loading="lazy" decoding="async"
-                src={user.avatar}
-                alt={user.name}
-                className="w-8 h-8 rounded-full object-cover border border-slate-200"
-              />
-              <div className="truncate">
-                <div className="text-xs font-bold text-slate-900 truncate">
-                  {user.name}
-                </div>
-                <div className="text-[11px] text-primary-600 font-mono">
-                  {user.xp} XP • {user.tier}
+                <div className="text-right">
+                  <div className="text-sm font-bold text-highlight tabular-nums">{user?.xp || 0}</div>
+                  <div className="text-[11px] text-white/45">XP</div>
                 </div>
               </div>
+              <div className="mt-2.5 h-1 rounded-full bg-white/10 overflow-hidden">
+                <div className="h-full bg-highlight rounded-full transition-[width] duration-700" style={{ width: `${Math.round(progress * 100)}%` }} />
+              </div>
+              <div className="mt-1.5 text-[12px] text-white/45">
+                {next ? `${toNext} XP to ${next.name}` : 'Top tier reached'}
+              </div>
+            </button>
+          ) : (
+            <div className="p-2.5">
+              <div className="text-sm font-semibold text-white">Earn XP for what you learn</div>
+              <p className="text-[13px] text-white/55 mt-1 leading-snug">Sign in to take quizzes and climb the leaderboard.</p>
+              <button
+                onClick={() => {
+                  setIsAuthModalOpen(true);
+                  if (typeof window !== 'undefined' && window.innerWidth < 768) toggleSidebar();
+                }}
+                className="mt-3 w-full py-2 rounded-md text-sm font-semibold bg-white text-night hover:bg-white/90 transition-colors cursor-pointer"
+              >
+                Sign in
+              </button>
             </div>
-          </div>
-        ) : (
-          <button
-            onClick={() => {
-              setIsAuthModalOpen(true);
-              if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                toggleSidebar();
-              }
-            }}
-            className="w-full py-2.5 px-3 rounded-xl text-xs font-bold bg-primary-600 text-white hover:bg-primary-700 transition-colors shadow-btn"
-          >
-            Student Sign In
-          </button>
-        )}
-      </div>
-    </aside>
+          )}
+        </div>
+      </aside>
     </>
   );
 };
