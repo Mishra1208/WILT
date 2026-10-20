@@ -21,6 +21,7 @@ import {
   supabase
 } from '../services/supabase';
 import { getOrCreateGuestUser } from '../services/storage';
+import { validateContent } from '../services/moderation';
 
 const AppContext = createContext();
 
@@ -35,8 +36,10 @@ export const AppProvider = ({ children }) => {
     const loadLivePosts = () => {
       fetchPostsFromSupabase().then((remotePosts) => {
         const cleanList = remotePosts || [];
-        setPosts(cleanList);
-        saveAllPostsToStorage(cleanList);
+        if (cleanList.length > 0) {
+          setPosts(cleanList);
+          saveAllPostsToStorage(cleanList);
+        }
         setIsPostsLoading(false);
       }).catch(() => {
         setIsPostsLoading(false);
@@ -68,55 +71,41 @@ export const AppProvider = ({ children }) => {
     // 3. Fetch live audience leaderboard from Supabase
     const loadLiveLeaderboard = () => {
       fetchLeaderboardFromSupabase().then((remoteLeaderboard) => {
-        const guestUser = getOrCreateGuestUser();
         let list = remoteLeaderboard || [];
-        
-        // Ensure active guest user with positive XP exists in list
-        if (guestUser && (guestUser.xp > 0 || guestUser.quizzesCompleted > 0)) {
-          const exists = list.some(u => u.username === guestUser.username || u.id === guestUser.id);
-          if (!exists) {
-            list = [...list, {
-              id: guestUser.id,
-              name: `@${guestUser.username}`,
-              username: guestUser.username,
-              avatar: guestUser.avatar,
-              university: guestUser.university || 'Anonymous Campus',
-              major: guestUser.major || 'Guest Scholar',
-              xp: guestUser.xp || 0,
-              accuracy: guestUser.accuracy || 0,
-              tier: guestUser.tier || 'Curious Scholar'
-            }];
-          }
-        }
         list.sort((a, b) => (b.xp || 0) - (a.xp || 0));
         list = list.map((item, idx) => ({ ...item, rank: idx + 1 }));
 
-        setLeaderboard(list);
+        // Keep the cached board if Supabase is unreachable
+        if (list.length > 0) setLeaderboard(list);
       });
     };
 
     loadLiveLeaderboard();
     const leaderboardInterval = setInterval(() => {
       if (!document.hidden) loadLiveLeaderboard();
-    }, 30000);
+    }, 60000);
 
     // 4. Supabase Realtime listener for instant cross-tab / cross-browser post & like push
     let postsChannel;
+    let realtimeTimer = null;
+    const scheduleReload = () => {
+      clearTimeout(realtimeTimer);
+      realtimeTimer = setTimeout(() => {
+        if (!document.hidden) loadLivePosts();
+      }, 2500);
+    };
     try {
       postsChannel = supabase
         .channel('realtime:posts')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
-          loadLivePosts();
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'concepts' }, () => {
-          loadLivePosts();
-        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, scheduleReload)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'concepts' }, scheduleReload)
         .subscribe();
     } catch (e) {}
 
     return () => {
       clearInterval(postsInterval);
       clearInterval(leaderboardInterval);
+      clearTimeout(realtimeTimer);
       if (postsChannel && supabase.removeChannel) {
         supabase.removeChannel(postsChannel);
       }
@@ -174,7 +163,13 @@ export const AppProvider = ({ children }) => {
   }, []);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    try {
+      return window.innerWidth >= 1024;
+    } catch (e) {
+      return true;
+    }
+  });
 
   const [posts, setPosts] = useState(() => getStoredPosts());
   const [concepts, setConcepts] = useState(() => getStoredConcepts());
@@ -194,7 +189,7 @@ export const AppProvider = ({ children }) => {
     document.documentElement.classList.add('light');
   }, []);
 
-  const createPost = (newPostData) => {
+  const createPost = async (newPostData) => {
     const post = {
       id: `post-${Date.now()}`,
       title: newPostData.title,
@@ -219,9 +214,9 @@ export const AppProvider = ({ children }) => {
     setPosts(updated);
     setIsNewPostModalOpen(false);
 
-    // Save directly to Supabase cloud database
-    savePostToSupabase(post);
-    if (newPostData.attachments && newPostData.attachments.length > 0) {
+    // Save to Supabase and report honestly whether the cloud save worked
+    const cloudResult = await savePostToSupabase(post);
+    if (cloudResult?.success && newPostData.attachments && newPostData.attachments.length > 0) {
       newPostData.attachments.forEach((att) => {
         saveAttachmentToSupabase(post.id, att);
       });
@@ -249,7 +244,7 @@ export const AppProvider = ({ children }) => {
       });
     }
 
-    return post;
+    return { ...post, synced: Boolean(cloudResult?.success) };
   };
 
   const createConcept = (newConceptData) => {
@@ -323,6 +318,7 @@ export const AppProvider = ({ children }) => {
 
   const addCommentToPost = (postId, commentText, currentUser) => {
     if (!commentText.trim()) return false;
+    if (!validateContent(commentText).isClean) return false;
 
     const activeUser = currentUser || getOrCreateGuestUser();
     let targetUpdatedPost = null;

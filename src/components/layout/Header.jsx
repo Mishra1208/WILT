@@ -25,16 +25,16 @@ export const Header = () => {
         </button>
 
         <div className="relative w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search concepts, topics... (⌘K)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 sm:pl-9 pr-3 sm:pr-12 py-1.5 sm:py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-medium placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:bg-white transition-all shadow-2xs"
+            className="w-full pl-8 sm:pl-9 pr-3 sm:pr-12 py-1.5 sm:py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-medium placeholder-slate-500 focus:outline-none focus:border-primary-500 focus:bg-white transition-all shadow-2xs"
           />
           <div className="hidden sm:flex absolute right-2.5 top-1/2 -translate-y-1/2 items-center gap-0.5">
-            <kbd className="px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 bg-white border border-slate-200 rounded shadow-2xs">
+            <kbd className="px-1.5 py-0.5 text-[11px] font-semibold text-slate-500 bg-white border border-slate-200 rounded shadow-2xs">
               ⌘K
             </kbd>
           </div>
@@ -49,7 +49,7 @@ export const Header = () => {
           className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-100 transition-colors cursor-pointer"
         >
           <Sparkles className="w-3.5 h-3.5 text-primary-600" />
-          <span>Weekly Quiz (+150 XP)</span>
+          <span>Weekly Quiz (up to 150 XP)</span>
         </button>
 
         {/* Notifications */}
@@ -69,7 +69,7 @@ export const Header = () => {
               onClick={() => setCurrentView('leaderboard')}
               className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-colors"
             >
-              <img
+              <img loading="lazy" decoding="async"
                 src={user?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"}
                 alt={user?.name || "Scholar"}
                 className="w-6 h-6 rounded-full object-cover"

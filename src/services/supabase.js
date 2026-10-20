@@ -19,68 +19,6 @@ export const supabase = createClient(
 );
 
 /**
- * 1. Record weekly digest newsletter subscriber in Supabase
- */
-export const subscribeToNewsletter = async (email) => {
-  if (!email || !email.includes('@')) {
-    return { success: false, status: 'invalid', message: 'Please enter a valid email address.' };
-  }
-
-  const cleanEmail = email.trim().toLowerCase();
-
-  try {
-    // Check if the subscriber already exists in Supabase
-    const { data: existing } = await supabase
-      .from('newsletter_subscribers')
-      .select('id, email')
-      .eq('email', cleanEmail)
-      .maybeSingle();
-
-    if (existing) {
-      return {
-        success: false,
-        status: 'already_exists',
-        message: 'You are already subscribed to the Weekly Digest! 📬'
-      };
-    }
-
-    // Insert new subscriber
-    const { data, error } = await supabase
-      .from('newsletter_subscribers')
-      .insert([
-        {
-          email: cleanEmail,
-          source: 'wilt_footer_digest',
-          created_at: new Date().toISOString()
-        }
-      ])
-      .select();
-
-    if (error) {
-      if (error.code === '23505' || error.message?.includes('duplicate') || error.message?.includes('unique')) {
-        return {
-          success: false,
-          status: 'already_exists',
-          message: 'You are already subscribed to the Weekly Digest! 📬'
-        };
-      }
-      console.warn('Supabase newsletter info:', error.message);
-      return { success: false, status: 'error', message: 'Failed to subscribe. Please try again.' };
-    }
-
-    return {
-      success: true,
-      status: 'subscribed',
-      message: 'Subscribed Successfully! 🎉',
-      data
-    };
-  } catch (err) {
-    console.warn('Supabase newsletter catch:', err);
-    return { success: false, status: 'error', message: 'Something went wrong. Please try again.' };
-  }
-};
-
-/**
  * 2. Save user post / knowledge slate entry to Supabase
  */
 export const savePostToSupabase = async (post) => {
@@ -437,44 +375,104 @@ export const fetchPostsFromSupabase = async () => {
   }
 };
 
+// Columns that are safe to read publicly. email / phone are deliberately excluded.
+export const PUBLIC_PROFILE_COLUMNS = 'id, username, name, avatar, university, major, xp, tier, rank, accuracy, quizzes_completed, updated_at';
+
 /**
  * 4. Save or Update Student Profile in Supabase
+ * Only signed-in accounts are persisted. Contact details (email / phone) are never
+ * written to the public profile table — Clerk is the source of truth for those.
  */
 export const saveUserProfileToSupabase = async (user) => {
-  if (!user || !user.username) return { success: false };
+  if (!user || !user.username || !user.id) return { success: false };
+  if (user.isGuest || String(user.id).startsWith('guest-')) return { success: false, skipped: true };
 
   try {
     const cleanUsername = (user.username || 'anonymous').replace(/^@/, '').toLowerCase().trim();
     const payload = {
-      id: user.id || `user_${cleanUsername}`,
+      id: user.id,
       username: cleanUsername,
       name: `@${cleanUsername}`,
       avatar: user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanUsername}`,
-      email: user.email || '',
-      phone: user.phone || '',
       university: user.university || 'Anonymous Campus',
       major: user.major || 'Guest Scholar',
-      xp: user.xp !== undefined && user.xp !== null ? Number(user.xp) : 0,
-      tier: user.tier || 'Curious Scholar',
+      xp: Number(user.xp) || 0,
+      tier: user.tier || 'Novice',
       rank: Number(user.rank) || 1,
-      accuracy: user.accuracy !== undefined && user.accuracy !== null ? Number(user.accuracy) : 0,
+      accuracy: Number(user.accuracy) || 0,
       quizzes_completed: Number(user.quizzesCompleted) || 0,
       updated_at: new Date().toISOString()
     };
 
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .upsert([payload])
-      .select();
+    const { error } = await supabase.from('user_profiles').upsert([payload]);
 
     if (error) {
       console.warn('Supabase user profile info:', error.message);
       return { success: false, error: error.message };
     }
-    return { success: true, data };
+    return { success: true };
   } catch (err) {
     console.warn('Supabase user profile catch:', err);
     return { success: false, error: err.message };
+  }
+};
+
+/**
+ * Load a signed-in account's saved profile (public columns only).
+ * Returns { profile } on success (profile may be null if the account is new),
+ * or { error } if Supabase could not be reached.
+ */
+export const fetchUserProfileFromSupabase = async (accountId) => {
+  if (!accountId) return { profile: null };
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select(PUBLIC_PROFILE_COLUMNS)
+      .eq('id', accountId)
+      .maybeSingle();
+    if (error) return { error: error.message };
+    return { profile: data || null };
+  } catch (err) {
+    return { error: err.message };
+  }
+};
+
+/**
+ * True if another account already uses this username.
+ * Returns false when Supabase can't be reached (we don't block sign-in on it).
+ */
+export const isUsernameTakenInSupabase = async (username, accountId) => {
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('username', username)
+      .neq('id', accountId)
+      .limit(1);
+    if (error) return false;
+    return Array.isArray(data) && data.length > 0;
+  } catch (err) {
+    return false;
+  }
+};
+
+/**
+ * Lifetime quiz accuracy for a handle, computed from real attempts:
+ * total correct answers / total questions answered.
+ */
+export const fetchQuizStatsFromSupabase = async (handle) => {
+  if (!handle) return null;
+  try {
+    const { data, error } = await supabase
+      .from('quiz_attempts')
+      .select('score, total_questions')
+      .eq('user_handle', handle.replace(/^@/, '').toLowerCase().trim());
+    if (error || !data) return null;
+    const totalCorrect = data.reduce((sum, a) => sum + (Number(a.score) || 0), 0);
+    const totalAnswered = data.reduce((sum, a) => sum + (Number(a.total_questions) || 0), 0);
+    return { totalCorrect, totalAnswered, attempts: data.length };
+  } catch (err) {
+    return null;
   }
 };
 
@@ -491,18 +489,17 @@ export const saveQuizAttemptToSupabase = async ({ userHandle, userName, score, t
           user_name: userName || 'Student Scholar',
           score: score,
           total_questions: totalQuestions,
-          accuracy_percentage: totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 100,
+          accuracy_percentage: totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0,
           xp_earned: xpEarned,
           created_at: new Date().toISOString()
         }
-      ])
-      .select();
+      ]);
 
     if (error) {
       console.warn('Supabase quiz attempt info:', error.message);
       return { success: false, error: error.message };
     }
-    return { success: true, data };
+    return { success: true };
   } catch (err) {
     console.warn('Supabase quiz attempt catch:', err);
     return { success: false, error: err.message };
@@ -510,88 +507,96 @@ export const saveQuizAttemptToSupabase = async ({ userHandle, userName, score, t
 };
 
 /**
- * Fetch real live audience leaderboard from Supabase
+ * Fetch real live audience leaderboard from Supabase.
+ * - Reads only public profile columns (never email / phone).
+ * - Accuracy is computed from real quiz attempts (correct / answered), never a placeholder.
  */
 export const fetchLeaderboardFromSupabase = async () => {
   try {
     const [profilesRes, attemptsRes] = await Promise.all([
       supabase
         .from('user_profiles')
-        .select('*')
+        .select(PUBLIC_PROFILE_COLUMNS)
         .gte('updated_at', '2026-09-07T05:45:00.000Z')
-        .order('xp', { ascending: false }),
+        .order('xp', { ascending: false })
+        .limit(500),
       supabase
         .from('quiz_attempts')
-        .select('*')
+        .select('user_handle, score, total_questions, xp_earned, created_at')
         .gte('created_at', '2026-09-07T05:45:00.000Z')
         .order('created_at', { ascending: false })
+        .limit(2000)
     ]).catch(() => [{ data: [] }, { data: [] }]);
 
     const profiles = profilesRes?.data || [];
     const attempts = attemptsRes?.data || [];
 
+    // Aggregate real attempt stats per handle
+    const statsByHandle = new Map();
+    attempts.forEach((a) => {
+      const handle = (a.user_handle || '').replace(/^@/, '').toLowerCase().trim();
+      if (!handle || handle === 'anonymous' || handle.startsWith('archived_reset_')) return;
+      const s = statsByHandle.get(handle) || { correct: 0, answered: 0, quizzes: 0, xp: 0 };
+      s.correct += Number(a.score) || 0;
+      s.answered += Number(a.total_questions) || 0;
+      s.quizzes += 1;
+      s.xp += Number(a.xp_earned) || 0;
+      statsByHandle.set(handle, s);
+    });
+
+    const accuracyFor = (stats, fallback) => {
+      if (stats && stats.answered > 0) return Math.round((stats.correct / stats.answered) * 100);
+      const n = Number(fallback);
+      return Number.isFinite(n) ? Math.max(0, Math.min(100, Math.round(n))) : 0;
+    };
+
     const handleMap = new Map();
 
-    if (profiles && profiles.length > 0) {
-      profiles.forEach((p) => {
-        const handle = (p.username || p.name || 'anonymous').replace(/^@/, '').toLowerCase().trim();
-        const userXp = Number(p.xp) || 0;
-        const quizzesDone = Number(p.quizzes_completed) || 0;
-        if (handle && !handle.startsWith('archived_reset_') && (userXp > 0 || quizzesDone > 0)) {
-          handleMap.set(handle, {
-            id: p.id || `user_${handle}`,
-            name: `@${handle}`,
-            username: handle,
-            avatar: p.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${handle}`,
-            university: p.university || 'Anonymous Campus',
-            major: p.major || 'Guest Scholar',
-            xp: userXp,
-            accuracy: Number(p.accuracy) || 90,
-            tier: p.tier || 'Curious Scholar',
-            quizzesCompleted: quizzesDone
-          });
-        }
+    profiles.forEach((p) => {
+      const handle = (p.username || p.name || '').replace(/^@/, '').toLowerCase().trim();
+      if (!handle || handle.startsWith('archived_reset_')) return;
+      const stats = statsByHandle.get(handle);
+      const userXp = Number(p.xp) || 0;
+      const quizzesDone = Math.max(Number(p.quizzes_completed) || 0, stats?.quizzes || 0);
+      if (userXp <= 0 && quizzesDone <= 0) return;
+      handleMap.set(handle, {
+        id: p.id || `user_${handle}`,
+        name: `@${handle}`,
+        username: handle,
+        avatar: p.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${handle}`,
+        university: p.university || 'Anonymous Campus',
+        major: p.major || 'Guest Scholar',
+        xp: userXp,
+        accuracy: accuracyFor(stats, p.accuracy),
+        quizzesCompleted: quizzesDone
       });
-    }
+    });
 
-    if (attempts && attempts.length > 0) {
-      attempts.forEach((a) => {
-        const handle = (a.user_handle || 'anonymous').replace(/^@/, '').toLowerCase().trim();
-        const earnedXp = Number(a.xp_earned) || 0;
-        if (handle && !handle.startsWith('archived_reset_') && earnedXp > 0) {
-          if (!handleMap.has(handle)) {
-            handleMap.set(handle, {
-              id: `anon_${handle}`,
-              name: `@${handle}`,
-              username: handle,
-              avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${handle}`,
-              university: 'Anonymous Campus',
-              major: 'Guest Scholar',
-              xp: earnedXp,
-              accuracy: Number(a.accuracy_percentage) || 90,
-              tier: 'Curious Scholar',
-              quizzesCompleted: 1
-            });
-          } else {
-            const existing = handleMap.get(handle);
-            if (earnedXp > existing.xp) {
-              existing.xp = earnedXp;
-              existing.accuracy = Number(a.accuracy_percentage) || existing.accuracy;
-            }
-          }
-        }
+    // Handles that only exist in quiz_attempts (no profile row)
+    statsByHandle.forEach((stats, handle) => {
+      if (handleMap.has(handle) || stats.xp <= 0) return;
+      handleMap.set(handle, {
+        id: `anon_${handle}`,
+        name: `@${handle}`,
+        username: handle,
+        avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${handle}`,
+        university: 'Anonymous Campus',
+        major: 'Guest Scholar',
+        xp: stats.xp,
+        accuracy: accuracyFor(stats, 0),
+        quizzesCompleted: stats.quizzes
       });
-    }
+    });
 
     const leaderboardList = Array.from(handleMap.values());
     leaderboardList.sort((a, b) => (b.xp || 0) - (a.xp || 0));
 
     return leaderboardList.map((item, idx) => {
-      let tier = "Curious Scholar";
-      if (item.xp >= 2500) tier = "Mastermind";
-      else if (item.xp >= 1800) tier = "Grandmaster";
-      else if (item.xp >= 1200) tier = "Fellow Analyst";
-      else if (item.xp >= 600) tier = "Curious Scholar";
+      let tier = 'Novice';
+      if (item.xp >= 2500) tier = 'Mastermind';
+      else if (item.xp >= 1800) tier = 'Grand Scholar';
+      else if (item.xp >= 1200) tier = 'Fellow Analyst';
+      else if (item.xp >= 600) tier = 'Curious Scholar';
 
       return {
         ...item,
@@ -676,57 +681,45 @@ export const fetchConceptsFromSupabase = async () => {
   }
 };
 
-// Local storage fallback for newsletter
-const saveLocalNewsletter = (email) => {
-  try {
-    const key = 'wilt_local_newsletter_v1';
-    const list = JSON.parse(localStorage.getItem(key) || '[]');
-    if (!list.includes(email)) {
-      list.push(email);
-      localStorage.setItem(key, JSON.stringify(list));
-    }
-  } catch (e) {}
-};
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /**
- * Subscribe email to newsletter_subscribers table in Supabase
+ * Subscribe email to newsletter_subscribers table in Supabase.
+ * Returns { success, status, message }. success is true ONLY when the row was saved
+ * (or the email is already on the list). Write-only: never reads the subscriber list.
  */
 export const subscribeNewsletterToSupabase = async (email, source = 'wilt_footer_digest') => {
-  const cleanEmail = email.trim().toLowerCase();
-  if (!cleanEmail) return { success: false, message: 'Invalid email' };
-
-  // Save to local backup
-  saveLocalNewsletter(cleanEmail);
+  const cleanEmail = (email || '').trim().toLowerCase();
+  if (!EMAIL_PATTERN.test(cleanEmail)) {
+    return { success: false, status: 'invalid', message: 'Please enter a valid email address.' };
+  }
 
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('newsletter_subscribers')
-      .insert([
-        {
-          email: cleanEmail,
-          source: source
-        }
-      ])
-      .select();
+      .insert([{ email: cleanEmail, source }]);
 
     if (error) {
+      if (error.code === '23505' || /duplicate|unique/i.test(error.message || '')) {
+        return { success: true, status: 'already_exists', message: "You're already subscribed." };
+      }
       console.warn('Supabase newsletter insert info:', error.message);
-      return { success: true, message: error.message };
+      return { success: false, status: 'error', message: "Couldn't subscribe right now. Please try again." };
     }
-
-    return { success: true, data };
+    return { success: true, status: 'subscribed', message: 'Subscribed!' };
   } catch (err) {
-    console.warn('Supabase newsletter catch:', err.message);
-    return { success: true };
+    console.warn('Supabase newsletter catch:', err?.message);
+    return { success: false, status: 'error', message: "Couldn't reach the server. Check your connection and try again." };
   }
 };
 
 /**
- * Report a bug in Supabase bug_reports table
+ * Report a bug in Supabase bug_reports table.
+ * Returns { success, message }. success is true ONLY when Supabase confirmed the insert.
  */
 export const reportBugToSupabase = async (bugData) => {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('bug_reports')
       .insert([
         {
@@ -740,21 +733,11 @@ export const reportBugToSupabase = async (bugData) => {
 
     if (error) {
       console.warn('Supabase bug_reports notice:', error.message);
-      // Fallback save to localStorage
-      try {
-        const local = JSON.parse(localStorage.getItem('wilt_bug_reports_v1') || '[]');
-        local.push({ ...bugData, timestamp: new Date().toISOString() });
-        localStorage.setItem('wilt_bug_reports_v1', JSON.stringify(local));
-      } catch (e) {}
+      return { success: false, message: "Your report couldn't be sent. Please try again, or email wilt.support@gmail.com." };
     }
     return { success: true };
   } catch (err) {
-    console.warn('Supabase bug report catch:', err.message);
-    try {
-      const local = JSON.parse(localStorage.getItem('wilt_bug_reports_v1') || '[]');
-      local.push({ ...bugData, timestamp: new Date().toISOString() });
-      localStorage.setItem('wilt_bug_reports_v1', JSON.stringify(local));
-    } catch (e) {}
-    return { success: true };
+    console.warn('Supabase bug report catch:', err?.message);
+    return { success: false, message: "Couldn't reach the server. Check your connection and try again, or email wilt.support@gmail.com." };
   }
 };

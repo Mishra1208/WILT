@@ -3,6 +3,7 @@ import { X, BookOpen, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { CATEGORIES } from '../../data/seedData';
+import { validateContent } from '../../services/moderation';
 
 export const NewConceptModal = () => {
   const { isNewConceptModalOpen, setIsNewConceptModalOpen, createConcept } = useApp();
@@ -14,12 +15,20 @@ export const NewConceptModal = () => {
   const [plainExplanation, setPlainExplanation] = useState('');
   const [definition, setDefinition] = useState('');
   const [formula, setFormula] = useState('');
+  const [moderationError, setModerationError] = useState(null);
 
   if (!isNewConceptModalOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!term.trim() || !definition.trim()) return;
+
+    const check = validateContent(term, definition, plainExplanation, customCategory);
+    if (!check.isClean) {
+      setModerationError(check.reason);
+      return;
+    }
+    setModerationError(null);
 
     const finalCategory = category === 'Other' 
       ? (customCategory.trim() || 'Other') 
@@ -61,13 +70,18 @@ export const NewConceptModal = () => {
 
           <button
             onClick={() => setIsNewConceptModalOpen(false)}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+            className="p-1.5 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
+          {moderationError && (
+            <div role="alert" className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700">
+              {moderationError}
+            </div>
+          )}
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">

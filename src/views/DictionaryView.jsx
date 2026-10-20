@@ -58,7 +58,7 @@ export const DictionaryView = () => {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8 animate-fadeIn">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -81,13 +81,13 @@ export const DictionaryView = () => {
 
       {/* Search Input */}
       <div className="relative">
-        <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+        <Search className="w-4 h-4 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search any concept (e.g. Repo Rate, EBITDA, BFS, Fixed Assets)..."
-          className="w-full pl-11 pr-4 py-3 text-xs sm:text-sm rounded-2xl bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 shadow-soft transition-all"
+          className="w-full pl-11 pr-4 py-3 text-xs sm:text-sm rounded-2xl bg-white border border-slate-200 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 shadow-soft transition-all"
         />
       </div>
 
@@ -119,24 +119,24 @@ export const DictionaryView = () => {
             className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-soft hover:shadow-hover hover:border-primary-200 transition-all flex flex-col justify-between"
           >
             <div>
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">
+              <div className="flex items-start justify-between gap-3 mb-3 min-w-0">
+                <div className="min-w-0">
+                  <h3 className="text-lg font-bold text-slate-900 break-words">
                     {concept.term}
                   </h3>
-                  <span className="text-[11px] text-slate-400 font-mono">
+                  <span className="text-[11px] text-slate-500 font-mono">
                     Contributed by @{concept.contributor || 'peer'}
                   </span>
                 </div>
 
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                <span className="shrink-0 whitespace-nowrap text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
                   {concept.category}
                 </span>
               </div>
 
               {concept.plainExplanation && (
                 <div className="p-3.5 rounded-2xl bg-primary-50/70 border border-primary-100 mb-3.5">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-primary-700 flex items-center gap-1 mb-0.5">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-primary-700 flex items-center gap-1 mb-0.5">
                     <Sparkles className="w-3 h-3 text-primary-600" />
                     <span>In Plain English</span>
                   </div>

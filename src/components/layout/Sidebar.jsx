@@ -60,7 +60,7 @@ export const Sidebar = () => {
         className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs z-40 md:hidden animate-fadeIn"
       />
 
-      <aside className="fixed inset-y-0 left-0 md:sticky md:top-0 w-72 md:w-64 h-screen max-h-screen flex-shrink-0 flex flex-col justify-between border-r border-slate-200/80 bg-white select-none transition-all duration-300 animate-fadeIn z-50 md:z-30 overflow-hidden shadow-2xl md:shadow-none">
+      <aside className="fixed inset-y-0 left-0 md:sticky md:top-0 w-[min(18rem,85vw)] md:w-64 h-screen-safe max-h-screen-safe flex-shrink-0 flex flex-col justify-between border-r border-slate-200/80 bg-white select-none transition-all duration-300 animate-fadeIn z-50 md:z-30 overflow-hidden shadow-2xl md:shadow-none">
         <div className="p-5 flex-1 flex flex-col gap-5 overflow-y-auto min-h-0">
         {/* Brand Header with Close Button */}
         <div className="flex items-center justify-between px-1 pt-1">
@@ -75,7 +75,7 @@ export const Sidebar = () => {
               <span className="font-extrabold text-xl tracking-tight text-slate-900 block leading-tight">
                 WILT
               </span>
-              <span className="text-[10px] font-semibold text-primary-600 uppercase tracking-wider block">
+              <span className="text-[11px] font-semibold text-primary-600 uppercase tracking-wider block">
                 What I Learned Today
               </span>
             </div>
@@ -85,7 +85,7 @@ export const Sidebar = () => {
           <button
             onClick={toggleSidebar}
             title="Close sidebar (⌘B)"
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            className="p-1.5 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <PanelLeftClose className="w-4 h-4" />
           </button>
@@ -93,7 +93,7 @@ export const Sidebar = () => {
 
         {/* LEARNING & DISCOVERY Section */}
         <div className="flex flex-col gap-1">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-3">
             Learning & Discovery
           </div>
           {learningNav.map((item) => {
@@ -112,13 +112,13 @@ export const Sidebar = () => {
                 <div className="flex items-center gap-3">
                   <Icon
                     className={`w-4 h-4 ${
-                      isActive ? 'text-primary-600' : 'text-slate-400'
+                      isActive ? 'text-primary-600' : 'text-slate-500'
                     }`}
                   />
                   <span>{item.label}</span>
                 </div>
                 {item.badge && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-coral-50 text-coral-600 border border-coral-100">
+                  <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-coral-50 text-coral-600 border border-coral-100">
                     {item.badge}
                   </span>
                 )}
@@ -129,7 +129,7 @@ export const Sidebar = () => {
 
         {/* RECALL & PERFORMANCE Section */}
         <div className="flex flex-col gap-1 pt-2 border-t border-slate-100/80">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-3">
             Recall & Performance
           </div>
           {recallNav.map((item) => {
@@ -148,13 +148,13 @@ export const Sidebar = () => {
                 <div className="flex items-center gap-3">
                   <Icon
                     className={`w-4 h-4 ${
-                      isActive ? 'text-primary-600' : 'text-slate-400'
+                      isActive ? 'text-primary-600' : 'text-slate-500'
                     }`}
                   />
                   <span>{item.label}</span>
                 </div>
                 {item.badge && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-coral-50 text-coral-600 border border-coral-100">
+                  <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-coral-50 text-coral-600 border border-coral-100">
                     {item.badge}
                   </span>
                 )}
@@ -165,7 +165,7 @@ export const Sidebar = () => {
 
         {/* ACCOUNT Section */}
         <div className="flex flex-col gap-1 pt-2 border-t border-slate-100/80">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-3">
             Account
           </div>
           {accountNav.map((item) => {
@@ -189,7 +189,7 @@ export const Sidebar = () => {
               >
                 <Icon
                   className={`w-4 h-4 ${
-                    isActive ? 'text-primary-600' : 'text-slate-400'
+                    isActive ? 'text-primary-600' : 'text-slate-500'
                   }`}
                 />
                 <span>{item.label}</span>
@@ -207,7 +207,7 @@ export const Sidebar = () => {
             className="flex items-center justify-between p-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 cursor-pointer transition-all"
           >
             <div className="flex items-center gap-2.5 truncate">
-              <img
+              <img loading="lazy" decoding="async"
                 src={user.avatar}
                 alt={user.name}
                 className="w-8 h-8 rounded-full object-cover border border-slate-200"

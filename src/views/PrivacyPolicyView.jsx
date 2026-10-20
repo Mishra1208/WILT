@@ -25,7 +25,7 @@ export const PrivacyPolicyView = () => {
         <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
           Privacy Policy
         </h1>
-        <p className="text-xs text-slate-400 font-mono">
+        <p className="text-xs text-slate-500 font-mono">
           Last Updated: August 25, 2026 • Effective for all WILT scholars
         </p>
       </div>

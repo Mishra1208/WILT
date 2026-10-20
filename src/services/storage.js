@@ -1,5 +1,4 @@
 import { INITIAL_POSTS, INITIAL_CONCEPTS, INITIAL_LEADERBOARD_USERS } from '../data/seedData';
-import { saveUserProfileToSupabase } from './supabase';
 
 const STORAGE_KEYS = {
   POSTS: 'wilt_posts_v16',
@@ -184,10 +183,6 @@ export const getOrCreateGuestUser = () => {
         parsed.accuracy = 0;
         localStorage.setItem(key, JSON.stringify(parsed));
       }
-      if (parsed.xp > 0) {
-        updateLeaderboardUser(parsed);
-        saveUserProfileToSupabase(parsed);
-      }
       return parsed;
     }
 
@@ -230,4 +225,65 @@ export const getOrCreateGuestUser = () => {
     };
     return fallbackGuest;
   }
+};
+
+// ---------------------------------------------------------------------------
+// Account identity helpers
+// ---------------------------------------------------------------------------
+const USERNAME_PREFIXES = ['quantum', 'stellar', 'curious', 'apex', 'matrix', 'cipher', 'nexus', 'orbit', 'vector', 'cosmic', 'zenith', 'hyper'];
+const USERNAME_ROLES = ['scholar', 'thinker', 'learner', 'mind', 'seeker', 'builder', 'fellow', 'explorer'];
+
+// FNV-1a 32-bit hash: small, fast, stable across browsers and devices.
+const stableHash = (str) => {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h >>> 0;
+};
+
+/**
+ * Deterministic pseudonym for a signed-in account.
+ * The same Clerk user ID always produces the same username on every device,
+ * and two different accounts get two different usernames.
+ */
+export const getUsernameForAccount = (accountId, attempt = 0) => {
+  const h = stableHash(`${accountId || 'anonymous'}${attempt ? `:${attempt}` : ''}`);
+  const prefix = USERNAME_PREFIXES[h % USERNAME_PREFIXES.length];
+  const role = USERNAME_ROLES[Math.floor(h / USERNAME_PREFIXES.length) % USERNAME_ROLES.length];
+  const h2 = stableHash(`${h}:${accountId}`);
+  const num = 10000 + (h2 % 90000);
+  return `${prefix}_${role}_${num}`;
+};
+
+// Per-account profile cache (offline fallback), keyed by account ID so that
+// switching accounts on one device never leaks one account's identity into another.
+const accountCacheKey = (accountId) => `wilt_account_profile_v1_${accountId}`;
+
+export const getCachedAccountProfile = (accountId) => {
+  if (!accountId) return null;
+  try {
+    const raw = localStorage.getItem(accountCacheKey(accountId));
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+export const cacheAccountProfile = (profile) => {
+  if (!profile || !profile.id) return;
+  try {
+    // Never persist contact details in the shared profile cache
+    const { email, phone, ...safe } = profile;
+    localStorage.setItem(accountCacheKey(profile.id), JSON.stringify(safe));
+  } catch (e) {}
+};
+
+export const getTierForXP = (xp = 0) => {
+  if (xp >= 2500) return { tier: 'Mastermind', tierColor: 'from-amber-400 to-yellow-600' };
+  if (xp >= 1800) return { tier: 'Grand Scholar', tierColor: 'from-slate-300 to-slate-500' };
+  if (xp >= 1200) return { tier: 'Fellow Analyst', tierColor: 'from-amber-600 to-orange-700' };
+  if (xp >= 600) return { tier: 'Curious Scholar', tierColor: 'from-indigo-400 to-indigo-600' };
+  return { tier: 'Novice', tierColor: 'from-slate-400 to-slate-600' };
 };

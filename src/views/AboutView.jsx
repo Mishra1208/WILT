@@ -224,7 +224,7 @@ export const AboutView = () => {
             className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold text-xs shadow-soft transition-all flex items-center justify-center gap-2"
           >
             <span>Explore Full Platform</span>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+            <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
           </button>
         </div>
       </div>
@@ -254,7 +254,7 @@ export const AboutView = () => {
               <div>
                 {/* Stylish Large Profile Photo Container */}
                 <div className="relative mx-auto my-3 w-28 h-28 sm:w-32 sm:h-32">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={creator.avatar}
                     alt={creator.name}
                     className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl object-cover ring-4 ring-slate-100 group-hover:ring-primary-300 group-hover:scale-105 shadow-md transition-all duration-300"
@@ -321,7 +321,7 @@ export const AboutView = () => {
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-black text-slate-400">
+                    <span className="text-xs font-mono font-black text-slate-500">
                       {step.step}
                     </span>
                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${step.color}`}>
@@ -379,7 +379,7 @@ export const AboutView = () => {
       </div>
 
       {/* FAQ SECTION */}
-      <div className="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
+      <div className="p-5 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
         <div className="flex items-center gap-2 text-slate-900">
           <HelpCircle className="w-5 h-5 text-primary-600" />
           <h3 className="text-xl font-bold">Frequently Asked Questions</h3>
@@ -396,7 +396,7 @@ export const AboutView = () => {
       </div>
 
       {/* BOTTOM BANNER */}
-      <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-primary-950 text-white text-center space-y-4 shadow-hover">
+      <div className="p-6 sm:p-10 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-primary-950 text-white text-center space-y-4 shadow-hover">
         <span className="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-bold">
           Start Today • Retain Forever
         </span>

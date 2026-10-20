@@ -29,7 +29,7 @@ export const AuthModal = () => {
         {/* Close Modal X Button */}
         <button
           onClick={() => setIsAuthModalOpen(false)}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-all cursor-pointer"
+          className="absolute top-4 right-4 p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-all cursor-pointer"
           aria-label="Close Modal"
         >
           <X className="w-5 h-5" />
@@ -39,7 +39,7 @@ export const AuthModal = () => {
         <div className="flex flex-col items-center text-center pt-2 space-y-3">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/25 relative group">
             <Lock className="w-7 h-7" />
-            <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center text-[10px] font-black shadow-xs">
+            <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center text-[11px] font-black shadow-xs">
               <Sparkles className="w-3 h-3 fill-slate-950 text-slate-950" />
             </div>
           </div>

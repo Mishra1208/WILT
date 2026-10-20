@@ -20,7 +20,7 @@ export const HomeView = () => {
   const featuredPosts = posts.slice(0, 3);
 
   return (
-    <div className="p-8 sm:p-12 max-w-6xl mx-auto space-y-16 animate-fadeIn">
+    <div className="p-4 sm:p-12 max-w-6xl mx-auto space-y-10 sm:space-y-16 animate-fadeIn">
       {/* Centered Hero Section (Nextplate Style) */}
       <div className="text-center max-w-3xl mx-auto pt-6 space-y-6">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-50 border border-primary-100 text-primary-700 text-xs font-bold">
@@ -52,7 +52,7 @@ export const HomeView = () => {
             className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm shadow-soft transition-all flex items-center justify-center gap-2"
           >
             <span>Explore Knowledge Feed</span>
-            <ArrowRight className="w-4 h-4 text-slate-400" />
+            <ArrowRight className="w-4 h-4 text-slate-500" />
           </button>
         </div>
       </div>

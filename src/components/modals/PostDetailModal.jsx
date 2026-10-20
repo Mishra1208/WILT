@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { validateContent } from '../../services/moderation';
 
 export const PostDetailModal = () => {
   const { selectedPost, closePostDetail, highlightSnippet, toggleLike, setCurrentView, setSearchQuery, addCommentToPost, isPostSaved, toggleSavePost } = useApp();
@@ -63,6 +64,12 @@ export const PostDetailModal = () => {
     e.preventDefault();
     setCommentError(null);
     if (!commentInput.trim()) return;
+
+    const check = validateContent(commentInput);
+    if (!check.isClean) {
+      setCommentError(check.reason);
+      return;
+    }
 
     addCommentToPost(selectedPost.id, commentInput, user);
     setCommentInput('');
@@ -117,7 +124,7 @@ export const PostDetailModal = () => {
           {/* Close X Button */}
           <button
             onClick={closePostDetail}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer ml-1"
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer ml-1"
           >
             <X className="w-5 h-5" />
           </button>
@@ -148,11 +155,11 @@ export const PostDetailModal = () => {
             <span className="text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-primary-50 text-primary-700 border border-primary-200">
               {selectedPost.category}
             </span>
-            <span className="text-xs text-slate-400 font-mono flex items-center gap-1">
+            <span className="text-xs text-slate-500 font-mono flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" />
               <span>{selectedPost.readTime}</span>
             </span>
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-slate-500 font-mono">
               • {selectedPost.createdAt || 'Recent'}
             </span>
           </div>
@@ -165,7 +172,7 @@ export const PostDetailModal = () => {
           {/* Author Meta Bar */}
           <div className="flex items-center justify-between py-4 border-y border-slate-100 flex-wrap gap-4">
             <div className="flex items-center gap-3">
-              <img
+              <img loading="lazy" decoding="async"
                 src={selectedPost.author?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"}
                 alt={selectedPost.author?.name}
                 className="w-12 h-12 rounded-2xl object-cover border border-slate-200 shadow-2xs"
@@ -211,7 +218,7 @@ export const PostDetailModal = () => {
                     <div key={idx} className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 p-2.5">
                       {att.type === 'image' || att.url?.startsWith('data:image/') || att.url?.startsWith('blob:') || att.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                         <div className="space-y-2">
-                          <img
+                          <img loading="lazy" decoding="async"
                             src={att.url}
                             alt={att.name || 'Uploaded photo'}
                             className="w-full max-h-96 object-contain rounded-xl bg-white border border-slate-200/80 shadow-2xs"
@@ -311,7 +318,7 @@ export const PostDetailModal = () => {
                     return (
                       <div key={`link-${idx}`} className="p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 flex items-center justify-between gap-3 shadow-2xs">
                         <div className="truncate">
-                          <span className="text-[10px] uppercase font-extrabold text-emerald-800/80 block font-mono">
+                          <span className="text-[11px] uppercase font-extrabold text-emerald-800/80 block font-mono">
                             Reference Link #{idx + 1}
                           </span>
                           <span className="font-mono text-emerald-950 truncate block text-xs font-extrabold mt-0.5">
@@ -338,7 +345,7 @@ export const PostDetailModal = () => {
                         <MapPin className="w-4 h-4" />
                       </div>
                       <div className="truncate">
-                        <span className="text-[10px] uppercase font-extrabold text-amber-800/80 block font-mono">
+                        <span className="text-[11px] uppercase font-extrabold text-amber-800/80 block font-mono">
                           Source / Book Reference
                         </span>
                         <span className="text-xs font-extrabold text-amber-950 truncate block mt-0.5">
@@ -424,14 +431,14 @@ export const PostDetailModal = () => {
               <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
                 <MessageSquare className="w-8 h-8 text-slate-300 mx-auto" />
                 <p className="text-xs font-bold text-slate-700">No peer comments yet</p>
-                <p className="text-[11px] text-slate-400">Be the first student to start the discussion for this insight!</p>
+                <p className="text-[11px] text-slate-500">Be the first student to start the discussion for this insight!</p>
               </div>
             ) : (
               comments.map((comment) => (
                 <div key={comment.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={comment.author?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"}
                         alt={comment.author?.name}
                         className="w-7 h-7 rounded-full object-cover border border-slate-200"
@@ -440,7 +447,7 @@ export const PostDetailModal = () => {
                         <span className="text-xs font-extrabold text-slate-900 font-mono">@{comment.author?.username || 'learner'}</span>
                       </div>
                     </div>
-                    <span className="text-[10px] text-slate-400 font-mono">{comment.createdAt || 'Just now'}</span>
+                    <span className="text-[11px] text-slate-500 font-mono">{comment.createdAt || 'Just now'}</span>
                   </div>
                   <p className="text-xs text-slate-700 pl-9 font-medium leading-relaxed">
                     {comment.text}

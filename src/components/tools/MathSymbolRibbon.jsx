@@ -156,7 +156,7 @@ export const MathSymbolRibbon = ({ onInsertSymbol, onInsertFormula, onClose }) =
             <h4 className="text-xs font-bold text-white tracking-wide">
               Formula & Symbol Palette (MS Word / Equation Style)
             </h4>
-            <p className="text-[10px] text-slate-300">
+            <p className="text-[11px] text-slate-300">
               Click any symbol or formula to insert it directly into your notes
             </p>
           </div>
@@ -241,13 +241,13 @@ export const MathSymbolRibbon = ({ onInsertSymbol, onInsertFormula, onClose }) =
                   <span className="text-sm font-bold text-slate-900 group-hover:text-primary-700 font-mono">
                     {sym.symbol}
                   </span>
-                  <span className="text-[9px] text-slate-400 truncate max-w-[50px]">
+                  <span className="text-[11px] text-slate-500 truncate max-w-[50px]">
                     {sym.label}
                   </span>
                 </button>
               ))}
             </div>
-            <p className="text-[11px] text-slate-400 font-mono text-center">
+            <p className="text-[11px] text-slate-500 font-mono text-center">
               💡 Tip: Click any symbol above to insert it at your cursor position.
             </p>
           </div>
@@ -267,11 +267,11 @@ export const MathSymbolRibbon = ({ onInsertSymbol, onInsertFormula, onClose }) =
                   <span className="text-base font-extrabold text-slate-900 group-hover:text-primary-700 font-mono">
                     {greek.symbol}
                   </span>
-                  <span className="text-[10px] font-bold text-slate-400">
+                  <span className="text-[11px] font-bold text-slate-500">
                     {greek.name}
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1 line-clamp-1">
+                <p className="text-[11px] text-slate-500 mt-1 line-clamp-1">
                   {greek.meaning}
                 </p>
               </button>
@@ -292,7 +292,7 @@ export const MathSymbolRibbon = ({ onInsertSymbol, onInsertFormula, onClose }) =
                   <h5 className="text-xs font-bold text-slate-900 group-hover:text-primary-700">
                     {tmpl.title}
                   </h5>
-                  <span className="text-[10px] px-2 py-0.2 rounded-md bg-white border border-slate-200 text-slate-500 font-semibold">
+                  <span className="text-[11px] px-2 py-0.2 rounded-md bg-white border border-slate-200 text-slate-500 font-semibold">
                     {tmpl.category}
                   </span>
                 </div>
@@ -313,7 +313,7 @@ export const MathSymbolRibbon = ({ onInsertSymbol, onInsertFormula, onClose }) =
                 onClick={() => handleTemplateClick(tmpl)}
                 className="p-3 rounded-xl bg-slate-50 hover:bg-primary-50 border border-slate-200 hover:border-primary-300 transition-all cursor-pointer group"
               >
-                <span className="text-[10px] px-2 py-0.5 rounded bg-white text-primary-700 border border-slate-200 font-semibold">
+                <span className="text-[11px] px-2 py-0.5 rounded bg-white text-primary-700 border border-slate-200 font-semibold">
                   {tmpl.category}
                 </span>
                 <h5 className="text-xs font-bold text-slate-900 group-hover:text-primary-700 mt-2">

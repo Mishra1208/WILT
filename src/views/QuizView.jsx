@@ -63,6 +63,8 @@ export const QuizView = () => {
     setIsAnswerSubmitted(true);
   };
 
+  const XP_PER_CORRECT = 30; // 5 questions x 30 = 150 XP max, 0 XP if nothing is correct
+
   const handleNextQuestion = () => {
     if (currentIdx + 1 < quizQuestions.length) {
       setCurrentIdx((prev) => prev + 1);
@@ -70,29 +72,32 @@ export const QuizView = () => {
       setIsAnswerSubmitted(false);
     } else {
       setIsQuizCompleted(true);
-      const finalScore = score + (selectedOption === quizQuestions[currentIdx]?.correctIndex ? 1 : 0);
-      const earnedXP = finalScore * 20 + 50;
-      
-      // Award XP and update leaderboard immediately
-      addXP(earnedXP, true);
+      // `score` already includes the last answer (counted in handleSubmitAnswer)
+      const finalScore = score;
+      const total = quizQuestions.length;
+      const earnedXP = finalScore * XP_PER_CORRECT;
+
+      // Award XP (may be 0) and record real accuracy for this attempt
+      addXP(earnedXP, { correct: finalScore, total });
       setLeaderboard(getStoredLeaderboard());
 
-      // Save Quiz attempt to Supabase
       saveQuizAttemptToSupabase({
         userHandle: user?.username || 'anonymous',
         userName: user?.name || 'Student Scholar',
         score: finalScore,
-        totalQuestions: quizQuestions.length,
+        totalQuestions: total,
         xpEarned: earnedXP
       });
 
-      try {
-        confetti({
-          particleCount: 90,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      } catch (e) {}
+      if (finalScore > 0) {
+        try {
+          confetti({
+            particleCount: 90,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        } catch (e) {}
+      }
     }
   };
 
@@ -139,7 +144,7 @@ export const QuizView = () => {
   // Quiz Lobby
   if (!quizStarted) {
     return (
-      <div className="p-8 max-w-3xl mx-auto space-y-6 animate-fadeIn">
+      <div className="p-4 sm:p-8 max-w-3xl mx-auto space-y-6 animate-fadeIn">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5 font-display">
             <span>Weekly Recall Challenge</span>
@@ -152,19 +157,19 @@ export const QuizView = () => {
           </p>
         </div>
 
-        <div className="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-              <div className="text-[11px] font-bold text-slate-400 uppercase">Questions</div>
-              <div className="text-xl font-extrabold text-slate-900 mt-1">5 MCQs</div>
+        <div className="p-5 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+            <div className="p-2.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
+              <div className="text-[11px] font-bold text-slate-500 uppercase">Questions</div>
+              <div className="text-sm sm:text-xl font-extrabold leading-tight text-slate-900 mt-1">5 MCQs</div>
             </div>
-            <div className="p-4 rounded-2xl bg-coral-50 border border-coral-100 text-center">
-              <div className="text-[11px] font-bold text-coral-500 uppercase">Reward</div>
-              <div className="text-xl font-extrabold text-coral-600 mt-1">+150 XP</div>
+            <div className="p-2.5 sm:p-4 rounded-2xl bg-coral-50 border border-coral-100 text-center">
+              <div className="text-[11px] font-bold text-coral-600 uppercase">Reward</div>
+              <div className="text-sm sm:text-xl font-extrabold leading-tight text-coral-600 mt-1">Up to 150 XP</div>
             </div>
-            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-center">
-              <div className="text-[11px] font-bold text-emerald-500 uppercase">Smart Review</div>
-              <div className="text-xl font-extrabold text-emerald-600 mt-1">Instant Link</div>
+            <div className="p-2.5 sm:p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-center">
+              <div className="text-[11px] font-bold text-emerald-700 uppercase">Smart Review</div>
+              <div className="text-sm sm:text-xl font-extrabold leading-tight text-emerald-600 mt-1">Instant Link</div>
             </div>
           </div>
 
@@ -175,7 +180,7 @@ export const QuizView = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-slate-100">
             <div className="text-xs text-slate-600 font-mono font-bold">
               Playing as: <span className="text-primary-600">@{user?.username || 'scholar'}</span> • {user?.xp || 0} XP
             </div>
@@ -194,12 +199,12 @@ export const QuizView = () => {
 
   // Quiz Results
   if (isQuizCompleted) {
-    const accuracy = Math.round((score / quizQuestions.length) * 100);
-    const xpWon = score * 20 + 50;
+    const accuracy = quizQuestions.length > 0 ? Math.round((score / quizQuestions.length) * 100) : 0;
+    const xpWon = score * XP_PER_CORRECT;
 
     return (
-      <div className="p-8 max-w-3xl mx-auto space-y-6 animate-fadeIn pb-16">
-        <div className="p-8 sm:p-10 rounded-3xl bg-white border border-slate-200/80 shadow-soft text-center space-y-6">
+      <div className="p-4 sm:p-8 max-w-3xl mx-auto space-y-6 animate-fadeIn pb-16">
+        <div className="p-5 sm:p-10 rounded-3xl bg-white border border-slate-200/80 shadow-soft text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mx-auto">
             <Trophy className="w-8 h-8" />
           </div>
@@ -213,24 +218,24 @@ export const QuizView = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 py-5 border-y border-slate-100">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 py-5 border-y border-slate-100">
             <div>
-              <div className="text-[11px] text-slate-400 uppercase font-bold">Score</div>
-              <div className="text-3xl font-extrabold text-slate-900 mt-1 font-mono">
+              <div className="text-[11px] text-slate-500 uppercase font-bold">Score</div>
+              <div className="text-xl sm:text-3xl font-extrabold text-slate-900 mt-1 font-mono">
                 {score} / {quizQuestions.length}
               </div>
-              <span className="text-xs font-bold text-emerald-600">{accuracy}%</span>
+              <span className={`text-xs font-bold ${accuracy >= 60 ? 'text-emerald-600' : accuracy >= 40 ? 'text-amber-600' : 'text-red-600'}`}>{accuracy}% accuracy</span>
             </div>
             <div>
-              <div className="text-[11px] text-slate-400 uppercase font-bold">XP Gained</div>
-              <div className="text-3xl font-extrabold text-coral-600 mt-1 font-mono">
+              <div className="text-[11px] text-slate-500 uppercase font-bold">XP Gained</div>
+              <div className="text-xl sm:text-3xl font-extrabold text-coral-600 mt-1 font-mono">
                 +{xpWon}
               </div>
               <span className="text-xs text-slate-500 font-mono font-bold">Total: {user?.xp || 0} XP</span>
             </div>
             <div>
-              <div className="text-[11px] text-slate-400 uppercase font-bold">Leaderboard Rank</div>
-              <div className="text-3xl font-extrabold text-slate-900 mt-1 font-mono">
+              <div className="text-[11px] text-slate-500 uppercase font-bold">Leaderboard Rank</div>
+              <div className="text-xl sm:text-3xl font-extrabold text-slate-900 mt-1 font-mono">
                 #{user?.rank || 1}
               </div>
               <span className="text-xs text-primary-600 font-bold">{user?.tier || 'Scholar'}</span>
@@ -294,7 +299,7 @@ export const QuizView = () => {
                     </span>
                   </div>
 
-                  <h4 className="text-sm sm:text-base font-extrabold text-slate-900 leading-snug">
+                  <h4 className="text-sm sm:text-base font-extrabold text-slate-900 leading-snug whitespace-pre-line">
                     {q.question}
                   </h4>
 
@@ -316,8 +321,8 @@ export const QuizView = () => {
                             <span className="font-mono font-bold">{String.fromCharCode(65 + optIdx)}.</span>
                             <span>{opt}</span>
                           </div>
-                          {isCorrect && <span className="text-[10px] uppercase font-extrabold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded">Correct Answer ✓</span>}
-                          {isSelected && !isCorrect && <span className="text-[10px] uppercase font-extrabold text-rose-700 bg-rose-100/70 px-2 py-0.5 rounded">Your Choice ✗</span>}
+                          {isCorrect && <span className="text-[11px] uppercase font-extrabold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded">Correct Answer ✓</span>}
+                          {isSelected && !isCorrect && <span className="text-[11px] uppercase font-extrabold text-rose-700 bg-rose-100/70 px-2 py-0.5 rounded">Your Choice ✗</span>}
                         </div>
                       );
                     })}
@@ -364,7 +369,7 @@ export const QuizView = () => {
   const isWrong = isAnswerSubmitted && selectedOption !== currentQ.correctIndex;
 
   return (
-    <div className="p-8 max-w-3xl mx-auto space-y-6 animate-fadeIn">
+    <div className="p-4 sm:p-8 max-w-3xl mx-auto space-y-6 animate-fadeIn">
       {/* Question Header */}
       <div className="flex items-center justify-between text-xs">
         <span className="font-bold text-primary-600 uppercase tracking-wider">
@@ -384,12 +389,12 @@ export const QuizView = () => {
       </div>
 
       {/* Question Card */}
-      <div className="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
+      <div className="p-5 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
         <div>
           <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary-50 text-primary-700 border border-primary-100">
             {currentQ.category}
           </span>
-          <h3 className="text-lg sm:text-xl font-bold text-slate-900 mt-2.5 leading-snug">
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 mt-2.5 leading-snug whitespace-pre-line">
             {currentQ.question}
           </h3>
         </div>

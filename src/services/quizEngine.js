@@ -32,45 +32,92 @@ const isValidQuizPost = (p) => {
   return hasTakeaways || hasGoodSummary || hasGoodContent;
 };
 
-export const generateWeeklyQuiz = (posts = [], count = 5) => {
-  // 1. Generate questions dynamically from Times of India Business News articles
-  const newsQuestions = (KNOWLEDGE_QUEST_ARTICLES || []).map((article, idx) => {
-    const whyItMatters = typeof article.summary === 'object' ? (article.summary?.whyItMatters || article.summary?.whatHappened || article.title) : article.title;
-    const whatHappened = typeof article.summary === 'object' ? (article.summary?.whatHappened || article.title) : article.title;
+// Unbiased Fisher–Yates shuffle (Array.sort with a random comparator is biased)
+const shuffle = (arr) => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
 
-    const otherArticles = KNOWLEDGE_QUEST_ARTICLES.filter(a => a.id !== article.id);
-    const d1 = typeof otherArticles[(idx + 1) % otherArticles.length]?.summary === 'object' 
-      ? otherArticles[(idx + 1) % otherArticles.length].summary.whyItMatters 
-      : "Operating expenses should be capitalized into long-term intangibles";
-    const d2 = typeof otherArticles[(idx + 2) % otherArticles.length]?.summary === 'object' 
-      ? otherArticles[(idx + 2) % otherArticles.length].summary.whyItMatters 
-      : "Central banks strictly ban liquidity ratios for educational institutions";
-    const d3 = "This economic metric only fluctuates when market variance drops below zero";
+const norm = (t) => String(t || '').trim().toLowerCase();
 
-    const rawOptions = [whyItMatters, d1, d2, d3];
-    // Deduplicate and shuffle
-    const uniqueOptions = Array.from(new Set(rawOptions));
-    while (uniqueOptions.length < 4) {
-      uniqueOptions.push(`Standard monetary adjustment #${uniqueOptions.length + 1}`);
+/**
+ * Build a 4-option question: correct answer + 3 distractors drawn from a pool of
+ * real, same-domain answers (other articles / other posts), then shuffled so the
+ * correct answer can land in any position.
+ */
+const buildOptions = (correct, candidatePools) => {
+  const seen = new Set([norm(correct)]);
+  const distractors = [];
+  for (const pool of candidatePools) {
+    for (const cand of shuffle(pool || [])) {
+      if (distractors.length >= 3) break;
+      const key = norm(cand);
+      if (!cand || seen.has(key) || key.length < 8) continue;
+      seen.add(key);
+      distractors.push(cand.trim());
     }
-    const options = uniqueOptions.sort(() => 0.5 - Math.random());
+    if (distractors.length >= 3) break;
+  }
+  if (distractors.length < 3) return null; // not enough material for a fair question
+  const options = shuffle([correct.trim(), ...distractors]);
+  return { options, correctIndex: options.indexOf(correct.trim()) };
+};
 
-    return {
-      isNews: true,
-      newsId: article.id,
-      postTitle: article.title,
-      toiUrl: article.toiUrl || 'https://timesofindia.indiatimes.com/business',
-      category: article.categoryLabel || 'Times of India Business',
-      question: `Times of India Business News: Regarding "${article.title}", why does this development matter?`,
-      options: options,
-      correctIndex: options.indexOf(whyItMatters),
-      correctAnswerText: whyItMatters,
-      explanation: `${whatHappened}\nWhy It Matters: ${whyItMatters}`,
-      sourceSnippet: `${whatHappened} (${typeof article.summary === 'object' ? article.summary?.keyMetric : article.source})`
-    };
-  });
+const summaryOf = (article) => (typeof article?.summary === 'object' ? article.summary : {});
 
-  // 2. Static high-quality peer seed question pool
+export const generateWeeklyQuiz = (posts = [], count = 5) => {
+  const articles = (KNOWLEDGE_QUEST_ARTICLES || []).filter((a) => a && a.title && typeof a.summary === 'object');
+
+  // 1. News questions — several question styles so options don't feel repetitive
+  const newsQuestions = articles.map((article) => {
+    const sum = summaryOf(article);
+    const sameCategory = articles.filter((a) => a.id !== article.id && a.category === article.category);
+    const otherCategory = articles.filter((a) => a.id !== article.id && a.category !== article.category);
+
+    const styles = shuffle(['why', 'headline', 'metric']);
+    for (const style of styles) {
+      let question;
+      let correct;
+      let pools;
+      if (style === 'why' && sum.whyItMatters) {
+        question = `"${article.title}" — why does this development matter?`;
+        correct = sum.whyItMatters;
+        pools = [sameCategory.map((a) => summaryOf(a).whyItMatters), otherCategory.map((a) => summaryOf(a).whyItMatters)];
+      } else if (style === 'headline' && sum.whatHappened) {
+        question = `Which headline matches this news summary?\n"${sum.whatHappened}"`;
+        correct = article.title;
+        pools = [sameCategory.map((a) => a.title), otherCategory.map((a) => a.title)];
+      } else if (style === 'metric' && sum.keyMetric) {
+        question = `Which key figure was reported in "${article.title}"?`;
+        correct = sum.keyMetric;
+        pools = [sameCategory.map((a) => summaryOf(a).keyMetric), otherCategory.map((a) => summaryOf(a).keyMetric)];
+      } else {
+        continue;
+      }
+      const built = buildOptions(correct, pools);
+      if (!built) continue;
+      return {
+        isNews: true,
+        newsId: article.id,
+        postTitle: article.title,
+        toiUrl: article.toiUrl || 'https://timesofindia.indiatimes.com/business',
+        category: article.categoryLabel || 'Times of India Business',
+        question,
+        options: built.options,
+        correctIndex: built.correctIndex,
+        correctAnswerText: correct,
+        explanation: `${sum.whatHappened || article.title}\nWhy It Matters: ${sum.whyItMatters || ''}`,
+        sourceSnippet: `${sum.whatHappened || article.title}${sum.keyMetric ? ` (${sum.keyMetric})` : ''}`
+      };
+    }
+    return null;
+  }).filter(Boolean);
+
+  // 2. Static high-quality peer seed question pool (options are shuffled below)
   const questionPool = [
     {
       postId: "post-1",
@@ -164,43 +211,53 @@ export const generateWeeklyQuiz = (posts = [], count = 5) => {
     }
   ];
 
-  // 3. Custom peer post questions
-  const validCustomPosts = (posts || []).filter(p => isValidQuizPost(p) && !questionPool.some(q => q.postId === p.id));
+  const peerSeedQuestions = questionPool.map((q) => {
+    const correct = q.options[q.correctIndex];
+    const options = shuffle(q.options);
+    return { ...q, options, correctIndex: options.indexOf(correct), correctAnswerText: correct };
+  });
 
-  const customPostQuestions = validCustomPosts.map(p => {
-    const takeaway = (p.keyTakeaways && p.keyTakeaways[0] && p.keyTakeaways[0].trim()) 
-      || (p.summary && p.summary.trim()) 
-      || p.title;
+  // 3. Custom peer post questions — distractors come from OTHER real posts
+  const validCustomPosts = (posts || []).filter((p) => isValidQuizPost(p) && !questionPool.some((q) => q.postId === p.id));
+  const takeawayOf = (p) =>
+    (Array.isArray(p.keyTakeaways) && p.keyTakeaways.find((t) => t && t.trim().length >= 15 && norm(t) !== norm(p.title))) ||
+    (p.summary && p.summary.trim().length >= 30 && norm(p.summary) !== norm(p.title) ? p.summary.trim() : null) ||
+    (p.content && p.content.trim().length >= 60 ? p.content.trim().split(/(?<=[.!?])\s+/)[0].slice(0, 180) : null);
 
+  const peerAnswerPool = [
+    ...validCustomPosts.map(takeawayOf),
+    ...questionPool.map((q) => q.options[q.correctIndex])
+  ].filter(Boolean);
+
+  const customPostQuestions = validCustomPosts.map((p) => {
+    const takeaway = takeawayOf(p);
+    if (!takeaway) return null;
+    const sameCategoryAnswers = validCustomPosts
+      .filter((o) => o.id !== p.id && o.category === p.category)
+      .map(takeawayOf);
+    const built = buildOptions(takeaway, [sameCategoryAnswers, peerAnswerPool]);
+    if (!built) return null;
     return {
       postId: p.id,
       postTitle: p.title,
-      category: p.category || "General",
-      question: `Regarding "${p.title}", which of the following is a primary key takeaway?`,
-      options: [
-        takeaway,
-        `Operating expenses should be capitalized into long-term intangibles`,
-        `Central banks strictly ban liquidity ratios for educational institutions`,
-        `This concept only applies when market variance drops below zero`
-      ].sort(() => 0.5 - Math.random()),
-      correctIndex: 0,
+      category: p.category || 'General',
+      question: `In the peer post "${p.title}", which statement is the key takeaway?`,
+      options: built.options,
+      correctIndex: built.correctIndex,
       correctAnswerText: takeaway,
-      explanation: `In "${p.title}", the primary takeaway is: ${takeaway}`,
+      explanation: `In "${p.title}", the key takeaway is: ${takeaway}`,
       sourceSnippet: p.summary || takeaway
     };
-  });
+  }).filter(Boolean);
 
-  // Re-index correctIndex for shuffled custom options
-  customPostQuestions.forEach(q => {
-    if (q.correctAnswerText) {
-      q.correctIndex = q.options.indexOf(q.correctAnswerText);
-    }
-  });
+  // 4. Balanced mix: roughly half news, half peer learning
+  const peerAll = shuffle([...customPostQuestions, ...peerSeedQuestions]);
+  const newsAll = shuffle(newsQuestions);
+  const newsTarget = Math.min(newsAll.length, Math.ceil(count / 2));
+  const picked = [...newsAll.slice(0, newsTarget), ...peerAll.slice(0, count - newsTarget)];
+  // Top up from whichever source still has questions
+  const leftovers = shuffle([...newsAll.slice(newsTarget), ...peerAll.slice(count - newsTarget)]);
+  while (picked.length < count && leftovers.length) picked.push(leftovers.shift());
 
-  // 4. Combine all sources: News + Static Peer Pool + Custom Posts
-  const allQuestions = [...newsQuestions, ...questionPool, ...customPostQuestions];
-
-  // Shuffle and pick `count` questions
-  const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
+  return shuffle(picked);
 };

@@ -16,23 +16,24 @@ import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { MathSymbolRibbon } from '../tools/MathSymbolRibbon';
 import { validateContent } from '../../services/moderation';
+import { useDraftState } from '../../hooks/useDraftState';
 
 export const NewPostModal = () => {
   const { isNewPostModalOpen, setIsNewPostModalOpen, createPost } = useApp();
   const { user } = useAuth();
 
   const textareaRef = useRef(null);
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('Accounting');
-  const [customCategory, setCustomCategory] = useState('');
-  const [summary, setSummary] = useState('');
-  const [content, setContent] = useState('');
-  const [takeaways, setTakeaways] = useState(['']);
-  const [terms, setTerms] = useState('');
+  const [title, setTitle] = useDraftState('post_title', '');
+  const [category, setCategory] = useDraftState('post_category', 'Accounting');
+  const [customCategory, setCustomCategory] = useDraftState('post_custom_category', '');
+  const [summary, setSummary] = useDraftState('post_summary', '');
+  const [content, setContent] = useDraftState('post_content', '');
+  const [takeaways, setTakeaways] = useDraftState('post_takeaways', ['']);
+  const [terms, setTerms] = useDraftState('post_terms', '');
 
   // Source of Trust
-  const [sourceUrl, setSourceUrl] = useState('');
-  const [sourceContext, setSourceContext] = useState('');
+  const [sourceUrl, setSourceUrl] = useDraftState('post_source_url', '');
+  const [sourceContext, setSourceContext] = useDraftState('post_source_context', '');
 
   // Errors
   const [moderationError, setModerationError] = useState(null);
@@ -85,7 +86,9 @@ export const NewPostModal = () => {
       content,
       ...takeaways,
       terms,
-      sourceContext
+      sourceContext,
+      sourceUrl,
+      customCategory
     );
 
     if (!moderationCheck.isClean) {
@@ -164,7 +167,7 @@ export const NewPostModal = () => {
 
           <button
             onClick={() => setIsNewPostModalOpen(false)}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -245,7 +248,7 @@ export const NewPostModal = () => {
           {/* Math & Symbol Toolbar */}
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+              <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
                 Math & Tools:
               </span>
               <button
@@ -306,7 +309,7 @@ export const NewPostModal = () => {
                 <ShieldCheck className="w-4 h-4 text-primary-600" />
                 <span>Source of Trust & Verification (Required)</span>
               </div>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
                 hasTrustSource 
                   ? 'bg-emerald-100 text-emerald-800' 
                   : 'bg-amber-100 text-amber-800'
@@ -317,7 +320,7 @@ export const NewPostModal = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-bold text-slate-700 uppercase mb-1 flex items-center gap-1">
+                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1 flex items-center gap-1">
                   <LinkIcon className="w-3 h-3 text-primary-600" />
                   <span>Option 1: Reference Link</span>
                 </label>
@@ -334,7 +337,7 @@ export const NewPostModal = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-700 uppercase mb-1 flex items-center gap-1">
+                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1 flex items-center gap-1">
                   <MapPin className="w-3 h-3 text-coral-500" />
                   <span>Option 2: Where did you learn it?</span>
                 </label>
@@ -387,7 +390,7 @@ export const NewPostModal = () => {
                     <button
                       type="button"
                       onClick={() => handleRemoveTakeaway(idx)}
-                      className="p-1.5 text-slate-400 hover:text-rose-500"
+                      className="p-1.5 text-slate-500 hover:text-rose-500"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

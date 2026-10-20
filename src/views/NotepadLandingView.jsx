@@ -25,28 +25,36 @@ import { uploadAttachmentToStorage } from '../services/supabase';
 import GradientText from '../components/ui/GradientText';
 import DotPattern from '../components/ui/DotPattern';
 import { cn } from '../lib/utils';
+import { useDraftState } from '../hooks/useDraftState';
 
 export const NotepadLandingView = () => {
   const { createPost, setCurrentView } = useApp();
   const { user, requireAuth } = useAuth();
 
   // Layout & Form States
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [title, setTitle] = useState('');
-  const [text, setText] = useState('');
-  const [references, setReferences] = useState(['']);
-  const [attachments, setAttachments] = useState([]);
+  const [isExpanded, setIsExpanded] = useState(() => {
+    try {
+      return Boolean(localStorage.getItem('wilt_draft_v1_notepad_references') || localStorage.getItem('wilt_draft_v1_notepad_attachments'));
+    } catch (e) {
+      return false;
+    }
+  });
+  const [title, setTitle] = useDraftState('notepad_title', '');
+  const [text, setText] = useDraftState('notepad_text', '');
+  const [references, setReferences] = useDraftState('notepad_references', ['']);
+  const [attachments, setAttachments] = useDraftState('notepad_attachments', []);
   const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
   
   // Status & Moderation
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [publishSynced, setPublishSynced] = useState(true);
   const [moderationError, setModerationError] = useState(null);
   const [referenceError, setReferenceError] = useState(null);
 
   // Modal State for Topic / Category Selection
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [category, setCategory] = useState('Tech & AI');
-  const [customCategory, setCustomCategory] = useState('');
+  const [category, setCategory] = useDraftState('notepad_category', 'Tech & AI');
+  const [customCategory, setCustomCategory] = useDraftState('notepad_custom_category', '');
   const [isPublishing, setIsPublishing] = useState(false);
 
   // Dynamic Reference List Handlers
@@ -156,9 +164,8 @@ export const NotepadLandingView = () => {
     }
 
     // Moderation Check
-    const combinedContent = `${title} ${text}`;
-    const check = validateContent(combinedContent);
-    if (check.isAbusive) {
+    const check = validateContent(title, text, ...references);
+    if (!check.isClean) {
       setModerationError(check.reason);
       return;
     }
@@ -188,6 +195,13 @@ export const NotepadLandingView = () => {
       setReferenceError("A reference/source is required to post.");
       setIsModalOpen(false);
       setIsExpanded(true);
+      return;
+    }
+
+    const categoryCheck = validateContent(customCategory);
+    if (!categoryCheck.isClean) {
+      setModerationError(categoryCheck.reason);
+      setIsModalOpen(false);
       return;
     }
 
@@ -230,13 +244,13 @@ export const NotepadLandingView = () => {
     const primarySource = activeReferences[0] || (finalAttachments[0] ? finalAttachments[0].url || finalAttachments[0].name : 'Self-Learned Insight');
     const additionalSources = activeReferences.slice(1).join(', ');
 
-    await createPost({
+    const created = await createPost({
       title: title.trim() || 'Daily Learning Note',
       category: finalCategory,
       summary: title.trim() || text.trim().substring(0, 80),
       content: text.trim(),
-      takeaways: [title.trim() || 'Key Insight'],
-      terms: '',
+      keyTakeaways: [title.trim() || 'Key Insight'],
+      terms: [],
       sourceUrl: primarySource,
       sourceContext: additionalSources || 'Verified Learner Post',
       attachments: finalAttachments,
@@ -251,6 +265,7 @@ export const NotepadLandingView = () => {
 
     setIsPublishing(false);
     setIsModalOpen(false);
+    setPublishSynced(Boolean(created?.synced));
     setIsSubmitted(true);
 
     try {
@@ -310,7 +325,7 @@ export const NotepadLandingView = () => {
           </GradientText>
 
           {/* Elegant Expanded Acronym Badge */}
-          <div className="mt-2 sm:mt-3 flex items-center gap-1 sm:gap-2 text-[9px] sm:text-xs font-extrabold tracking-[0.14em] sm:tracking-[0.22em] text-slate-500 uppercase flex-wrap justify-center">
+          <div className="mt-2 sm:mt-3 flex items-center gap-1 sm:gap-2 text-[11px] sm:text-xs font-extrabold tracking-[0.14em] sm:tracking-[0.22em] text-slate-500 uppercase flex-wrap justify-center">
             <span>WHAT</span>
             <span className="w-1 h-1 rounded-full bg-primary-500 inline-block" />
             <span>I</span>
@@ -336,10 +351,19 @@ export const NotepadLandingView = () => {
 
         {/* Success Toast */}
         {isSubmitted && (
-          <div className="w-full max-w-2xl p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-bold flex items-center justify-between animate-fadeIn shadow-sm">
-            <div className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-              <span>Insight published to Learning Hub! 🎉</span>
+          <div className={cn(
+            "w-full max-w-2xl p-4 rounded-2xl border text-xs font-bold flex items-center justify-between gap-3 animate-fadeIn shadow-sm",
+            publishSynced ? "bg-emerald-50 border-emerald-300 text-emerald-900" : "bg-amber-50 border-amber-300 text-amber-900"
+          )}>
+            <div className="flex items-center gap-2.5 text-left">
+              {publishSynced
+                ? <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                : <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />}
+              <span>
+                {publishSynced
+                  ? 'Insight published to Learning Hub! 🎉'
+                  : "Saved on this device only — we couldn't reach the server, so other students can't see it yet. Please check your connection."}
+              </span>
             </div>
             <button 
               onClick={() => setCurrentView('discover')}
@@ -367,8 +391,14 @@ export const NotepadLandingView = () => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Title / Heading of your insight..."
-                className="w-full text-base sm:text-lg font-extrabold text-slate-900 placeholder-slate-400 focus:outline-none bg-transparent"
+                className="w-full text-base sm:text-lg font-extrabold text-slate-900 placeholder-slate-500 focus:outline-none bg-transparent"
               />
+            </div>
+          )}
+
+          {(title.trim() || text.trim()) && (
+            <div className="absolute -top-3 right-6 px-2 py-0.5 rounded-full bg-white border border-slate-200 text-[11px] font-semibold text-slate-600 shadow-2xs">
+              Draft saved on this device
             </div>
           )}
 
@@ -381,7 +411,7 @@ export const NotepadLandingView = () => {
               onKeyDown={handleKeyDown}
               placeholder={isExpanded ? "Write detailed learning notes content..." : "Tell us what you have learned Today....."}
               className={cn(
-                "w-full bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base font-medium leading-relaxed focus:outline-none resize-none transition-all",
+                "w-full bg-transparent text-slate-900 placeholder-slate-500 text-sm sm:text-base font-medium leading-relaxed focus:outline-none resize-none transition-all",
                 isExpanded ? "h-32 sm:h-44" : "h-28 sm:h-36"
               )}
             />
@@ -459,9 +489,9 @@ export const NotepadLandingView = () => {
           {isExpanded && (
             <div className="mt-4 pt-3 border-t border-slate-100 space-y-2.5 animate-fadeIn">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                   <span>Reference List / Sources</span>
-                  <span className="text-rose-500 font-bold text-[10px] bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">
+                  <span className="text-rose-500 font-bold text-[11px] bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">
                     * Required
                   </span>
                 </span>
@@ -504,7 +534,7 @@ export const NotepadLandingView = () => {
                       <button
                         type="button"
                         onClick={() => handleRemoveReference(idx)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -517,7 +547,7 @@ export const NotepadLandingView = () => {
 
           {/* SUBMIT BUTTON & SHORTCUT */}
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
+            <span className="text-[11px] text-slate-500 font-mono hidden sm:inline">
               ⌘ + Enter to post
             </span>
             <button
@@ -580,7 +610,7 @@ export const NotepadLandingView = () => {
             <form onSubmit={handleFinalPublish} className="space-y-4">
               {/* Category Selector */}
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   Topic / Category
                 </label>
                 <select
@@ -680,11 +710,11 @@ export const NotepadLandingView = () => {
 
             <form onSubmit={handleConfirmAddLink} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   Reference URL
                 </label>
                 <div className="relative flex items-center">
-                  <LinkIcon className="w-4 h-4 absolute left-3.5 text-slate-400 pointer-events-none" />
+                  <LinkIcon className="w-4 h-4 absolute left-3.5 text-slate-500 pointer-events-none" />
                   <input
                     type="text"
                     autoFocus

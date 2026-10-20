@@ -27,7 +27,7 @@ export const FloatingNavbar = () => {
           <span className="font-extrabold text-lg tracking-tight text-slate-900 leading-none">
             WILT
           </span>
-          <span className="text-[9px] font-bold text-primary-600 uppercase tracking-widest leading-tight">
+          <span className="text-[11px] font-bold text-primary-600 uppercase tracking-widest leading-tight">
             What I Learned Today
           </span>
         </div>

@@ -29,6 +29,45 @@ export const getNewsFallbackSvg = (categoryLabel = 'BUSINESS NEWS') => {
   return `data:image/svg+xml;utf8,${encoded}`;
 };
 
+// Decode the handful of HTML entities RSS descriptions commonly contain
+const decodeEntities = (str = '') =>
+  str
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+
+const cleanText = (html = '') => decodeEntities(String(html).replace(/<[^>]*>?/gm, ' ')).replace(/\s+/g, ' ').trim();
+
+// Trim to whole sentences instead of cutting mid-word
+const toSentences = (text, max = 320) => {
+  if (!text || text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const lastStop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
+  return lastStop > 80 ? cut.slice(0, lastStop + 1) : `${cut.slice(0, cut.lastIndexOf(' '))}…`;
+};
+
+// Classify a live headline using ITS OWN words (never borrowed from another story)
+const CATEGORY_RULES = [
+  { id: 'markets', label: '📈 Markets & Economy', words: /\b(sensex|nifty|stock|stocks|shares|market|markets|ipo|sebi|gdp|inflation|cpi|rupee|gold|silver|bond|bonds|earnings)\b/i },
+  { id: 'banking', label: '🏦 Banking & Policy', words: /\b(rbi|bank|banks|banking|repo|npa|loan|loans|credit|upi|npci|deposit|lender|nbfc|cbdc|monetary policy)\b/i },
+  { id: 'mutual_funds', label: '💰 MF & Finance', words: /\b(mutual fund|mutual funds|sip|sips|amc|amfi|nav|elss|aum|insurance|pension|epfo|tax|itr|gst)\b/i },
+  { id: 'international', label: '🌐 International Business', words: /\b(u\.s\.|fed|america|china|europe|ecb|global|world|trump|tariff|tariffs|opec|crude|dollar|imf|uk|japan)\b/i }
+];
+const classifyHeadline = (text) => {
+  const rule = CATEGORY_RULES.find((r) => r.words.test(text)) || (/\bUS\b/.test(text) ? CATEGORY_RULES.find((r) => r.id === 'international') : null);
+  return rule ? { category: rule.id, categoryLabel: rule.label } : { category: 'india_business', categoryLabel: '🇮🇳 India Business' };
+};
+
+/**
+ * Live headlines come straight from the TOI Business RSS feed.
+ * Each live card shows ONLY what the feed says about that story (headline + TOI's own
+ * description). We never attach a curated "Why it matters" / talking point written for a
+ * different story — that mismatch was reported in pilot testing.
+ */
 export const fetchLiveBusinessNews = async () => {
   try {
     const rssUrl = encodeURIComponent('https://timesofindia.indiatimes.com/rssfeeds/1898055.cms');
@@ -36,44 +75,44 @@ export const fetchLiveBusinessNews = async () => {
     if (!res.ok) throw new Error('Network response was not ok');
     const data = await res.json();
 
-    if (data && data.items && data.items.length > 0) {
-      const liveItems = data.items.slice(0, 15).map((item, idx) => {
-        const pubDateObj = item.pubDate ? new Date(item.pubDate) : new Date();
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const dateFormatted = `${months[pubDateObj.getMonth()]} ${String(pubDateObj.getDate()).padStart(2, '0')}, ${pubDateObj.getFullYear()}`;
+    if (data && Array.isArray(data.items) && data.items.length > 0) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const liveItems = data.items
+        .slice(0, 15)
+        .filter((item) => item && item.title && item.link)
+        .map((item, idx) => {
+          const title = cleanText(item.title);
+          const description = toSentences(cleanText(item.description || item.content || ''));
+          const pubDateObj = item.pubDate ? new Date(item.pubDate.replace(' ', 'T')) : null;
+          const dateFormatted = pubDateObj && !isNaN(pubDateObj)
+            ? `${months[pubDateObj.getMonth()]} ${String(pubDateObj.getDate()).padStart(2, '0')}, ${pubDateObj.getFullYear()}`
+            : 'Today';
+          const { category, categoryLabel } = classifyHeadline(`${title} ${description}`);
 
-        // Match existing curated article for high quality structured summary if title matches
-        const fallback = KNOWLEDGE_QUEST_ARTICLES[idx % KNOWLEDGE_QUEST_ARTICLES.length];
+          return {
+            id: `live-toi-${idx}-${encodeURIComponent(item.guid || item.link).slice(-24)}`,
+            isLive: true,
+            title,
+            category,
+            categoryLabel,
+            date: dateFormatted,
+            readTime: 'Live headline',
+            source: 'Times of India Business (Live)',
+            toiUrl: item.link,
+            imageUrl: item.thumbnail || item.enclosure?.link || SECONDARY_FALLBACK_IMAGES[category],
+            summary: {
+              whatHappened: description && description.toLowerCase() !== title.toLowerCase() ? description : ''
+            },
+            interviewTalkingPoint: null,
+            keyTerms: []
+          };
+        });
 
-        return {
-          id: `live-toi-${idx}-${Date.now()}`,
-          title: item.title || fallback.title,
-          category: fallback.category,
-          categoryLabel: fallback.categoryLabel,
-          date: dateFormatted,
-          readTime: fallback.readTime || '60 sec read',
-          source: 'Times of India Business (Live)',
-          toiUrl: item.link || fallback.toiUrl,
-          imageUrl: item.thumbnail || item.enclosure?.link || fallback.imageUrl,
-          summary: {
-            whatHappened: item.description ? item.description.replace(/<[^>]*>?/gm, '').slice(0, 200) + '...' : fallback.summary.whatHappened,
-            whyItMatters: fallback.summary.whyItMatters,
-            keyMetric: fallback.summary.keyMetric
-          },
-          interviewTalkingPoint: fallback.interviewTalkingPoint,
-          keyTerms: fallback.keyTerms
-        };
-      });
-
-      // Merge live breaking items at top, followed by curated articles to ensure full 30 articles available
-      const existingIds = new Set(liveItems.map(i => i.title));
-      const filteredCurated = KNOWLEDGE_QUEST_ARTICLES.filter(a => !existingIds.has(a.title));
-      return [...liveItems, ...filteredCurated];
+      return [...liveItems, ...KNOWLEDGE_QUEST_ARTICLES];
     }
   } catch (err) {
-    console.warn('Live RSS feed fetch notice (using curated dynamic articles fallback):', err);
+    console.warn('Live RSS feed fetch notice (showing curated briefs only):', err);
   }
 
-  // Fail-safe fallback to curated articles stream with dynamic dates
   return KNOWLEDGE_QUEST_ARTICLES;
 };

@@ -51,7 +51,7 @@ export const NotificationsView = () => {
   ];
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-6 animate-fadeIn">
+    <div className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6 animate-fadeIn">
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           Notifications
@@ -80,7 +80,7 @@ export const NotificationsView = () => {
                   <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
                     {n.description}
                   </p>
-                  <span className="text-[11px] text-slate-400 mt-1.5 block font-mono">
+                  <span className="text-[11px] text-slate-500 mt-1.5 block font-mono">
                     {n.time}
                   </span>
                 </div>

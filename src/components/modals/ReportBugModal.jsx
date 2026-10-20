@@ -55,9 +55,14 @@ export const ReportBugModal = () => {
       email: email.trim()
     };
 
-    await reportBugToSupabase(bugData);
-
+    const result = await reportBugToSupabase(bugData);
     setIsSubmitting(false);
+
+    if (!result?.success) {
+      // Keep the form filled in so the user doesn't lose what they wrote
+      setErrorMsg(result?.message || "Your report couldn't be sent. Please try again.");
+      return;
+    }
     setIsSubmitted(true);
   };
 
@@ -78,7 +83,7 @@ export const ReportBugModal = () => {
         {/* Close Button */}
         <button
           onClick={handleReset}
-          className="absolute top-5 right-5 p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+          className="absolute top-5 right-5 p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-600 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -155,7 +160,7 @@ export const ReportBugModal = () => {
             {/* Field 4: Contact Email (Optional) */}
             <div className="space-y-1.5">
               <label className="text-xs font-extrabold text-slate-800 uppercase tracking-wider block">
-                4. Your Email or Handle <span className="text-slate-400 font-normal lowercase">(optional)</span>
+                4. Your Email or Handle <span className="text-slate-500 font-normal lowercase">(optional)</span>
               </label>
               <input
                 type="text"

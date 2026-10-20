@@ -24,7 +24,7 @@ export const RevisionView = () => {
 
         {/* Minimal Timeline Pill */}
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-slate-100 text-slate-600 text-xs font-mono font-bold">
-          <Clock className="w-3.5 h-3.5 text-slate-400" />
+          <Clock className="w-3.5 h-3.5 text-slate-500" />
           <span>Expected Release: 2026 Edition</span>
         </div>
 

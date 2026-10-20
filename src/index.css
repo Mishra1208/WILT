@@ -63,3 +63,22 @@ body {
   -webkit-text-fill-color: transparent !important;
   animation: auroraGradient 8s linear infinite !important;
 }
+
+/* --- Mobile viewport + overflow safety (pilot testing fixes) --- */
+.h-screen-safe {
+  height: 100vh;
+  height: 100dvh;
+}
+.max-h-screen-safe {
+  max-height: 100vh;
+  max-height: 100dvh;
+}
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+/* Long URLs / references in posts must wrap instead of pushing the page sideways */
+body {
+  overflow-wrap: break-word;
+}

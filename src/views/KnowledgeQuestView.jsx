@@ -187,7 +187,7 @@ export const KnowledgeQuestView = () => {
                 >
                   <span>{cat.label}</span>
                   <span className={cn(
-                    "px-2 py-0.5 rounded-full text-[10px] font-black",
+                    "px-2 py-0.5 rounded-full text-[11px] font-black",
                     activeCategory === cat.id ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
                   )}>
                     {count}
@@ -199,7 +199,7 @@ export const KnowledgeQuestView = () => {
 
           {/* Search Input */}
           <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
@@ -226,7 +226,7 @@ export const KnowledgeQuestView = () => {
                 
                 {/* Article Header Image */}
                 <div className="relative h-48 w-full overflow-hidden bg-slate-100">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={article.imageUrl}
                     alt={article.title}
                     onError={(e) => {
@@ -243,21 +243,21 @@ export const KnowledgeQuestView = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
                   
                   <div className="absolute top-3 left-3">
-                    <span className="px-3 py-1 rounded-xl bg-white/95 backdrop-blur-md text-slate-900 font-black text-[10px] uppercase tracking-wider shadow-sm">
+                    <span className="px-3 py-1 rounded-xl bg-white/95 backdrop-blur-md text-slate-900 font-black text-[11px] uppercase tracking-wider shadow-sm">
                       {article.categoryLabel}
                     </span>
                   </div>
 
                   <div className="absolute top-3 right-3">
-                    <span className="px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-white font-extrabold text-[10px] tracking-wide flex items-center gap-1.5 shadow-md border border-white/20">
+                    <span className="px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-white font-extrabold text-[11px] tracking-wide flex items-center gap-1.5 shadow-md border border-white/20">
                       <Calendar className="w-3 h-3 text-amber-400" />
-                      <span>{article.date}</span>
+                      <span>{article.isLive ? article.date : 'Curated brief'}</span>
                     </span>
                   </div>
 
                   <div className="absolute bottom-3 left-3 right-3 text-white">
                     <div className="flex items-center gap-2 mb-1 text-[11px] font-bold text-slate-200">
-                      <span>{article.source}</span>
+                      <span>{article.isLive ? article.source : 'WILT curated brief · evergreen explainer'}</span>
                     </div>
                     <h3 className="text-sm font-extrabold leading-snug line-clamp-2">
                       {article.title}
@@ -269,6 +269,23 @@ export const KnowledgeQuestView = () => {
                 <div className="relative flex-1 flex flex-col justify-between min-h-[300px]">
                   <div className={cn("p-5 sm:p-6 space-y-4 transition-all duration-300", !isLoggedIn && "filter blur-md select-none pointer-events-none opacity-40")}>
                     
+                    {article.isLive ? (
+                      <div className="space-y-2.5 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-slate-800">
+                          <Zap className="w-3.5 h-3.5 text-amber-500" />
+                          <span>Live headline from Times of India</span>
+                        </div>
+                        {article.summary?.whatHappened ? (
+                          <p className="text-xs text-slate-700 font-medium leading-relaxed">
+                            <strong className="text-slate-900 font-bold">TOI summary:</strong> {article.summary.whatHappened}
+                          </p>
+                        ) : null}
+                        <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
+                          This is breaking news straight from the TOI feed, so there's no WILT analysis or interview talking point for it yet. Read the full article for the details.
+                        </p>
+                      </div>
+                    ) : (
+                    <>
                     {/* Executive Summary Block */}
                     <div className="space-y-2.5 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                       <div className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-slate-800">
@@ -301,7 +318,7 @@ export const KnowledgeQuestView = () => {
                         </div>
                         <button
                           onClick={() => handleCopyTalkingPoint(article.interviewTalkingPoint, article.id)}
-                          className="text-[10px] font-bold text-indigo-700 hover:text-indigo-900 bg-white px-2 py-1 rounded-lg border border-indigo-200 flex items-center gap-1 transition-all cursor-pointer"
+                          className="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-white px-2 py-1 rounded-lg border border-indigo-200 flex items-center gap-1 transition-all cursor-pointer"
                         >
                           {isCopied ? (
                             <>
@@ -320,13 +337,15 @@ export const KnowledgeQuestView = () => {
 
                       {/* Key Terms Badges */}
                       <div className="pt-1 flex flex-wrap gap-1.5">
-                        {article.keyTerms.map((term, idx) => (
-                          <span key={idx} className="px-2 py-0.5 rounded-md bg-white border border-indigo-100 text-indigo-700 text-[10px] font-bold">
+                        {(article.keyTerms || []).map((term, idx) => (
+                          <span key={idx} className="px-2 py-0.5 rounded-md bg-white border border-indigo-100 text-indigo-700 text-[11px] font-bold">
                             #{term}
                           </span>
                         ))}
                       </div>
                     </div>
+                    </>
+                    )}
 
                   </div>
 
@@ -407,7 +426,7 @@ export const KnowledgeQuestView = () => {
             
             <button
               onClick={resetQuiz}
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-600 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -439,7 +458,7 @@ export const KnowledgeQuestView = () => {
                     if (selectedOption !== null) {
                       if (isCorrect) style = "bg-emerald-50 text-emerald-900 border-emerald-300 font-bold";
                       else if (isSelected) style = "bg-rose-50 text-rose-900 border-rose-300 font-bold";
-                      else style = "bg-slate-50 text-slate-400 border-slate-100 opacity-60";
+                      else style = "bg-slate-50 text-slate-500 border-slate-100 opacity-60";
                     }
 
                     return (
@@ -461,7 +480,7 @@ export const KnowledgeQuestView = () => {
 
                 {selectedOption !== null && (
                   <div className="p-3.5 rounded-2xl bg-indigo-50 border border-indigo-100 space-y-1 animate-fadeIn">
-                    <span className="text-[10px] font-extrabold uppercase text-indigo-900 block">Explanation</span>
+                    <span className="text-[11px] font-extrabold uppercase text-indigo-900 block">Explanation</span>
                     <p className="text-xs text-indigo-800 font-medium">
                       {KNOWLEDGE_QUEST_QUIZ[quizIndex].explanation}
                     </p>

@@ -92,7 +92,7 @@ export const LeaderboardView = () => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-extrabold text-amber-900 uppercase tracking-wider">Your Live Standing</span>
-                <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black uppercase">
+                <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[11px] font-black uppercase">
                   {activeUserXP > 0 ? 'Active Player' : 'Unranked'}
                 </span>
               </div>
@@ -130,7 +130,7 @@ export const LeaderboardView = () => {
                 <span className="text-xs text-slate-500 font-mono font-bold">{top2.accuracy}% Acc</span>
               </div>
               <div className="flex items-center gap-3.5 mb-3">
-                <img
+                <img loading="lazy" decoding="async"
                   src={top2.avatar}
                   alt={getCleanHandle(top2)}
                   className="w-12 h-12 rounded-full object-cover border-2 border-slate-200"
@@ -172,7 +172,7 @@ export const LeaderboardView = () => {
                 <span className="text-xs text-amber-800 font-mono font-bold">{top1.accuracy}% Acc</span>
               </div>
               <div className="flex items-center gap-4 mb-3">
-                <img
+                <img loading="lazy" decoding="async"
                   src={top1.avatar}
                   alt={getCleanHandle(top1)}
                   className="w-14 h-14 rounded-full object-cover border-2 border-amber-400 shadow-md"
@@ -213,7 +213,7 @@ export const LeaderboardView = () => {
                 <span className="text-xs text-slate-500 font-mono font-bold">{top3.accuracy}% Acc</span>
               </div>
               <div className="flex items-center gap-3.5 mb-3">
-                <img
+                <img loading="lazy" decoding="async"
                   src={top3.avatar}
                   alt={getCleanHandle(top3)}
                   className="w-12 h-12 rounded-full object-cover border-2 border-slate-200"
@@ -259,13 +259,13 @@ export const LeaderboardView = () => {
           </div>
 
           <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={filterQuery}
               onChange={(e) => setFilterQuery(e.target.value)}
               placeholder="Search handle, rank (#1), or campus..."
-              className="w-full pl-10 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary-500 font-medium"
+              className="w-full pl-10 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-primary-500 font-medium"
             />
           </div>
         </div>
@@ -304,7 +304,7 @@ export const LeaderboardView = () => {
 
                     <td className="py-4 px-5 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <img
+                        <img loading="lazy" decoding="async"
                           src={student.avatar}
                           alt={handle}
                           className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0"
@@ -317,7 +317,7 @@ export const LeaderboardView = () => {
                             {handle}
                           </span>
                           {isCurrentUser && (
-                            <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black uppercase shadow-2xs">
+                            <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[11px] font-black uppercase shadow-2xs">
                               ⭐ YOU
                             </span>
                           )}

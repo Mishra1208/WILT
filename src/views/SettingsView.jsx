@@ -27,7 +27,7 @@ export const SettingsView = () => {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8 animate-fadeIn">
+    <div className="p-4 sm:p-8 max-w-4xl mx-auto space-y-8 animate-fadeIn">
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           Account Settings
@@ -40,7 +40,7 @@ export const SettingsView = () => {
       {user ? (
         <form onSubmit={handleSaveProfile} className="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
           <div className="flex items-center gap-4">
-            <img
+            <img loading="lazy" decoding="async"
               src={user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'}
               alt={user.name}
               className="w-14 h-14 rounded-full object-cover border-2 border-primary-500 shadow-sm"
@@ -48,12 +48,12 @@ export const SettingsView = () => {
             <div>
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <span>{user.name}</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center gap-1">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3 text-emerald-600" /> Verified Scholar
                 </span>
               </h3>
               <p className="text-xs text-primary-600 font-mono font-bold">@{user.username} • {user.tier}</p>
-              <p className="text-xs text-slate-400 mt-0.5">{user.xp} XP Earned</p>
+              <p className="text-xs text-slate-500 mt-0.5">{user.xp} XP Earned</p>
             </div>
           </div>
 

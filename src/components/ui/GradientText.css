@@ -52,3 +52,22 @@
   -webkit-background-clip: text;
   color: transparent;
 }
+
+@keyframes wilt-gradient-x {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+@keyframes wilt-gradient-y {
+  from { background-position: 50% 0%; }
+  to { background-position: 50% 100%; }
+}
+.animated-gradient-text.pause-on-hover:hover .text-content,
+.animated-gradient-text.pause-on-hover:hover .gradient-overlay {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animated-gradient-text .text-content,
+  .animated-gradient-text .gradient-overlay {
+    animation: none !important;
+  }
+}

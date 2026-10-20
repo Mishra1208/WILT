@@ -45,25 +45,25 @@ export const PostCard = ({ post }) => {
   return (
     <div
       onClick={() => requireAuth(() => openPostDetail(post))}
-      className="group p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/80 hover:border-primary-400/80 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_-4px_rgba(79,70,229,0.08)] transition-all duration-200 cursor-pointer flex flex-col justify-between"
+      className="group p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/80 hover:border-primary-400/80 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_-4px_rgba(79,70,229,0.08)] transition-all duration-200 cursor-pointer flex flex-col justify-between min-w-0"
     >
       <div className="space-y-3.5">
         {/* Author Header & Topic Pill */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <img
+        <div className="flex items-center justify-between gap-3 min-w-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <img loading="lazy" decoding="async"
               src={post.author?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"}
               alt={post.author?.name}
               className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-100"
             />
-            <div className="leading-tight">
-              <div className="text-xs font-extrabold text-slate-900 font-mono group-hover:text-primary-700 transition-colors">
+            <div className="leading-tight min-w-0">
+              <div className="text-xs font-extrabold text-slate-900 font-mono group-hover:text-primary-700 transition-colors truncate">
                 @{post.author?.username || 'learner'}
               </div>
             </div>
           </div>
 
-          <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 group-hover:bg-primary-50 group-hover:text-primary-700 transition-colors">
+          <span className="shrink-0 max-w-[50%] truncate text-[11px] font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 group-hover:bg-primary-50 group-hover:text-primary-700 transition-colors">
             {post.category}
           </span>
         </div>
@@ -81,7 +81,7 @@ export const PostCard = ({ post }) => {
         {/* Attached Image Thumbnail Preview */}
         {post.attachments && post.attachments.some(a => a.type === 'image' || a.url?.startsWith('blob:') || a.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)) && (
           <div className="rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-50">
-            <img
+            <img loading="lazy" decoding="async"
               src={post.attachments.find(a => a.type === 'image' || a.url?.startsWith('blob:') || a.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i))?.url}
               alt="Attached photo"
               className="w-full h-36 object-cover hover:scale-105 transition-transform duration-300"
@@ -118,7 +118,7 @@ export const PostCard = ({ post }) => {
       </div>
 
       {/* Card Footer Actions */}
-      <div className="flex items-center justify-between pt-3.5 mt-3.5 border-t border-slate-100 text-xs text-slate-400">
+      <div className="flex items-center justify-between pt-3.5 mt-3.5 border-t border-slate-100 text-xs text-slate-500">
         <div className="flex items-center gap-4">
           <button
             onClick={handleLike}
@@ -141,7 +141,7 @@ export const PostCard = ({ post }) => {
           </button>
         </div>
 
-        <span className="flex items-center gap-1 text-[11px] text-slate-400 font-mono">
+        <span className="flex items-center gap-1 text-[11px] text-slate-500 font-mono">
           <Clock className="w-3.5 h-3.5" />
           {post.readTime}
         </span>
