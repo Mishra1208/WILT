@@ -406,7 +406,7 @@ export const AboutView = () => {
         <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
           <button
             onClick={() => setCurrentView('notepad')}
-            className="px-6 py-3 rounded-md bg-highlight hover:bg-[#FFEA8F] text-night font-semibold text-[15px]"
+            className="px-6 py-3 rounded-md bg-highlight hover:bg-[#FBE995] text-night font-semibold text-[15px]"
           >
             Write today's note
           </button>

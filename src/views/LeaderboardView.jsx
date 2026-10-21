@@ -78,9 +78,9 @@ export const LeaderboardView = () => {
         {/* Podium: block height encodes the place */}
         <div className="grid grid-cols-3 items-end gap-2 sm:gap-4 max-w-2xl pt-2">
           {[
-            { entry: top2, place: 2, block: 'h-16 sm:h-24 bg-[#E6E9EE]' },
+            { entry: top2, place: 2, block: 'h-16 sm:h-24 bg-[#E2E2DF]' },
             { entry: top1, place: 1, block: 'h-24 sm:h-36 bg-highlight' },
-            { entry: top3, place: 3, block: 'h-12 sm:h-16 bg-[#F0DEC8]' }
+            { entry: top3, place: 3, block: 'h-12 sm:h-16 bg-[#E9D5BF]' }
           ].map(({ entry, place, block }) => (
             <div key={place} className="flex flex-col items-center text-center min-w-0">
               {entry ? (
@@ -191,14 +191,14 @@ export const LeaderboardView = () => {
                     className={cn(
                       "transition-all duration-200",
                       isCurrentUser
-                        ? "bg-[#FFFBEA] shadow-[inset_3px_0_0_#FFE36E]"
+                        ? "bg-[#FFF8DC] shadow-[inset_3px_0_0_#F9E177]"
                         : "hover:bg-slate-50/80"
                     )}
                   >
                     <td className="py-4 px-5 whitespace-nowrap">
                       <span className={cn(
                         "inline-flex items-center justify-center w-7 h-7 rounded-md text-sm font-semibold tabular-nums",
-                        student.rank === 1 ? "bg-highlight text-ink" : student.rank === 2 ? "bg-[#E6E9EE] text-ink" : student.rank === 3 ? "bg-[#F0DEC8] text-ink" : "text-muted"
+                        student.rank === 1 ? "bg-highlight text-ink" : student.rank === 2 ? "bg-[#E2E2DF] text-ink" : student.rank === 3 ? "bg-[#E9D5BF] text-ink" : "text-muted"
                       )}>
                         {student.rank}
                       </span>

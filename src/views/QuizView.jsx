@@ -219,7 +219,7 @@ export const QuizView = () => {
             </button>
             <button
               onClick={() => setCurrentView('leaderboard')}
-              className="px-6 py-3 rounded-md bg-highlight text-night text-[15px] font-semibold flex items-center justify-center gap-2 hover:bg-[#FFEA8F] transition-colors cursor-pointer"
+              className="px-6 py-3 rounded-md bg-highlight text-night text-[15px] font-semibold flex items-center justify-center gap-2 hover:bg-[#FBE995] transition-colors cursor-pointer"
             >
               <Trophy className="w-4 h-4" />
               See leaderboard
@@ -366,7 +366,7 @@ export const QuizView = () => {
       {/* Question Card */}
       <div key={currentIdx} className="animate-rise p-5 sm:p-8 rounded-xl bg-white border border-line space-y-6">
         <div>
-          <span className={`inline-flex items-center gap-1.5 text-[13px] font-semibold ${currentQ.isNews ? 'text-[#B4233C]' : 'text-primary-700'}`}>
+          <span className={`inline-flex items-center gap-1.5 text-[13px] font-semibold ${currentQ.isNews ? 'text-[#8F3333]' : 'text-primary-700'}`}>
             {currentQ.isNews ? <Globe2 className="w-3.5 h-3.5" /> : <BookOpen className="w-3.5 h-3.5" />}
             {currentQ.isNews ? 'Business news' : 'Peer post'} · {currentQ.category}
           </span>
@@ -424,7 +424,7 @@ export const QuizView = () => {
 
         {/* RECALL CALLOUT BANNER ON WRONG ANSWER */}
         {isWrong && (
-          <div className="p-5 rounded-lg bg-[#FFF9DB] border border-[#F3E2A0] space-y-3">
+          <div className="p-5 rounded-lg bg-[#FFF8DC] border border-[#F2E2A4] space-y-3">
             <div className="flex items-center gap-2 text-ink text-[15px] font-semibold">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>

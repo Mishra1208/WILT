@@ -7,9 +7,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Schibsted Grotesk', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['Schibsted Grotesk', '-apple-system', 'sans-serif'],
-        serif: ['Newsreader', 'Georgia', 'serif'],
+        sans: ['Fustat', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['Fustat', '-apple-system', 'sans-serif'],
+        // "serif" is the reading style; in this design it's the same friendly sans
+        serif: ['Fustat', '-apple-system', 'sans-serif'],
+        hand: ['Kalam', 'cursive'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
       colors: {
@@ -62,9 +64,17 @@ export default {
           700: '#0B7A59',
         },
         haze: 'rgb(var(--haze) / <alpha-value>)',
-        line: '#E3E6EB',          // hairlines
-        muted: '#5A6372',         // secondary text
-        highlight: '#FFE36E',     // the highlighter
+        line: '#E9E5DC',          // hairlines
+        muted: '#5C5A57',         // secondary text
+        highlight: '#FFD66B',
+        paper: '#F7F5F0',
+        marker: {
+          orange: '#FF6B35',
+          green: '#2DB463',
+          blue: '#4F9DEB',
+          yellow: '#FFD66B',
+          brown: '#4B1A11',
+        },     // the highlighter
         coral: {
           50: '#FFF7ED',
           500: '#F97316',

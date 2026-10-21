@@ -1,101 +1,107 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SignInButton, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { Menu, X } from 'lucide-react';
 
 const LINKS = [
-  { id: 'knowledge-quest', label: 'Knowledge Quest' },
-  { id: 'discover', label: 'Learning hub' },
+  { id: 'discover', label: 'Notes' },
+  { id: 'knowledge-quest', label: 'Business news' },
   { id: 'quiz', label: 'Weekly quiz' },
   { id: 'leaderboard', label: 'Leaderboard' },
   { id: 'about', label: 'About' }
 ];
 
 /**
- * Top bar for the landing page. It sits on the deep-indigo hero, so it's dark
- * and translucent rather than white.
+ * Landing-page top bar: wordmark on the left, a floating white pill of links in
+ * the middle, and a black pill action on the right. Gains a soft paper
+ * backdrop once the page scrolls.
  */
 export const FloatingNavbar = () => {
   const { currentView, setCurrentView } = useApp();
   const { user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [moved, setMoved] = useState(false);
 
-  const handleNavClick = (view) => {
+  useEffect(() => {
+    const onScroll = () => setMoved(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const go = (view) => {
     setCurrentView(view);
     setMobileMenuOpen(false);
   };
 
   return (
-    <header className="sticky top-0 w-full bg-white/95 backdrop-blur border-b border-line px-4 sm:px-8 h-16 flex items-center justify-between z-40 select-none">
-      <button onClick={() => handleNavClick('notepad')} className="text-left cursor-pointer">
-        <span className="block text-[22px] font-extrabold tracking-[-0.04em] text-ink leading-none">
-          wilt<span className="text-[#E0B400]">.</span>
-        </span>
-      </button>
-
-      <nav className="hidden md:flex items-center gap-1 text-[15px] font-medium" aria-label="Main">
-        {LINKS.map((l) => (
-          <button
-            key={l.id}
-            onClick={() => handleNavClick(l.id)}
-            className={`px-3 py-2 rounded-md transition-colors cursor-pointer ${
-              currentView === l.id ? 'text-ink' : 'text-muted hover:text-ink'
-            }`}
-          >
-            {l.label}
-          </button>
-        ))}
-      </nav>
-
-      <div className="flex items-center gap-2">
-        <SignedOut>
-          <SignInButton mode="modal">
-            <button className="hidden sm:inline-flex px-4 py-2 rounded-md text-sm font-semibold bg-ink text-white hover:bg-ink/90 transition-colors cursor-pointer">
-              Sign in
-            </button>
-          </SignInButton>
-        </SignedOut>
-        <SignedIn>
-          <button
-            onClick={() => handleNavClick('leaderboard')}
-            className="hidden sm:inline-flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-md border border-line text-sm font-semibold text-ink hover:bg-haze transition-colors cursor-pointer"
-          >
-            <img src={user?.avatar} alt="" className="w-6 h-6 rounded-full bg-haze" />
-            <span>
-              {user?.xp || 0} <span className="text-muted font-medium">XP</span>
-            </span>
-          </button>
-        </SignedIn>
-
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-ink hover:bg-haze rounded-md transition-colors"
-          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileMenuOpen}
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+    <header
+      className={`fixed top-0 inset-x-0 z-40 select-none transition-colors duration-300 ${
+        moved || mobileMenuOpen ? 'bg-paper/85 backdrop-blur-md' : 'bg-transparent'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 h-20 flex items-center justify-between gap-4">
+        <button onClick={() => go('notepad')} className="text-left cursor-pointer">
+          <span className="text-[28px] font-bold tracking-[-0.06em] text-ink leading-none">
+            wilt<span className="text-marker-orange">.</span>
+          </span>
         </button>
-      </div>
 
-      {mobileMenuOpen && (
-        <div className="absolute top-full left-0 right-0 bg-white border-b border-line shadow-lift py-3 px-4 flex flex-col md:hidden z-50">
+        <nav className="hidden md:flex items-center gap-1 rounded-full bg-white px-2 py-1.5 shadow-[0_8px_24px_-16px_rgba(30,30,30,0.35)]" aria-label="Main">
           {LINKS.map((l) => (
             <button
               key={l.id}
-              onClick={() => handleNavClick(l.id)}
-              className={`text-left text-base font-medium px-3 py-3 rounded-md transition-colors ${
-                currentView === l.id ? 'bg-haze text-ink' : 'text-ink/80 hover:bg-haze'
+              onClick={() => go(l.id)}
+              className={`px-4 py-2 rounded-full text-[15px] font-medium transition-colors cursor-pointer ${
+                currentView === l.id ? 'bg-paper text-ink' : 'text-ink/75 hover:text-ink hover:bg-paper'
               }`}
             >
               {l.label}
             </button>
           ))}
+        </nav>
+
+        <div className="flex items-center gap-2">
           <SignedOut>
             <SignInButton mode="modal">
-              <button className="mt-2 w-full py-3 rounded-md text-sm font-semibold bg-ink text-white">Sign in</button>
+              <button className="btn-iris hidden sm:inline-flex px-6 py-3 text-[15px] font-semibold cursor-pointer">Get started</button>
             </SignInButton>
           </SignedOut>
+          <SignedIn>
+            <button
+              onClick={() => go('leaderboard')}
+              className="hidden sm:inline-flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full bg-white text-[15px] font-semibold text-ink shadow-[0_8px_24px_-16px_rgba(30,30,30,0.35)] cursor-pointer"
+            >
+              <img src={user?.avatar} alt="" className="w-8 h-8 rounded-full bg-paper" />
+              {user?.xp || 0} XP
+            </button>
+          </SignedIn>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden w-11 h-11 rounded-full bg-white flex items-center justify-center text-ink shadow-[0_8px_24px_-16px_rgba(30,30,30,0.35)]"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </div>
+
+      {mobileMenuOpen && (
+        <div className="md:hidden px-5 pb-5">
+          <div className="rounded-[24px] bg-white p-3 flex flex-col shadow-lift">
+            {LINKS.map((l) => (
+              <button key={l.id} onClick={() => go(l.id)} className="text-left text-[17px] font-medium px-4 py-3 rounded-full text-ink hover:bg-paper">
+                {l.label}
+              </button>
+            ))}
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="btn-iris mt-2 w-full py-3.5 text-[16px] font-semibold">Get started</button>
+              </SignInButton>
+            </SignedOut>
+          </div>
         </div>
       )}
     </header>

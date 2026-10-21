@@ -63,10 +63,10 @@ export const Footer = () => {
       <div className="max-w-6xl mx-auto px-5 sm:px-8">
         <div className="grid grid-cols-2 md:grid-cols-12 gap-8">
           <div className="col-span-2 md:col-span-4">
-            <span className="block text-[22px] font-extrabold tracking-[-0.04em] text-ink leading-none">
-              wilt<span className="text-[#E0B400]">.</span>
+            <span className="block text-[28px] font-bold tracking-[-0.06em] text-ink leading-none">
+              wilt<span className="text-marker-orange">.</span>
             </span>
-            <p className="mt-3 font-serif text-[17px] text-muted leading-snug max-w-xs">
+            <p className="mt-3 text-[16px] text-muted leading-relaxed max-w-xs">
               One thing you learned today, with a source, remembered through a weekly quiz.
             </p>
           </div>
@@ -99,18 +99,18 @@ export const Footer = () => {
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); if (subscribeError) setSubscribeError(null); }}
                 placeholder="you@university.edu"
-                className="flex-1 min-w-0 px-3 py-2.5 text-[15px] rounded-md bg-haze border border-transparent text-ink placeholder-muted focus:outline-none focus:bg-white focus:border-line focus:ring-4 focus:ring-primary-500/10"
+                className="flex-1 min-w-0 px-4 py-3 text-[15px] rounded-full bg-paper border border-transparent text-ink placeholder-muted focus:outline-none focus:bg-white focus:border-line focus:ring-4 focus:ring-primary-500/10"
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2.5 rounded-md bg-ink text-white text-[15px] font-semibold hover:bg-ink/90 disabled:opacity-60 transition-colors cursor-pointer flex items-center gap-1.5"
+                className="px-5 py-3 rounded-full bg-ink text-white text-[15px] font-semibold hover:bg-ink/85 disabled:opacity-60 transition-colors cursor-pointer flex items-center gap-1.5"
               >
                 {loading ? 'Saving…' : subscribed ? (<><Check className="w-4 h-4" />{subscribed === 'exists' ? 'Already in' : 'Subscribed'}</>) : 'Subscribe'}
               </button>
             </form>
             {subscribeError && (
-              <p role="alert" className="mt-2 text-sm font-medium text-[#B4233C]">{subscribeError}</p>
+              <p role="alert" className="mt-2 text-sm font-medium text-[#8F3333]">{subscribeError}</p>
             )}
           </div>
         </div>

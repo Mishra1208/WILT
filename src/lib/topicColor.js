@@ -1,12 +1,12 @@
 // Stable colour per topic so a category always looks the same across the app.
-// Solid, slightly deep tones that read well as small text on white.
+// Drawn from the same Figma palettes as the rest of the UI.
 const PALETTE = [
-  { text: 'text-[#1F4FD1]', dot: 'bg-[#1F4FD1]', chip: 'bg-[#EEF3FF] text-[#1F4FD1]' },
-  { text: 'text-[#0F766E]', dot: 'bg-[#0F766E]', chip: 'bg-[#E9F7F5] text-[#0F766E]' },
-  { text: 'text-[#B4233C]', dot: 'bg-[#B4233C]', chip: 'bg-[#FCEEF0] text-[#B4233C]' },
-  { text: 'text-[#9A5B00]', dot: 'bg-[#D99A1E]', chip: 'bg-[#FFF6E0] text-[#9A5B00]' },
-  { text: 'text-[#6B4FBB]', dot: 'bg-[#6B4FBB]', chip: 'bg-[#F2EFFB] text-[#6B4FBB]' },
-  { text: 'text-[#2F6B2F]', dot: 'bg-[#3E8E3E]', chip: 'bg-[#EEF7EE] text-[#2F6B2F]' }
+  { text: 'text-[#1F5E45]', dot: 'bg-[#174C38]', chip: 'bg-[#EEF5F1] text-[#1F5E45]' },  // racing green
+  { text: 'text-[#225F73]', dot: 'bg-[#225F73]', chip: 'bg-[#EEF5F7] text-[#225F73]' },  // petrol
+  { text: 'text-[#8F3333]', dot: 'bg-[#8F3333]', chip: 'bg-[#FBF1F1] text-[#8F3333]' },  // oxblood
+  { text: 'text-[#8A6A12]', dot: 'bg-[#D9A400]', chip: 'bg-[#FFF8DC] text-[#8A6A12]' },  // honey
+  { text: 'text-[#515081]', dot: 'bg-[#515081]', chip: 'bg-[#EFEFF6] text-[#515081]' },  // dusk (Blue eclipse)
+  { text: 'text-[#723E22]', dot: 'bg-[#723E22]', chip: 'bg-[#F7EFEA] text-[#723E22]' }   // rust (Yacht club)
 ];
 
 export const topicColor = (topic = '') => {

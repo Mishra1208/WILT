@@ -16,6 +16,7 @@ export default defineConfig({
           if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'vendor-react';
           if (id.includes('@clerk')) return 'vendor-auth';
           if (id.includes('@supabase')) return 'vendor-db';
+          if (id.includes('/gsap/')) return 'vendor-motion';
           return undefined;
         }
       }
