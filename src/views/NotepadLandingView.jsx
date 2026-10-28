@@ -28,11 +28,7 @@ import { uploadAttachmentToStorage } from '../services/supabase';
 import { cn } from '../lib/utils';
 import { useDraftState } from '../hooks/useDraftState';
 import { LandingHero } from './landing/LandingHero';
-import { Manifesto } from './landing/Manifesto';
-import { HowItWorks } from './landing/HowItWorks';
-import { TopicMarquee } from './landing/TopicMarquee';
 import { FreshNotes } from './landing/FreshNotes';
-import { WhyWilt } from './landing/WhyWilt';
 import { Faq } from './landing/Faq';
 import { ClosingCta } from './landing/ClosingCta';
 import { useReveal } from './landing/useReveal';
@@ -44,12 +40,16 @@ export const NotepadLandingView = () => {
   const topThree = (leaderboard || []).filter((u) => (u.xp || 0) > 0).slice(0, 3);
   const pageRef = useRef(null);
   useReveal(pageRef, [(posts || []).length]);
-  const heroAvatars = [...new Set((posts || []).map((p) => p.author?.avatar).filter(Boolean))].slice(0, 5);
-  const topicList = [...new Set([...(posts || []).map((p) => p.category), ...(concepts || []).map((c) => c.category)].filter(Boolean))].slice(0, 14);
+  const heroAvatars = [...new Set((posts || []).map((p) => p.author?.avatar).filter(Boolean))].slice(0, 4);
 
   const scrollToWrite = () => {
     const el = document.getElementById('write');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setIsExpanded(true);
+    setTimeout(() => {
+      const box = el && el.querySelector('textarea');
+      if (box) box.focus({ preventScroll: true });
+    }, 600);
   };
   const { user, requireAuth } = useAuth();
 
@@ -315,28 +315,10 @@ export const NotepadLandingView = () => {
   return (
     <div ref={pageRef} className="bg-paper">
       <LandingHero
-        onWrite={scrollToWrite}
         onBrowse={() => setCurrentView('discover')}
         notesCount={(posts || []).length}
         avatars={heroAvatars}
-      />
-      <TopicMarquee topics={topicList} />
-      <HowItWorks />
-      <FreshNotes posts={posts || []} onOpen={(p) => requireAuth(() => openPostDetail(p))} onSeeAll={() => setCurrentView('discover')} />
-      <Manifesto />
-
-      {/* Your turn: the writing slate */}
-      <section id="write" className="bg-paper scroll-mt-20">
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 py-24 sm:py-32 space-y-4">
-          <div className="pb-6 text-center">
-            <div className="font-hand text-[22px] text-marker-orange">Your turn</div>
-            <h2 className="mt-2 text-ink font-semibold leading-[1.05] tracking-[-0.05em] text-[clamp(2.2rem,4.6vw,3.6rem)]">
-              What did you learn today?
-            </h2>
-            <p className="mt-4 text-[18px] text-muted leading-relaxed">
-              Two or three lines is plenty. Add where you learned it, then pick a topic.
-            </p>
-          </div>
+      >
         {/* Moderation Error Banner */}
         {moderationError && (
           <div className="w-full p-3.5 rounded-lg bg-rose-50 border border-rose-300 text-rose-800 text-xs font-semibold flex items-center gap-2 animate-fadeIn">
@@ -557,18 +539,11 @@ export const NotepadLandingView = () => {
           </div>
         </form>
 
-        </div>
-      </section>
+      </LandingHero>
 
-      <WhyWilt
-        go={setCurrentView}
-        topThree={topThree}
-        stats={[
-          [(posts || []).length, 'notes shared'],
-          [(leaderboard || []).length, 'students ranked'],
-          [(concepts || []).length, 'terms defined']
-        ]}
-      />
+      <FreshNotes posts={posts || []} onOpen={(p) => requireAuth(() => openPostDetail(p))} onSeeAll={() => setCurrentView('discover')} />
+
+
       <Faq />
       <ClosingCta onWrite={scrollToWrite} />
 
