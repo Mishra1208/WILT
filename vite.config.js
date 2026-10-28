@@ -1,8 +1,28 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+// In `npm run dev` there are no Vercel functions, so serve /api/mint-news
+// from the same code the Vercel function uses.
+const devApi = () => ({
+  name: 'wilt-dev-api',
+  configureServer(server) {
+    server.middlewares.use('/api/mint-news', async (_req, res) => {
+      try {
+        const { getMintNews } = await server.ssrLoadModule('/server/mintFeed.js');
+        const data = await getMintNews();
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(data));
+      } catch (err) {
+        res.statusCode = 502;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: String(err), stories: [] }));
+      }
+    });
+  }
+});
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), devApi()],
   server: {
     port: 5175,
   },

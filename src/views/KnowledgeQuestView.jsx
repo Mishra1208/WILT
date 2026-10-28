@@ -1,492 +1,500 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Compass, 
-  ExternalLink, 
-  Bookmark, 
-  CheckCircle2, 
-  Search, 
-  Sparkles, 
-  HelpCircle, 
-  MessageSquareQuote, 
-  Globe2, 
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  ExternalLink,
+  Bookmark,
+  CheckCircle2,
+  Search,
+  HelpCircle,
   ArrowRight,
   ArrowUp,
   ArrowDown,
-  Zap,
-  Check,
   X,
-  Calendar,
-  Clock,
   Lock,
-  Newspaper
+  Newspaper,
+  RefreshCw
 } from 'lucide-react';
-import { KNOWLEDGE_QUEST_CATEGORIES, KNOWLEDGE_QUEST_ARTICLES, KNOWLEDGE_QUEST_QUIZ, SECONDARY_FALLBACK_IMAGES } from '../data/knowledgeQuestData';
-import { fetchLiveBusinessNews, getNewsFallbackSvg } from '../services/newsService';
+import {
+  fetchMintNews,
+  buildMintQuiz,
+  timeAgo,
+  fallbackImageFor,
+  getNewsFallbackSvg,
+  MINT_CATEGORIES,
+  MINT_EPAPER_URL,
+  matchesMintCategory
+} from '../services/newsService';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
-import { PageHero, HeroChip, HeroAction, TabRow } from '../components/widgets/PageHero';
+import { PageHero, HeroChip, TabRow } from '../components/widgets/PageHero';
+
+const PAGE_SIZE = 18;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const DATE_FILTERS = [
+  { id: 'week', label: 'This week', test: () => true },
+  { id: 'day', label: 'Last 24 hours', test: (t) => t >= Date.now() - DAY_MS }
+];
+
+// "Top of the news": the latest story from each of these, in order
+const TOP_PICKS = ['economy', 'markets', 'companies', 'finance', 'international'];
+
+const StoryImage = ({ article, className }) => (
+  <img
+    loading="lazy"
+    decoding="async"
+    src={article.imageUrl}
+    alt=""
+    onError={(e) => {
+      const el = e.currentTarget;
+      if (!el.dataset.retried) {
+        el.dataset.retried = 'true';
+        el.src = fallbackImageFor(article.category);
+      } else {
+        el.onerror = null;
+        el.src = getNewsFallbackSvg(article.categoryLabel);
+      }
+    }}
+    className={className}
+  />
+);
+
+const Meta = ({ article }) => (
+  <div className="flex items-center gap-2 text-[13px] text-muted">
+    <span className="font-semibold text-ink">{article.categoryLabel}</span>
+    <span aria-hidden="true">·</span>
+    <span>{article.regionLabel}</span>
+    <span aria-hidden="true">·</span>
+    <span>{timeAgo(article.publishedAt)}</span>
+  </div>
+);
 
 export const KnowledgeQuestView = () => {
   const { toggleSaveNews, isNewsSaved } = useApp();
   const { requireAuth, isLoggedIn } = useAuth();
-  const [articles, setArticles] = useState(KNOWLEDGE_QUEST_ARTICLES);
+
+  const [articles, setArticles] = useState([]);
+  const [status, setStatus] = useState('loading'); // loading | ready | error
+  const [fetchedAt, setFetchedAt] = useState(null);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [dateFilter, setDateFilter] = useState('week');
   const [searchQuery, setSearchQuery] = useState('');
-  const [visibleCount, setVisibleCount] = useState(10);
-  const [copiedId, setCopiedId] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  useEffect(() => {
-    fetchLiveBusinessNews().then((liveNews) => {
-      if (liveNews && liveNews.length > 0) {
-        setArticles(liveNews);
-      }
+  const load = () => {
+    setStatus('loading');
+    fetchMintNews().then(({ articles: list, fetchedAt: at, error }) => {
+      setArticles(list);
+      setFetchedAt(at);
+      setStatus(error ? 'error' : 'ready');
     });
-  }, []);
-
-  // Reset pagination when category or search query changes
-  useEffect(() => {
-    setVisibleCount(10);
-  }, [activeCategory, searchQuery]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 120) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Quiz Modal State
-  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+  useEffect(load, []);
+  useEffect(() => setVisibleCount(PAGE_SIZE), [activeCategory, searchQuery, dateFilter]);
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // ---- filtering ----
+  const dateTest = DATE_FILTERS.find((d) => d.id === dateFilter)?.test || (() => true);
+  const inDateRange = useMemo(
+    () => articles.filter((a) => dateTest(Date.parse(a.publishedAt))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [articles, dateFilter]
+  );
+
+  const q = searchQuery.trim().toLowerCase();
+  const filtered = inDateRange.filter((a) => {
+    if (!matchesMintCategory(a, activeCategory)) return false;
+    if (!q) return true;
+    return a.title.toLowerCase().includes(q) || (a.summary?.whatHappened || '').toLowerCase().includes(q);
+  });
+
+  const showTop = activeCategory === 'all' && !q;
+  const topStories = useMemo(() => {
+    if (!showTop) return [];
+    const used = new Set();
+    return TOP_PICKS.map((cat) => {
+      const pick = inDateRange.find((a) => !used.has(a.id) && a.summary?.whatHappened && matchesMintCategory(a, cat) && a.category !== 'opinion');
+      if (pick) used.add(pick.id);
+      return pick;
+    }).filter(Boolean);
+  }, [inDateRange, showTop]);
+  const topIds = new Set(topStories.map((a) => a.id));
+  const rest = filtered.filter((a) => !topIds.has(a.id));
+  const displayed = rest.slice(0, visibleCount);
+
+  const countFor = (catId) => inDateRange.filter((a) => matchesMintCategory(a, catId)).length;
+
+  // ---- quiz from real Mint stories ----
+  const [quiz, setQuiz] = useState(null);
   const [quizIndex, setQuizIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [quizScore, setQuizScore] = useState(0);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
 
-  // Filter Articles
-  const filteredArticles = (articles || []).filter((article) => {
-    if (!article) return false;
-    const matchesCategory = activeCategory === 'all' || article.category === activeCategory;
-    const q = (searchQuery || '').toLowerCase();
-    
-    const whatHappened = typeof article.summary === 'object' ? (article.summary?.whatHappened || '') : (article.summary || '');
-    const whyItMatters = typeof article.summary === 'object' ? (article.summary?.whyItMatters || '') : '';
-    
-    const matchesSearch = 
-      (article.title || '').toLowerCase().includes(q) ||
-      whatHappened.toLowerCase().includes(q) ||
-      whyItMatters.toLowerCase().includes(q) ||
-      (article.keyTerms && article.keyTerms.some(term => (term || '').toLowerCase().includes(q)));
-    
-    return matchesCategory && matchesSearch;
-  });
-
-  const displayedArticles = filteredArticles.slice(0, visibleCount);
-
-  const getCategoryCount = (catId) => {
-    if (catId === 'all') return articles.length;
-    return articles.filter((a) => a.category === catId).length;
+  const openQuiz = () => {
+    const questions = buildMintQuiz(articles, 5);
+    if (questions.length === 0) return;
+    setQuiz(questions);
+    setQuizIndex(0);
+    setSelectedOption(null);
+    setQuizScore(0);
+    setQuizSubmitted(false);
   };
-
-  const handleCopyTalkingPoint = (text, id) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2500);
-  };
-
-  const handleSelectQuizOption = (optIdx) => {
+  const closeQuiz = () => setQuiz(null);
+  const pickOption = (idx) => {
     if (selectedOption !== null) return;
-    setSelectedOption(optIdx);
-    if (optIdx === KNOWLEDGE_QUEST_QUIZ[quizIndex].correctAnswer) {
-      setQuizScore(prev => prev + 1);
-    }
+    setSelectedOption(idx);
+    if (idx === quiz[quizIndex].correctAnswer) setQuizScore((s) => s + 1);
   };
-
-  const handleNextQuizQuestion = () => {
-    if (quizIndex < KNOWLEDGE_QUEST_QUIZ.length - 1) {
-      setQuizIndex(prev => prev + 1);
+  const nextQuestion = () => {
+    if (quizIndex < quiz.length - 1) {
+      setQuizIndex((i) => i + 1);
       setSelectedOption(null);
     } else {
       setQuizSubmitted(true);
     }
   };
 
-  const resetQuiz = () => {
-    setQuizIndex(0);
-    setSelectedOption(null);
-    setQuizScore(0);
-    setQuizSubmitted(false);
-    setIsQuizModalOpen(false);
+  const ReadButton = ({ article, compact = false }) => (
+    <a
+      href={article.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        'btn-iris rounded-full font-semibold inline-flex items-center gap-1.5 cursor-pointer',
+        compact ? 'px-4 py-2 text-[13px]' : 'px-5 py-2.5 text-sm'
+      )}
+    >
+      Read full story on Mint <ExternalLink className="w-3.5 h-3.5" />
+    </a>
+  );
+
+  const SaveButton = ({ article }) => {
+    const saved = isNewsSaved(article.id);
+    return (
+      <button
+        onClick={() => requireAuth(() => toggleSaveNews(article))}
+        aria-label={saved ? 'Remove from saved' : 'Save for later'}
+        title={saved ? 'Saved' : 'Save for later'}
+        className={cn(
+          'w-9 h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer shrink-0',
+          saved ? 'bg-highlight/40 border-highlight text-ink' : 'border-line text-muted hover:text-ink hover:bg-paper'
+        )}
+      >
+        <Bookmark className={cn('w-4 h-4', saved && 'fill-ink')} />
+      </button>
+    );
+  };
+
+  // Summary text, or a sign-in prompt for guests
+  const Summary = ({ article, lines = 'line-clamp-4' }) => {
+    const text = article.summary?.whatHappened;
+    if (!text) return null;
+    if (isLoggedIn) return <p className={cn('text-[15px] leading-relaxed text-ink/80', lines)}>{text}</p>;
+    return (
+      <div className="relative">
+        <p className={cn('text-[15px] leading-relaxed text-ink/80 blur-[5px] select-none', lines)} aria-hidden="true">{text}</p>
+        <button
+          onClick={() => requireAuth()}
+          className="absolute inset-0 flex items-center justify-center gap-2 text-sm font-semibold text-ink cursor-pointer"
+        >
+          <span className="inline-flex items-center gap-2 bg-white/90 border border-line rounded-full px-4 py-2 shadow-sm">
+            <Lock className="w-3.5 h-3.5" /> Sign in to read the summary
+          </span>
+        </button>
+      </div>
+    );
   };
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-16 px-5 sm:px-8 pt-8 sm:pt-10">
-      
       <PageHero
-        icon={Newspaper}
         title="Knowledge Quest"
-        description="Business news, cut down to what you'd need in a placement interview: what happened, why it matters, and how to talk about it."
+        description="This week's business and finance news from Mint, India and global, with Mint's own summary. What recruiters expect you to know."
         aside={
-          <HeroAction onClick={() => requireAuth(() => setIsQuizModalOpen(true))} icon={HelpCircle}>Test yourself on the news</HeroAction>
+          <div className="flex flex-col sm:flex-row gap-2.5">
+            <a
+              href={MINT_EPAPER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-3 rounded-full border-2 border-ink text-ink text-[15px] font-semibold hover:bg-ink hover:text-white transition-colors inline-flex items-center justify-center gap-2"
+            >
+              <Newspaper className="w-4 h-4" /> Open today's e-paper
+            </a>
+            <button
+              onClick={() => requireAuth(openQuiz)}
+              disabled={status !== 'ready'}
+              className="btn-iris px-5 py-3 rounded-full font-semibold text-[15px] inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <HelpCircle className="w-4 h-4" /> Test yourself
+            </button>
+          </div>
         }
       >
-        <div className="flex flex-col-reverse md:flex-row md:items-end gap-4">
-          <TabRow className="flex-1">
-            {KNOWLEDGE_QUEST_CATEGORIES.map((cat) => (
+        <div className="space-y-4">
+          <TabRow>
+            {MINT_CATEGORIES.map((cat) => (
               <HeroChip key={cat.id} active={activeCategory === cat.id} onClick={() => setActiveCategory(cat.id)}>
-                {cat.label.replace(/^[^A-Za-z]+/, '')}
-                <span className="ml-1.5 text-muted tabular-nums">{getCategoryCount(cat.id)}</span>
+                {cat.label}
+                {status === 'ready' && <span className="ml-1.5 text-muted tabular-nums">{countFor(cat.id)}</span>}
               </HeroChip>
             ))}
           </TabRow>
-          <div className="relative w-full md:w-64 shrink-0 md:mb-2">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search the news"
-              className="w-full pl-9 pr-3 py-2 text-[15px] rounded-md bg-white border border-line text-ink placeholder-muted focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-ink/30"
-            />
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+            <div className="inline-flex p-1 rounded-full bg-white border border-line self-start">
+              {DATE_FILTERS.map((d) => (
+                <button
+                  key={d.id}
+                  onClick={() => setDateFilter(d.id)}
+                  className={cn(
+                    'px-4 py-1.5 rounded-full text-sm font-semibold transition-colors cursor-pointer',
+                    dateFilter === d.id ? 'bg-ink text-white' : 'text-muted hover:text-ink'
+                  )}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
+            <div className="relative w-full sm:w-72">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search Mint stories"
+                className="w-full pl-10 pr-3 py-2.5 text-[15px] rounded-full bg-white border border-line text-ink placeholder-muted focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-ink/30"
+              />
+            </div>
           </div>
         </div>
       </PageHero>
 
-
-      {/* News Articles Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {displayedArticles.map((article) => {
-          const isSaved = isNewsSaved(article.id);
-          const isCopied = copiedId === article.id;
-
-          return (
-            <div
-              key={article.id}
-              className="card-lift rounded-xl bg-white border border-line flex flex-col justify-between overflow-hidden group relative"
-            >
-              <div className="space-y-4">
-                
-                {/* Article Header Image */}
-                <div className="relative h-48 w-full overflow-hidden bg-slate-100">
-                  <img loading="lazy" decoding="async"
-                    src={article.imageUrl}
-                    alt={article.title}
-                    onError={(e) => {
-                      if (!e.currentTarget.dataset.retried) {
-                        e.currentTarget.dataset.retried = "true";
-                        e.currentTarget.src = SECONDARY_FALLBACK_IMAGES[article.category] || SECONDARY_FALLBACK_IMAGES.india_business;
-                      } else {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = getNewsFallbackSvg(article.categoryLabel || article.category);
-                      }
-                    }}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
-                  
-                  <div className="absolute top-3 left-3">
-                    <span className="px-3 py-1 rounded-full bg-white/95 text-ink font-semibold text-xs shadow-sm">
-                      {article.categoryLabel}
-                    </span>
-                  </div>
-
-                  <div className="absolute top-3 right-3">
-                    <span className="px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-white font-extrabold text-[11px] tracking-wide flex items-center gap-1.5 shadow-md border border-white/20">
-                      <Calendar className="w-3 h-3 text-amber-400" />
-                      <span>{article.isLive ? article.date : 'Curated brief'}</span>
-                    </span>
-                  </div>
-
-                  <div className="absolute bottom-3 left-3 right-3 text-white">
-                    <div className="flex items-center gap-2 mb-1 text-[11px] font-bold text-slate-200">
-                      <span>{article.isLive ? article.source : 'WILT curated brief · evergreen explainer'}</span>
-                    </div>
-                    <h3 className="text-lg font-semibold leading-snug tracking-[-0.01em] line-clamp-2">
-                      {article.title}
-                    </h3>
-                  </div>
-                </div>
-
-                {/* Content Body Container (Blurred if unauthenticated) */}
-                <div className="relative flex-1 flex flex-col justify-between min-h-[300px]">
-                  <div className={cn("p-5 sm:p-6 space-y-4 transition-all duration-300", !isLoggedIn && "filter blur-md select-none pointer-events-none opacity-40")}>
-                    
-                    {article.isLive ? (
-                      <div className="space-y-2.5 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                        <div className="flex items-center gap-1.5 text-sm font-bold text-ink">
-                          <Zap className="w-3.5 h-3.5 text-amber-500" />
-                          <span>Live from Times of India</span>
-                        </div>
-                        {article.summary?.whatHappened ? (
-                          <p className="text-xs text-slate-700 font-medium leading-relaxed">
-                            <strong className="text-slate-900 font-bold">TOI summary:</strong> {article.summary.whatHappened}
-                          </p>
-                        ) : null}
-                        <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
-                          This is breaking news straight from the TOI feed, so there's no WILT analysis or interview talking point for it yet. Read the full article for the details.
-                        </p>
-                      </div>
-                    ) : (
-                    <>
-                    {/* Executive Summary Block */}
-                    <div className="space-y-2.5 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                      <div className="flex items-center gap-1.5 text-sm font-bold text-ink">
-                        <Zap className="w-3.5 h-3.5 text-amber-500" />
-                        <span>The 30-second version</span>
-                      </div>
-
-                      <ul className="space-y-2 text-xs text-slate-700 font-medium leading-relaxed">
-                        <li className="flex items-start gap-2">
-                          <span className="font-extrabold text-primary-600 shrink-0">·</span>
-                          <span><strong className="text-slate-900 font-bold">What Happened:</strong> {typeof article.summary === 'object' ? (article.summary?.whatHappened || article.title) : (article.summary || article.title)}</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="font-extrabold text-primary-600 shrink-0">·</span>
-                          <span><strong className="text-slate-900 font-bold">Why It Matters:</strong> {typeof article.summary === 'object' ? (article.summary?.whyItMatters || 'Key market development.') : 'Key market development.'}</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="font-extrabold text-emerald-600 shrink-0">·</span>
-                          <span><strong className="text-slate-900 font-bold">Key Metric:</strong> <code className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono text-[11px] font-bold">{typeof article.summary === 'object' ? (article.summary?.keyMetric || `Source: ${article.source || 'News'}`) : `Source: ${article.source || 'News'}`}</code></span>
-                        </li>
-                      </ul>
-                    </div>
-
-                    {/* Placement Interview Talking Point Box */}
-                    <div className="p-4 rounded-2xl bg-primary-50/70 border border-primary-100 space-y-2 relative">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5 text-sm font-bold text-primary-950">
-                          <MessageSquareQuote className="w-4 h-4 text-primary-600" />
-                          <span>Say this in an interview</span>
-                        </div>
-                        <button
-                          onClick={() => handleCopyTalkingPoint(article.interviewTalkingPoint, article.id)}
-                          className="text-[11px] font-bold text-primary-700 hover:text-primary-900 bg-white px-2 py-1 rounded-lg border border-primary-200 flex items-center gap-1 transition-all cursor-pointer"
-                        >
-                          {isCopied ? (
-                            <>
-                              <Check className="w-3 h-3 text-emerald-600" />
-                              <span className="text-emerald-700 font-extrabold">Copied!</span>
-                            </>
-                          ) : (
-                            <span>Copy Answer</span>
-                          )}
-                        </button>
-                      </div>
-
-                      <p className="text-xs text-primary-900 font-medium leading-relaxed italic">
-                        "{article.interviewTalkingPoint}"
-                      </p>
-
-                      {/* Key Terms Badges */}
-                      <div className="pt-1 flex flex-wrap gap-1.5">
-                        {(article.keyTerms || []).map((term, idx) => (
-                          <span key={idx} className="px-2 py-0.5 rounded-md bg-white border border-primary-100 text-primary-700 text-[11px] font-bold">
-                            #{term}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    </>
-                    )}
-
-                  </div>
-
-                  {/* Card Footer Action Bar */}
-                  <div className={cn("p-5 sm:p-6 pt-0 flex items-center justify-between gap-3 border-t border-slate-100 mt-4", !isLoggedIn && "filter blur-md select-none pointer-events-none opacity-40")}>
-                    <button
-                      onClick={() => requireAuth(() => toggleSaveNews(article))}
-                      className={cn(
-                        "px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border",
-                        isSaved
-                          ? "bg-amber-50 text-amber-800 border-amber-200"
-                          : "bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200"
-                      )}
-                    >
-                      <Bookmark className={cn("w-3.5 h-3.5", isSaved && "fill-amber-500 text-amber-500")} />
-                      <span>{isSaved ? 'Saved to Notes' : 'Save Prep'}</span>
-                    </button>
-
-                    <a
-                      href={article.toiUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-iris px-4 py-2 rounded-md font-semibold text-sm flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <span>Read on Times of India</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-
-                  {/* Lock Overlay for Unauthenticated Users */}
-                  {!isLoggedIn && (
-                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 bg-white/70 text-center rounded-b-3xl">
-                      <div className="p-3 rounded-full bg-white text-primary-600 shadow-xl mb-3 border border-slate-100 ring-4 ring-primary-500/10">
-                        <Lock className="w-6 h-6 stroke-[2.5]" />
-                      </div>
-                      <h4 className="text-base font-extrabold text-slate-900 mb-1 font-display">
-                        30-Sec Executive Summary Locked
-                      </h4>
-                      <p className="text-xs text-slate-700 font-semibold max-w-xs mb-4 leading-relaxed">
-                        Sign in to unlock recruiter-ready summaries, placement interview talking points, and full article links.
-                      </p>
-                      <button
-                        onClick={() => requireAuth()}
-                        className="px-6 py-3 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs shadow-xl hover:shadow-2xl transition-all cursor-pointer flex items-center gap-2 transform active:scale-95 group"
-                      >
-                        <Sparkles className="w-4 h-4 text-amber-300" />
-                        <span>Read Full Summary</span>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
-                    </div>
-                  )}
-
-                </div>
-
+      {/* Loading */}
+      {status === 'loading' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy="true">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="rounded-2xl bg-white border border-line overflow-hidden animate-pulse">
+              <div className="h-44 bg-haze" />
+              <div className="p-5 space-y-3">
+                <div className="h-3 w-24 bg-haze rounded" />
+                <div className="h-5 w-full bg-haze rounded" />
+                <div className="h-5 w-2/3 bg-haze rounded" />
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Load More News Button */}
-      {filteredArticles.length > visibleCount && (
-        <div className="flex justify-center pt-6 pb-4">
-          <button
-            onClick={() => setVisibleCount((prev) => prev + 10)}
-            className="px-8 py-3.5 rounded-2xl bg-white border border-slate-200/90 text-slate-800 font-extrabold text-xs shadow-md hover:shadow-xl hover:border-primary-300 hover:text-primary-600 transition-all flex items-center gap-2 cursor-pointer group"
-          >
-            <span>Load More Business News ({filteredArticles.length - visibleCount} remaining)</span>
-            <ArrowDown className="w-4 h-4 text-primary-600 group-hover:translate-y-0.5 transition-transform" />
-          </button>
+          ))}
         </div>
       )}
 
-      {/* Placement Interview Retention Quiz Modal */}
-      {isQuizModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden p-6 sm:p-8 space-y-6 relative">
-            
-            <button
-              onClick={resetQuiz}
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-600 transition-colors"
-            >
+      {/* Couldn't load */}
+      {status === 'error' && (
+        <div className="rounded-2xl bg-white border border-line p-8 sm:p-10 text-center max-w-xl mx-auto space-y-4">
+          <Newspaper className="w-8 h-8 mx-auto text-muted" />
+          <h2 className="text-xl font-bold text-ink">We couldn't reach Mint just now</h2>
+          <p className="text-muted">Try again in a minute, or read today's paper directly.</p>
+          <div className="flex flex-wrap justify-center gap-2.5">
+            <button onClick={load} className="btn-iris px-5 py-2.5 rounded-full text-sm font-semibold inline-flex items-center gap-2 cursor-pointer">
+              <RefreshCw className="w-4 h-4" /> Try again
+            </button>
+            <a href={MINT_EPAPER_URL} target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 rounded-full border border-line text-sm font-semibold text-ink hover:bg-paper">
+              Open the e-paper
+            </a>
+          </div>
+        </div>
+      )}
+
+      {status === 'ready' && (
+        <>
+          {/* Top of the news: one lead story per main section */}
+          {topStories.length > 0 && (
+            <section aria-labelledby="top-news" className="space-y-4">
+              <h2 id="top-news" className="text-[13px] font-semibold uppercase tracking-[0.12em] text-muted">Top of the news</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                {/* Lead */}
+                <article className="lg:col-span-3 rounded-2xl bg-white border border-line overflow-hidden flex flex-col">
+                  <div className="relative aspect-[2/1] bg-haze overflow-hidden">
+                    <StoryImage article={topStories[0]} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-6 sm:p-7 space-y-3 flex-1 flex flex-col">
+                    <Meta article={topStories[0]} />
+                    <h3 className="text-2xl sm:text-[1.75rem] font-bold text-ink leading-tight tracking-[-0.02em]">{topStories[0].title}</h3>
+                    <Summary article={topStories[0]} lines="line-clamp-5" />
+                    <div className="mt-auto pt-3 flex items-center gap-2.5">
+                      <ReadButton article={topStories[0]} />
+                      <SaveButton article={topStories[0]} />
+                    </div>
+                  </div>
+                </article>
+
+                {/* The other sections */}
+                <div className="lg:col-span-2 rounded-2xl bg-white border border-line divide-y divide-line">
+                  {topStories.slice(1).map((a) => (
+                    <article key={a.id} className="p-5 flex gap-4">
+                      <div className="min-w-0 flex-1 space-y-1.5">
+                        <Meta article={a} />
+                        <a href={a.url} target="_blank" rel="noopener noreferrer" className="block text-[17px] font-semibold text-ink leading-snug hover:underline decoration-2 underline-offset-2">
+                          {a.title}
+                        </a>
+                      </div>
+                      <div className="w-20 h-20 rounded-xl overflow-hidden bg-haze shrink-0">
+                        <StoryImage article={a} className="w-full h-full object-cover" />
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* All stories */}
+          <section className="space-y-4">
+            {showTop && rest.length > 0 && (
+              <h2 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-muted">All stories</h2>
+            )}
+
+            {rest.length === 0 && topStories.length === 0 ? (
+              <div className="rounded-2xl bg-white border border-line p-10 text-center text-muted">
+                No Mint stories match{q ? ` "${searchQuery}"` : ''} here.{' '}
+                {dateFilter !== 'week' && (
+                  <button onClick={() => setDateFilter('week')} className="font-semibold text-ink underline underline-offset-2 cursor-pointer">
+                    Show the whole week
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {displayed.map((a) => (
+                  <article key={a.id} className="card-lift rounded-2xl bg-white border border-line overflow-hidden flex flex-col">
+                    <div className="relative h-44 bg-haze overflow-hidden">
+                      <StoryImage article={a} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="p-5 space-y-2.5 flex-1 flex flex-col">
+                      <Meta article={a} />
+                      <h3 className="text-[18px] font-semibold text-ink leading-snug tracking-[-0.01em]">{a.title}</h3>
+                      <Summary article={a} />
+                      <div className="mt-auto pt-3 flex items-center justify-between gap-2">
+                        <ReadButton article={a} compact />
+                        <SaveButton article={a} />
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+
+            {rest.length > visibleCount && (
+              <div className="flex justify-center pt-4">
+                <button
+                  onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
+                  className="px-7 py-3 rounded-full bg-white border border-line text-ink font-semibold text-sm hover:bg-paper transition-colors inline-flex items-center gap-2 cursor-pointer"
+                >
+                  Show more stories ({rest.length - visibleCount} left) <ArrowDown className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </section>
+
+          <p className="text-[13px] text-muted text-center pt-2">
+            Headlines, summaries and images are from Mint (livemint.com) · full stories open on Mint
+            {fetchedAt ? ` · updated ${timeAgo(fetchedAt)}` : ''}
+          </p>
+        </>
+      )}
+
+      {/* Quiz built from this week's Mint stories */}
+      {quiz && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm animate-fadeIn" role="dialog" aria-modal="true">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl p-6 sm:p-8 space-y-6 relative">
+            <button onClick={closeQuiz} aria-label="Close" className="absolute top-4 right-4 p-2 rounded-full hover:bg-paper text-muted hover:text-ink">
               <X className="w-5 h-5" />
             </button>
 
             {!quizSubmitted ? (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-4">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-amber-500" />
-                    <h3 className="text-lg font-black text-slate-900 font-display">
-                      Placement Prep Retention Test
-                    </h3>
-                  </div>
-                  <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
-                    Question {quizIndex + 1} of {KNOWLEDGE_QUEST_QUIZ.length}
+              <div className="space-y-5">
+                <div className="flex items-center justify-between gap-2 pr-10">
+                  <h3 className="text-lg font-bold text-ink">Match the headline</h3>
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-paper text-muted">
+                    {quizIndex + 1} of {quiz.length}
                   </span>
                 </div>
-
-                <h4 className="text-base font-bold text-slate-800 leading-snug">
-                  {KNOWLEDGE_QUEST_QUIZ[quizIndex].question}
-                </h4>
-
+                <div className="rounded-2xl bg-paper p-4">
+                  <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-muted">Mint's summary</span>
+                  <p className="mt-1.5 text-[15px] text-ink leading-relaxed">{quiz[quizIndex].question}</p>
+                </div>
+                <p className="text-sm font-semibold text-ink">Which story is this?</p>
                 <div className="space-y-2.5">
-                  {KNOWLEDGE_QUEST_QUIZ[quizIndex].options.map((option, idx) => {
-                    const isSelected = selectedOption === idx;
-                    const isCorrect = idx === KNOWLEDGE_QUEST_QUIZ[quizIndex].correctAnswer;
-                    
-                    let style = "bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200";
+                  {quiz[quizIndex].options.map((option, idx) => {
+                    const isCorrect = idx === quiz[quizIndex].correctAnswer;
+                    let style = 'bg-white hover:bg-paper text-ink border-line';
                     if (selectedOption !== null) {
-                      if (isCorrect) style = "bg-emerald-50 text-emerald-900 border-emerald-300 font-bold";
-                      else if (isSelected) style = "bg-rose-50 text-rose-900 border-rose-300 font-bold";
-                      else style = "bg-slate-50 text-slate-500 border-slate-100 opacity-60";
+                      if (isCorrect) style = 'bg-marker-green/10 text-ink border-marker-green font-semibold';
+                      else if (idx === selectedOption) style = 'bg-[#8F3333]/10 text-ink border-[#8F3333]';
+                      else style = 'bg-white text-muted border-line opacity-60';
                     }
-
                     return (
                       <button
                         key={idx}
-                        onClick={() => handleSelectQuizOption(idx)}
+                        onClick={() => pickOption(idx)}
                         disabled={selectedOption !== null}
-                        className={cn(
-                          "w-full p-3.5 rounded-2xl text-xs font-semibold border text-left transition-all flex items-center justify-between gap-3 cursor-pointer",
-                          style
-                        )}
+                        className={cn('w-full p-3.5 rounded-2xl text-sm border text-left transition-colors flex items-center justify-between gap-3 cursor-pointer', style)}
                       >
                         <span>{option}</span>
-                        {selectedOption !== null && isCorrect && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
+                        {selectedOption !== null && isCorrect && <CheckCircle2 className="w-4 h-4 text-marker-green shrink-0" />}
                       </button>
                     );
                   })}
                 </div>
-
                 {selectedOption !== null && (
-                  <div className="p-3.5 rounded-2xl bg-primary-50 border border-primary-100 space-y-1 animate-fadeIn">
-                    <span className="text-[11px] font-extrabold uppercase text-primary-900 block">Explanation</span>
-                    <p className="text-xs text-primary-800 font-medium">
-                      {KNOWLEDGE_QUEST_QUIZ[quizIndex].explanation}
-                    </p>
+                  <div className="text-sm text-muted">
+                    {quiz[quizIndex].explanation}{' '}
+                    <a href={quiz[quizIndex].url} target="_blank" rel="noopener noreferrer" className="font-semibold text-ink underline underline-offset-2">
+                      Read it
+                    </a>
                   </div>
                 )}
-
-                <div className="flex items-center justify-end pt-2">
+                <div className="flex justify-end">
                   <button
-                    onClick={handleNextQuizQuestion}
+                    onClick={nextQuestion}
                     disabled={selectedOption === null}
-                    className="px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="btn-iris px-5 py-2.5 rounded-full font-semibold text-sm inline-flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                   >
-                    <span>{quizIndex < KNOWLEDGE_QUEST_QUIZ.length - 1 ? 'Next Question' : 'View Results'}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    {quizIndex < quiz.length - 1 ? 'Next' : 'See score'} <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="text-center space-y-6 py-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-2xl">
-                  🏆
+              <div className="text-center space-y-5 py-4">
+                <div className="text-5xl font-bold text-ink tabular-nums">
+                  {quizScore}/{quiz.length}
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-black text-slate-900 font-display">
-                    Retention Test Complete!
-                  </h3>
-                  <p className="text-sm font-semibold text-slate-600">
-                    You scored <strong className="text-primary-600">{quizScore} out of {KNOWLEDGE_QUEST_QUIZ.length}</strong> on today's TOI Business & Global News quiz.
-                  </p>
+                <p className="text-muted">
+                  {quizScore === quiz.length ? 'Perfect. You really read the news this week.' : 'Read a few more stories and try again — the questions change every time.'}
+                </p>
+                <div className="flex justify-center gap-2.5">
+                  <button onClick={openQuiz} className="btn-iris px-5 py-2.5 rounded-full font-semibold text-sm cursor-pointer">New questions</button>
+                  <button onClick={closeQuiz} className="px-5 py-2.5 rounded-full border border-line font-semibold text-sm text-ink hover:bg-paper cursor-pointer">Back to the news</button>
                 </div>
-                <button
-                  onClick={resetQuiz}
-                  className="px-6 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-lg transition-all cursor-pointer"
-                >
-                  Back to Knowledge Quest
-                </button>
               </div>
             )}
-
           </div>
         </div>
       )}
-      {/* Floating Back to Top Button */}
+
       {showScrollTop && (
         <button
-          onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 p-3.5 rounded-full bg-primary-600 hover:bg-primary-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center border border-white/20 cursor-pointer animate-fadeIn"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-ink text-white shadow-xl flex items-center justify-center cursor-pointer"
           aria-label="Back to top"
-          title="Back to Top"
         >
-          <ArrowUp className="w-5 h-5 stroke-[2.5]" />
+          <ArrowUp className="w-5 h-5" />
         </button>
       )}
-
     </div>
   );
 };

@@ -1,118 +1,173 @@
 /**
- * News Service — Times of India (TOI) Business & Global News Engine
- * Provides instant, 100% reliable, recruiter-ready 60-second digests
- * categorized into International Business, India Business, Markets & Economy,
- * Mutual Funds & Finance, and Banking & Policy.
+ * News service: Mint (livemint.com).
+ *
+ * Knowledge Quest reads /api/mint-news, our own endpoint that gathers every
+ * official Mint section feed on the server and caches it for 15 minutes.
+ * Each story carries only what Mint publishes: headline, Mint's own summary,
+ * image and a link to the full story on livemint.com.
  */
 
-import { KNOWLEDGE_QUEST_ARTICLES, SECONDARY_FALLBACK_IMAGES } from '../data/knowledgeQuestData';
+import { SECONDARY_FALLBACK_IMAGES } from '../data/knowledgeQuestData';
 
-// 100% Fail-Safe Inline SVG Data URL Generator when external CDN is unreachable
-export const getNewsFallbackSvg = (categoryLabel = 'BUSINESS NEWS') => {
-  const cleanLabel = (categoryLabel || 'BUSINESS NEWS').replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
-  const encoded = encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
-      <defs>
-        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#312E81"/>
-          <stop offset="50%" stop-color="#4F46E5"/>
-          <stop offset="100%" stop-color="#0F172A"/>
-        </linearGradient>
-      </defs>
-      <rect width="800" height="400" fill="url(#g)"/>
-      <circle cx="700" cy="80" r="150" fill="white" opacity="0.06"/>
-      <circle cx="100" cy="320" r="180" fill="white" opacity="0.06"/>
-      <text x="50%" y="42%" dominant-baseline="middle" text-anchor="middle" fill="#FFFFFF" font-family="sans-serif" font-size="28" font-weight="900" letter-spacing="2">TIMES OF INDIA BUSINESS</text>
-      <text x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" fill="#A5B4FC" font-family="sans-serif" font-size="18" font-weight="700">${cleanLabel.toUpperCase()}</text>
-    </svg>
-  `);
-  return `data:image/svg+xml;utf8,${encoded}`;
-};
+export const MINT_EPAPER_URL = 'https://epaper.livemint.com/';
 
-// Decode the handful of HTML entities RSS descriptions commonly contain
-const decodeEntities = (str = '') =>
-  str
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;|&apos;/g, "'")
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
-
-const cleanText = (html = '') => decodeEntities(String(html).replace(/<[^>]*>?/gm, ' ')).replace(/\s+/g, ' ').trim();
-
-// Trim to whole sentences instead of cutting mid-word
-const toSentences = (text, max = 320) => {
-  if (!text || text.length <= max) return text;
-  const cut = text.slice(0, max);
-  const lastStop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
-  return lastStop > 80 ? cut.slice(0, lastStop + 1) : `${cut.slice(0, cut.lastIndexOf(' '))}…`;
-};
-
-// Classify a live headline using ITS OWN words (never borrowed from another story)
-const CATEGORY_RULES = [
-  { id: 'markets', label: '📈 Markets & Economy', words: /\b(sensex|nifty|stock|stocks|shares|market|markets|ipo|sebi|gdp|inflation|cpi|rupee|gold|silver|bond|bonds|earnings)\b/i },
-  { id: 'banking', label: '🏦 Banking & Policy', words: /\b(rbi|bank|banks|banking|repo|npa|loan|loans|credit|upi|npci|deposit|lender|nbfc|cbdc|monetary policy)\b/i },
-  { id: 'mutual_funds', label: '💰 MF & Finance', words: /\b(mutual fund|mutual funds|sip|sips|amc|amfi|nav|elss|aum|insurance|pension|epfo|tax|itr|gst)\b/i },
-  { id: 'international', label: '🌐 International Business', words: /\b(u\.s\.|fed|america|china|europe|ecb|global|world|trump|tariff|tariffs|opec|crude|dollar|imf|uk|japan)\b/i }
+// "India business" / "International business" filter by region; the rest by topic
+export const MINT_CATEGORIES = [
+  { id: 'all', label: 'All business news' },
+  { id: 'india', label: 'India business', by: 'region' },
+  { id: 'international', label: 'International business', by: 'region' },
+  { id: 'markets', label: 'Markets' },
+  { id: 'finance', label: 'Banking & finance' },
+  { id: 'companies', label: 'Companies & deals' },
+  { id: 'economy', label: 'Economy & policy' },
+  { id: 'tech', label: 'Tech & startups' },
+  { id: 'opinion', label: 'Opinion' }
 ];
-const classifyHeadline = (text) => {
-  const rule = CATEGORY_RULES.find((r) => r.words.test(text)) || (/\bUS\b/.test(text) ? CATEGORY_RULES.find((r) => r.id === 'international') : null);
-  return rule ? { category: rule.id, categoryLabel: rule.label } : { category: 'india_business', categoryLabel: '🇮🇳 India Business' };
+
+export const matchesMintCategory = (article, catId) => {
+  if (catId === 'all') return true;
+  if (catId === 'india' || catId === 'international') return article.region === catId;
+  return article.category === catId;
+};
+
+// Local images used when Mint's image fails to load
+const FALLBACK_BY_CATEGORY = {
+  india: SECONDARY_FALLBACK_IMAGES.india_business,
+  international: SECONDARY_FALLBACK_IMAGES.international,
+  markets: SECONDARY_FALLBACK_IMAGES.markets,
+  finance: SECONDARY_FALLBACK_IMAGES.mutual_funds,
+  economy: SECONDARY_FALLBACK_IMAGES.banking,
+  companies: SECONDARY_FALLBACK_IMAGES.india_business,
+  tech: SECONDARY_FALLBACK_IMAGES.international,
+  opinion: SECONDARY_FALLBACK_IMAGES.india_business,
+  others: SECONDARY_FALLBACK_IMAGES.india_business
+};
+export const fallbackImageFor = (category) =>
+  FALLBACK_BY_CATEGORY[category] || SECONDARY_FALLBACK_IMAGES[category] || SECONDARY_FALLBACK_IMAGES.india_business;
+
+// Last-resort inline image (no network needed)
+export const getNewsFallbackSvg = (categoryLabel = 'Business news') => {
+  const clean = String(categoryLabel || 'Business news')
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+    .replace(/[<>&"]/g, '')
+    .trim();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+    <rect width="800" height="450" fill="#F7F5F0"/>
+    <rect x="40" y="40" width="720" height="370" rx="24" fill="#FFFFFF" stroke="#E9E5DC"/>
+    <text x="400" y="210" text-anchor="middle" fill="#1E1E1E" font-family="sans-serif" font-size="44" font-weight="700">mint</text>
+    <text x="400" y="260" text-anchor="middle" fill="#5C5A57" font-family="sans-serif" font-size="20">${clean}</text>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const formatDate = (iso) => {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '' : `${MONTHS[d.getMonth()]} ${String(d.getDate()).padStart(2, '0')}, ${d.getFullYear()}`;
+};
+
+/** "12 min ago", "3 h ago", "Yesterday", "Oct 24" */
+export const timeAgo = (iso) => {
+  const t = Date.parse(iso);
+  if (!Number.isFinite(t)) return '';
+  const mins = Math.max(0, Math.round((Date.now() - t) / 60000));
+  if (mins < 60) return `${Math.max(1, mins)} min ago`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `${hrs} h ago`;
+  if (hrs < 48) return 'Yesterday';
+  const d = new Date(t);
+  return `${MONTHS[d.getMonth()]} ${d.getDate()}`;
+};
+
+// Shape a Mint story so the rest of the app (Saved, quiz) can use it like
+// any other news item.
+const toArticle = (s) => ({
+  id: s.id,
+  isLive: true,
+  isMint: true,
+  title: s.title,
+  category: s.category,
+  categoryLabel: s.categoryLabel,
+  region: s.region || 'india',
+  regionLabel: s.regionLabel || 'India',
+  publishedAt: s.publishedAt,
+  date: formatDate(s.publishedAt),
+  source: 'Mint',
+  url: s.url,
+  toiUrl: s.url, // older screens read this field for the "read full story" link
+  imageUrl: s.imageUrl || fallbackImageFor(s.category),
+  summary: { whatHappened: s.summary || '' },
+  interviewTalkingPoint: null,
+  keyTerms: []
+});
+
+const CACHE_KEY = 'wilt:mint-news:v2';
+const CACHE_MS = 10 * 60 * 1000;
+
+const readCache = () => {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Date.now() - parsed.at < CACHE_MS ? parsed.data : null;
+  } catch {
+    return null;
+  }
+};
+const writeCache = (data) => {
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data }));
+  } catch {
+    /* storage full or blocked: fine, we just refetch next time */
+  }
 };
 
 /**
- * Live headlines come straight from the TOI Business RSS feed.
- * Each live card shows ONLY what the feed says about that story (headline + TOI's own
- * description). We never attach a curated "Why it matters" / talking point written for a
- * different story — that mismatch was reported in pilot testing.
+ * Returns { articles, fetchedAt, error }. Never throws.
  */
-export const fetchLiveBusinessNews = async () => {
+export const fetchMintNews = async () => {
+  const cached = readCache();
+  if (cached) return cached;
   try {
-    const rssUrl = encodeURIComponent('https://timesofindia.indiatimes.com/rssfeeds/1898055.cms');
-    const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
-    if (!res.ok) throw new Error('Network response was not ok');
+    const res = await fetch('/api/mint-news');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-
-    if (data && Array.isArray(data.items) && data.items.length > 0) {
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const liveItems = data.items
-        .slice(0, 15)
-        .filter((item) => item && item.title && item.link)
-        .map((item, idx) => {
-          const title = cleanText(item.title);
-          const description = toSentences(cleanText(item.description || item.content || ''));
-          const pubDateObj = item.pubDate ? new Date(item.pubDate.replace(' ', 'T')) : null;
-          const dateFormatted = pubDateObj && !isNaN(pubDateObj)
-            ? `${months[pubDateObj.getMonth()]} ${String(pubDateObj.getDate()).padStart(2, '0')}, ${pubDateObj.getFullYear()}`
-            : 'Today';
-          const { category, categoryLabel } = classifyHeadline(`${title} ${description}`);
-
-          return {
-            id: `live-toi-${idx}-${encodeURIComponent(item.guid || item.link).slice(-24)}`,
-            isLive: true,
-            title,
-            category,
-            categoryLabel,
-            date: dateFormatted,
-            readTime: 'Live headline',
-            source: 'Times of India Business (Live)',
-            toiUrl: item.link,
-            imageUrl: item.thumbnail || item.enclosure?.link || SECONDARY_FALLBACK_IMAGES[category],
-            summary: {
-              whatHappened: description && description.toLowerCase() !== title.toLowerCase() ? description : ''
-            },
-            interviewTalkingPoint: null,
-            keyTerms: []
-          };
-        });
-
-      return [...liveItems, ...KNOWLEDGE_QUEST_ARTICLES];
-    }
+    const articles = (data.stories || []).filter((s) => s && s.title && s.url).map(toArticle);
+    if (articles.length === 0) throw new Error('No stories');
+    const result = { articles, fetchedAt: data.fetchedAt, error: null };
+    writeCache(result);
+    return result;
   } catch (err) {
-    console.warn('Live RSS feed fetch notice (showing curated briefs only):', err);
+    console.warn('Mint news could not be loaded:', err);
+    return { articles: [], fetchedAt: null, error: 'Mint news could not be loaded right now.' };
   }
+};
 
-  return KNOWLEDGE_QUEST_ARTICLES;
+/**
+ * A quick "match the headline" quiz from real Mint stories: we show Mint's
+ * summary and the student picks the right headline. Wrong options come from
+ * other stories in the same section so they're plausible.
+ */
+export const buildMintQuiz = (articles = [], count = 5) => {
+  const pool = articles.filter((a) => a.summary?.whatHappened && a.summary.whatHappened.length > 60);
+  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+  const picked = shuffle(pool).slice(0, count);
+
+  return picked
+    .map((a) => {
+      const same = shuffle(pool.filter((b) => b.id !== a.id && b.category === a.category));
+      const other = shuffle(pool.filter((b) => b.id !== a.id && b.category !== a.category));
+      const wrong = [...same, ...other].slice(0, 3).map((b) => b.title);
+      if (wrong.length < 3) return null;
+      const options = shuffle([a.title, ...wrong]);
+      return {
+        id: a.id,
+        question: a.summary.whatHappened,
+        options,
+        correctAnswer: options.indexOf(a.title),
+        explanation: `This was Mint's story "${a.title}" (${a.categoryLabel}).`,
+        url: a.url
+      };
+    })
+    .filter(Boolean);
 };

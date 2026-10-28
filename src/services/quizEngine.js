@@ -69,11 +69,51 @@ const buildOptions = (correct, candidatePools) => {
 
 const summaryOf = (article) => (typeof article?.summary === 'object' ? article.summary : {});
 
-export const generateWeeklyQuiz = (posts = [], count = 5) => {
-  const articles = (KNOWLEDGE_QUEST_ARTICLES || []).filter((a) => a && a.title && typeof a.summary === 'object');
+/**
+ * News questions from this week's real Mint stories: we show Mint's own
+ * summary and the student picks the matching headline. Wrong options are
+ * other Mint headlines from the same section, so they're plausible.
+ */
+const buildMintQuestions = (mintArticles) => {
+  const pool = (mintArticles || []).filter(
+    (a) => a && a.title && a.url && (a.summary?.whatHappened || '').length > 60
+  );
+  if (pool.length < 4) return [];
+  return pool.map((article) => {
+    const summary = article.summary.whatHappened;
+    const same = pool.filter((a) => a.id !== article.id && a.category === article.category).map((a) => a.title);
+    const other = pool.filter((a) => a.id !== article.id && a.category !== article.category).map((a) => a.title);
+    const built = buildOptions(article.title, [same, other]);
+    if (!built) return null;
+    return {
+      isNews: true,
+      newsId: article.id,
+      postTitle: article.title,
+      toiUrl: article.url,
+      sourceName: 'Mint',
+      category: `Mint · ${article.categoryLabel}`,
+      question: `Which Mint headline matches this summary?\n"${summary}"`,
+      options: built.options,
+      correctIndex: built.correctIndex,
+      correctAnswerText: article.title,
+      explanation: `Mint reported: "${article.title}"\n${summary}`,
+      sourceSnippet: summary
+    };
+  }).filter(Boolean);
+};
 
-  // 1. News questions — several question styles so options don't feel repetitive
-  const newsQuestions = articles.map((article) => {
+/**
+ * @param posts         peer notes
+ * @param count         number of questions
+ * @param mintArticles  this week's Mint stories (from fetchMintNews). When
+ *                      Mint can't be reached we fall back to the built-in briefs.
+ */
+export const generateWeeklyQuiz = (posts = [], count = 5, mintArticles = []) => {
+  const articles = (KNOWLEDGE_QUEST_ARTICLES || []).filter((a) => a && a.title && typeof a.summary === 'object');
+  const mintQuestions = buildMintQuestions(mintArticles);
+
+  // 1. News questions — real Mint stories when we have them, otherwise the built-in briefs
+  const newsQuestions = mintQuestions.length > 0 ? mintQuestions : articles.map((article) => {
     const sum = summaryOf(article);
     const sameCategory = articles.filter((a) => a.id !== article.id && a.category === article.category);
     const otherCategory = articles.filter((a) => a.id !== article.id && a.category !== article.category);
@@ -105,6 +145,7 @@ export const generateWeeklyQuiz = (posts = [], count = 5) => {
         newsId: article.id,
         postTitle: article.title,
         toiUrl: article.toiUrl || 'https://timesofindia.indiatimes.com/business',
+        sourceName: 'Times of India',
         category: article.categoryLabel || 'Times of India Business',
         question,
         options: built.options,

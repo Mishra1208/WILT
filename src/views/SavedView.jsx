@@ -235,7 +235,7 @@ export const SavedView = () => {
                           </p>
                           {article.isLive ? (
                             <p className="text-slate-600 font-medium leading-relaxed">
-                              Live TOI headline — open the full article for details.
+                              Live headline from Mint. Open the full story for details.
                             </p>
                           ) : (
                             <p className="text-slate-700 font-medium leading-relaxed">

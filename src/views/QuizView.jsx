@@ -16,6 +16,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { generateWeeklyQuiz } from '../services/quizEngine';
+import { fetchMintNews } from '../services/newsService';
 import { saveQuizAttemptToSupabase } from '../services/supabase';
 import { getStoredLeaderboard } from '../services/storage';
 import { PageHero, HeroStat, HeroAction } from '../components/widgets/PageHero';
@@ -35,9 +36,15 @@ export const QuizView = () => {
 
   const [userAnswers, setUserAnswers] = useState({});
 
-  const startNewQuiz = () => {
-    if (!requireAuth()) return;
-    const questions = generateWeeklyQuiz(posts, 5);
+  const [isStarting, setIsStarting] = useState(false);
+
+  const startNewQuiz = async () => {
+    if (!requireAuth() || isStarting) return;
+    setIsStarting(true);
+    // This week's Mint stories (cached for 10 minutes, so retakes are instant)
+    const { articles: mintArticles } = await fetchMintNews();
+    setIsStarting(false);
+    const questions = generateWeeklyQuiz(posts, 5, mintArticles);
     setQuizQuestions(questions);
     setCurrentIdx(0);
     setSelectedOption(null);
@@ -107,7 +114,7 @@ export const QuizView = () => {
     if (!question) return;
 
     if (question.isNews || question.toiUrl) {
-      window.open(question.toiUrl || 'https://timesofindia.indiatimes.com/business', '_blank', 'noopener,noreferrer');
+      window.open(question.toiUrl || 'https://www.livemint.com/', '_blank', 'noopener,noreferrer');
       return;
     }
 
@@ -149,8 +156,8 @@ export const QuizView = () => {
       <div className="px-5 sm:px-8 py-8 sm:py-10 max-w-4xl mx-auto space-y-10">
         <PageHero
           title="Weekly quiz"
-          description="Five questions from your classmates' notes and this week's business news. Each correct answer is worth 30 XP."
-          aside={<HeroAction onClick={startNewQuiz} icon={Sparkles}>Start quiz</HeroAction>}
+          description="Five questions from your classmates' notes and this week's news in Mint. Each correct answer is worth 30 XP."
+          aside={<HeroAction onClick={startNewQuiz} disabled={isStarting} icon={Sparkles}>{isStarting ? 'Getting this week\'s news…' : 'Start quiz'}</HeroAction>}
         >
           <div className="flex">
             <HeroStat value="5" label="questions" />
@@ -212,7 +219,8 @@ export const QuizView = () => {
           <div className="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
             <button
               onClick={startNewQuiz}
-              className="px-5 py-3 rounded-md border border-white/25 hover:bg-white/10 text-white text-[15px] font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              disabled={isStarting}
+              className="px-5 py-3 rounded-md border border-white/25 disabled:opacity-60 hover:bg-white/10 text-white text-[15px] font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
               Play again
@@ -302,13 +310,13 @@ export const QuizView = () => {
                     </p>
                     {q.isNews || q.toiUrl ? (
                       <a
-                        href={q.toiUrl || 'https://timesofindia.indiatimes.com/business'}
+                        href={q.toiUrl || 'https://www.livemint.com/'}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn-iris inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-semibold text-xs shadow-2xs transition-all cursor-pointer mt-1"
                       >
                         <Globe2 className="w-3.5 h-3.5" />
-                        <span>Read Full Article on Times of India</span>
+                        <span>Read the full story on {q.sourceName || 'Mint'}</span>
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     ) : q.postTitle ? (
@@ -439,13 +447,13 @@ export const QuizView = () => {
             <div className="pt-1">
               {currentQ.isNews || currentQ.toiUrl ? (
                 <a
-                  href={currentQ.toiUrl || 'https://timesofindia.indiatimes.com/business'}
+                  href={currentQ.toiUrl || 'https://www.livemint.com/'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-iris inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer"
                 >
                   <Globe2 className="w-3.5 h-3.5" />
-                  <span>Read Full Article on Times of India</span>
+                  <span>Read the full story on {currentQ.sourceName || 'Mint'}</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               ) : (
