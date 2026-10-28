@@ -1,423 +1,301 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Sparkles,
-  Zap,
-  Brain,
-  Trophy,
-  BookOpen,
-  ArrowRight,
-  CheckCircle2,
-  Users,
-  GraduationCap,
-  HelpCircle,
-  PenTool,
-  Award,
-  HeartHandshake,
-  Lightbulb,
-  ShieldCheck
-} from 'lucide-react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import { ArrowUpRight, PenLine, Plus, Minus, GraduationCap } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { DrawCircleHeading } from '../components/ui/DrawCircleHeading';
-import avinendraImg from '../avinendra.JPG';
-import kumarImg from '../kumar.JPG';
-import narendraImg from '../narendra.jpg';
+import { gsap, prefersReducedMotion } from '../lib/gsap';
+import { useReveal } from './landing/useReveal';
+import { Sparkle, Squiggle, CurvyArrow, Smiley } from './landing/Doodles';
+import ClosingCta from './landing/ClosingCta';
+import narendraImg from '../assets/team/narendra.webp';
+import avinendraImg from '../assets/team/avinendra.webp';
+import kumarImg from '../assets/team/kumar.webp';
 
-export const AboutView = () => {
-  const { setCurrentView } = useApp();
-  const [animateScribble, setAnimateScribble] = useState(false);
+// Slightly uneven "cut paper" edges, one per card so they don't look stamped
+const CUTS = [
+  'polygon(3% 4%, 98% 0, 100% 95%, 0 100%)',
+  'polygon(0 2%, 97% 5%, 100% 100%, 2% 96%)',
+  'polygon(2% 0, 100% 4%, 98% 97%, 0 100%)'
+];
 
-  useEffect(() => {
-    const timer = setTimeout(() => setAnimateScribble(true), 150);
-    return () => clearTimeout(timer);
-  }, []);
+const TEAM = [
+  {
+    name: 'Narendra Mishra',
+    role: 'Lead Architect',
+    school: 'Concordia University, Canada',
+    cohort: "Concordia '26",
+    photo: narendraImg,
+    panel: 'bg-marker-orange',
+    tilt: '-rotate-2',
+    quote: 'Knowledge grows when shared. WILT makes continuous peer learning seamless, high-yield, and accessible to every engineering, finance, and tech student.',
+    focus: 'Full-stack architecture & cloud'
+  },
+  {
+    name: 'Avinendra Pratap Singh',
+    role: 'Concept Architect',
+    school: 'Symbiosis School of Banking & Finance, Pune',
+    cohort: "SSBF '26",
+    photo: avinendraImg,
+    panel: 'bg-marker-green',
+    tilt: 'rotate-1',
+    quote: "Students shouldn't have to reread 500-page finance textbooks for one formula. WILT is built so SSBF peers can teach each other in 30 seconds.",
+    focus: 'Banking & financial services'
+  },
+  {
+    name: 'Karan Kumar',
+    role: 'Platform Lead',
+    school: 'Symbiosis School of Banking & Finance, Pune',
+    cohort: "SSBF '26",
+    photo: kumarImg,
+    panel: 'bg-marker-blue',
+    tilt: '-rotate-1',
+    quote: "The secret to acing banking exams isn't cramming. It's active recall. We engineered WILT to turn financial revision into a fast, gamified habit.",
+    focus: 'Banking & fintech systems'
+  }
+];
 
-  const pillars = [
-    {
-      icon: Zap,
-      iconColor: 'bg-primary-50 text-primary-600 border-primary-100',
-      title: '1. Micro-Learning Bites',
-      tag: '30s Retention',
-      desc: 'Instead of passive 3-hour slides, learn and post 30-second insights, formulas, and shortcuts that immediately click in your head.'
-    },
-    {
-      icon: Brain,
-      iconColor: 'bg-coral-50 text-coral-600 border-coral-100',
-      title: '2. Active Recall & Smart Review',
-      tag: 'Spaced Memory',
-      desc: 'Our weekly quiz tests you on random cards. If you get a question wrong, our recall engine says "Did you forget about it? Read it here" linking back to the exact source post.'
-    },
-    {
-      icon: Trophy,
-      iconColor: 'bg-amber-50 text-amber-600 border-amber-100',
-      title: '3. Campus Rank Hierarchy',
-      tag: 'Trophy Podiums',
-      desc: 'Compete for the top 3 podium (🥇 Gold, 🥈 Silver, 🥉 Bronze) with unique handles, campus cohorts, accuracy stats, and XP progression.'
-    },
-    {
-      icon: BookOpen,
-      iconColor: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-      title: '4. Crowdsourced Peer Glossary',
-      tag: 'Plain English',
-      desc: 'Search any finance, accounting, or tech concept and get simple, plain-English analogies written and curated by college peers.'
-    }
-  ];
+const STEPS = [
+  { n: '01', title: 'Write one note', body: 'A formula, a shortcut or a concept you learned today, in two or three lines, with where you learned it.' },
+  { n: '02', title: 'Take the weekly quiz', body: "Five questions from classmates' notes and the week's business news in Mint. No one writes them by hand." },
+  { n: '03', title: 'Get sent back to the source', body: "Miss a question and WILT opens the exact note or story it came from, so the gap closes right away." },
+  { n: '04', title: 'Climb the leaderboard', body: 'Every right answer earns XP. Build a streak and rise through your campus ranking.' }
+];
 
-  const creators = [
-    {
-      name: "Narendra Mishra",
-      role: "Lead Architect",
-      university: "Concordia University, Canada",
-      cohort: "Concordia '26",
-      avatar: narendraImg,
-      quote: "Knowledge grows when shared. WILT makes continuous peer learning seamless, high-yield, and accessible to every engineering, finance, and tech student.",
-      focus: "Full-Stack System Architecture & Cloud Infrastructure"
-    },
-    {
-      name: "Avinendra Pratap Singh",
-      role: "Concept Architect",
-      university: "Symbiosis School of Banking & Finance, Pune",
-      cohort: "SSBF '26",
-      avatar: avinendraImg,
-      quote: "Students shouldn't have to reread 500-page finance textbooks for one formula. WILT is built so SSBF peers can teach each other in 30 seconds.",
-      focus: "Banking & Financial Services (SSBF)"
-    },
-    {
-      name: "Karan Kumar",
-      role: "Platform Lead",
-      university: "Symbiosis School of Banking & Finance, Pune",
-      cohort: "SSBF '26",
-      avatar: kumarImg,
-      quote: "The secret to acing banking exams isn't cramming—it's active recall. We engineered WILT to turn financial revision into a fast, gamified habit.",
-      focus: "Banking & FinTech Systems (SSBF)"
-    }
-  ];
+const PILLARS = [
+  { title: 'Small notes, every day', body: 'Thirty-second insights instead of three-hour slides. Small enough to write daily, specific enough to remember.', color: 'bg-marker-orange', mark: 'N' },
+  { title: 'Recall, not rereading', body: 'The weekly quiz makes you pull answers out of memory, which is what actually makes them stick.', color: 'bg-highlight', mark: 'Q' },
+  { title: 'News recruiters ask about', body: "Knowledge Quest gathers the week's business and finance stories from Mint, India and global, for placement prep.", color: 'bg-marker-green', mark: 'K' },
+  { title: 'Terms in plain English', body: 'A dictionary of finance, accounting and tech terms explained the way a classmate would explain them.', color: 'bg-marker-blue', mark: 'D' }
+];
 
-  const workflowSteps = [
-    {
-      step: '01',
-      title: 'Jot down 30s Insight',
-      desc: 'Type a formula, shortcut, or concept in the digital notepad studio.',
-      icon: PenTool,
-      color: 'text-primary-600 bg-primary-50'
-    },
-    {
-      step: '02',
-      title: 'Weekly Auto-Quiz',
-      desc: 'Algorithmic MCQ generation tests peer knowledge without manual effort.',
-      icon: Zap,
-      color: 'text-amber-600 bg-amber-50'
-    },
-    {
-      step: '03',
-      title: 'Instant Recall Loop',
-      desc: '"Did you forget about it? Read it here" opens exact source context.',
-      icon: Brain,
-      color: 'text-coral-600 bg-coral-50'
-    },
-    {
-      step: '04',
-      title: 'Campus Podium Standing',
-      desc: 'Earn XP, climb your university roster, and unlock Gold trophies.',
-      icon: Trophy,
-      color: 'text-emerald-600 bg-emerald-50'
-    }
-  ];
+const FAQS = [
+  {
+    q: 'Who is WILT for?',
+    a: 'University students in finance, accounting, economics, business and computer science who want to learn a little every day and remember it, especially MBA students getting ready for placements.'
+  },
+  {
+    q: 'How does "Did you forget about it? Read it here" work?',
+    a: 'When you get a weekly quiz question wrong, WILT shows a link straight to the note or news story the question came from, with the relevant part highlighted.'
+  },
+  {
+    q: 'Where does the business news come from?',
+    a: "Knowledge Quest shows stories from Mint (livemint.com) with Mint's own summary. The full story always opens on Mint's site."
+  },
+  {
+    q: 'Who started WILT?',
+    a: 'Narendra Mishra (Concordia University, Canada), with Avinendra Pratap Singh and Karan Kumar (Symbiosis School of Banking & Finance, Pune).'
+  }
+];
 
-  const faqs = [
-    {
-      q: 'Who is WILT built for?',
-      a: 'WILT (What I Learned Today) is crafted specifically for university and college students studying Finance, Accounting, Economics, and Computer Science who want to learn faster through peer knowledge and active recall.'
-    },
-    {
-      q: 'How does the "Did you forget about it? Read it here" feature work?',
-      a: 'When you take the weekly active recall quiz, if you answer any question incorrectly, our smart review engine instantly pops up a notice with a direct 1-click link to the exact peer post and highlighted source context.'
-    },
-    {
-      q: 'Who started the WILT project?',
-      a: 'WILT was conceptualized and created by Narendra Mishra, Avinendra Pratap Singh, and Karan Kumar as a modern peer-learning ecosystem combining micro-notes, spaced repetition, and university hierarchy leaderboards.'
-    }
-  ];
-
+const FaqItem = ({ q, a }) => {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="py-8 px-4 sm:px-6 max-w-5xl mx-auto space-y-16 animate-fadeIn select-none">
-      {/* HERO SECTION WITH ANIMATED PEN & SCRIBBLE */}
-      <div className="text-center max-w-3xl mx-auto space-y-5 pt-4">
-        {/* Floating Tag */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 text-white text-xs font-bold shadow-sm hover:scale-105 transition-transform">
-          <GraduationCap className="w-4 h-4 text-primary-400" />
-          <span>The WILT Story & Vision</span>
-        </div>
-
-        {/* Animated Headline with Writing Pen and Hand-drawn underline */}
-        <div className="relative inline-block px-4">
-          {/* Animated Floating Fountain Pen Icon */}
-          <div className="absolute -top-6 -left-3 sm:-left-6 text-primary-600 animate-bounce">
-            <div className="p-2 rounded-2xl bg-primary-50 border border-primary-200 shadow-sm transform -rotate-12">
-              <PenTool className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
-            </div>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
-            Built for students who want to{' '}
-            <span className="relative inline-block">
-              {/* Masked Gradient Text */}
-              <span className="bg-gradient-to-r from-primary-700 via-primary-600 to-coral-500 bg-clip-text text-transparent animate-gradient-x">
-                learn in seconds
-              </span>
-
-              {/* Hand-Drawn SVG Scribble Underline Animation */}
-              <svg
-                className="absolute -bottom-2 sm:-bottom-3 left-0 w-full h-4 sm:h-5 text-coral-500 overflow-visible pointer-events-none"
-                viewBox="0 0 260 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M 5,14 Q 70,4 135,11 Q 195,17 255,8"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className={`transition-all duration-1000 ease-out ${
-                    animateScribble ? 'stroke-dashoffset-0 opacity-100' : 'opacity-0'
-                  }`}
-                  style={{
-                    strokeDasharray: 300,
-                    strokeDashoffset: animateScribble ? 0 : 300,
-                  }}
-                />
-                <path
-                  d="M 15,18 Q 85,9 155,15 Q 215,7 245,13"
-                  stroke="#F59E0B"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className={`transition-all duration-1000 delay-300 ease-out ${
-                    animateScribble ? 'stroke-dashoffset-0 opacity-90' : 'opacity-0'
-                  }`}
-                  style={{
-                    strokeDasharray: 300,
-                    strokeDashoffset: animateScribble ? 0 : 300,
-                  }}
-                />
-              </svg>
-            </span>
-            , not hours.
-          </h1>
-        </div>
-
-        <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto font-medium">
-          WILT turns fragmented notes and exhausting exam cramming into an engaging daily learning habit backed by spaced repetition, source verification, and peer collaboration.
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
-          <button
-            onClick={() => setCurrentView('notepad')}
-            className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs shadow-btn hover:shadow-hover transition-all transform active:scale-95 flex items-center justify-center gap-2"
-          >
-            <PenTool className="w-3.5 h-3.5" />
-            <span>Open Notepad Studio 📝</span>
-          </button>
-          <button
-            onClick={() => setCurrentView('discover')}
-            className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold text-xs shadow-soft transition-all flex items-center justify-center gap-2"
-          >
-            <span>Explore Full Platform</span>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
-          </button>
-        </div>
-      </div>
-
-      {/* PROJECT CREATORS & FOUNDERS SPOTLIGHT (DIRECTLY ON PAGE CANVAS) */}
-      <div className="space-y-8">
-        <div className="text-center space-y-2 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary-50 border border-primary-100/80 text-primary-700 text-xs font-extrabold shadow-2xs">
-            <HeartHandshake className="w-4 h-4 text-primary-600" />
-            <span>Original Idea & Platform Architecture</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Meet the Creators
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-            WILT was envisioned and created by <strong>Narendra Mishra</strong> (Concordia University, Canada), <strong>Avinendra Pratap Singh</strong>, and <strong>Karan Kumar</strong> (Symbiosis School of Banking & Finance, Pune).
-          </p>
-        </div>
-
-        {/* 3 Founders Cards directly on page canvas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {creators.map((creator, idx) => (
-            <div
-              key={idx}
-              className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/80 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_-4px_rgba(79,70,229,0.08)] hover:border-primary-300 transition-all duration-300 flex flex-col justify-between group relative text-center"
-            >
-              <div>
-                {/* Stylish Large Profile Photo Container */}
-                <div className="relative mx-auto my-3 w-28 h-28 sm:w-32 sm:h-32">
-                  <img loading="lazy" decoding="async"
-                    src={creator.avatar}
-                    alt={creator.name}
-                    className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl object-cover ring-4 ring-slate-100 group-hover:ring-primary-300 group-hover:scale-105 shadow-md transition-all duration-300"
-                  />
-                  <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-emerald-500 ring-2 ring-white flex items-center justify-center text-xs text-white font-black shadow-xs" title="Co-Founder Active">
-                    ✓
-                  </div>
-                </div>
-
-                {/* Creator Details */}
-                <div className="space-y-1 mt-4">
-                  <h3 className="text-lg font-extrabold text-slate-900 group-hover:text-primary-700 transition-colors leading-snug">
-                    {creator.name}
-                  </h3>
-                  <p className="text-xs font-extrabold text-primary-600 font-mono tracking-wide">
-                    {creator.role}
-                  </p>
-                </div>
-
-                {/* University Badge */}
-                <div className="mt-3 inline-block">
-                  <span className="px-3.5 py-1.5 rounded-xl bg-primary-50/90 border border-primary-100/90 text-xs font-extrabold text-primary-950 inline-flex items-center gap-1.5 shadow-2xs">
-                    🏫 {creator.university}
-                  </span>
-                </div>
-
-                {/* Personal Quote */}
-                <p className="text-xs text-slate-600 leading-relaxed italic bg-slate-50/80 p-4 rounded-2xl border border-slate-100 font-serif mt-4 text-left">
-                  "{creator.quote}"
-                </p>
-              </div>
-
-              {/* Card Footer */}
-              <div className="pt-3.5 mt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium gap-2 text-left">
-                <span className="flex items-center gap-1.5 text-primary-700 font-bold truncate">
-                  <Award className="w-4 h-4 text-primary-600 flex-shrink-0" />
-                  <span className="truncate">{creator.focus}</span>
-                </span>
-                <span className="font-mono text-slate-600 text-[11px] font-extrabold bg-slate-100 px-2.5 py-0.5 rounded-md flex-shrink-0">{creator.cohort}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* HOW ACTIVE RECALL WORKS (4-STEP WORKFLOW) */}
-      <div className="space-y-6">
-        <div className="text-center space-y-1">
-          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            How WILT Works
-          </h2>
-          <p className="text-xs text-slate-500">
-            A frictionless 4-step loop designed for permanent memory retention
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {workflowSteps.map((step, idx) => {
-            const Icon = step.icon;
-            return (
-              <div
-                key={idx}
-                className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-soft hover:shadow-hover hover:border-primary-300 transition-all flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-black text-slate-500">
-                      {step.step}
-                    </span>
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${step.color}`}>
-                      <Icon className="w-4 h-4" />
-                    </div>
-                  </div>
-                  <h4 className="text-sm font-bold text-slate-900">
-                    {step.title}
-                  </h4>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    {step.desc}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 4 CORE PILLARS GRID WITH DRAW-CIRCLE ANIMATION */}
-      <div className="space-y-6">
-        <div className="text-center space-y-1">
-          <DrawCircleHeading prefix="The" highlight="4 Core Pillars" suffix="of WILT" />
-          <p className="text-xs text-slate-500">
-            Engineered specifically around collegiate micro-learning patterns
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {pillars.map((pillar, idx) => {
-            const Icon = pillar.icon;
-            return (
-              <div
-                key={idx}
-                className="p-7 rounded-3xl bg-white border border-slate-200/80 shadow-soft hover:shadow-hover hover:border-primary-200 transition-all space-y-4 group"
-              >
-                <div className="flex items-center justify-between">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border ${pillar.iconColor} group-hover:scale-105 transition-transform`}>
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                    {pillar.tag}
-                  </span>
-                </div>
-                <h3 className="text-base font-bold text-slate-900 group-hover:text-primary-700 transition-colors">
-                  {pillar.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                  {pillar.desc}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* FAQ SECTION */}
-      <div className="p-5 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-soft space-y-6">
-        <div className="flex items-center gap-2 text-slate-900">
-          <HelpCircle className="w-5 h-5 text-primary-600" />
-          <h3 className="text-xl font-bold">Frequently Asked Questions</h3>
-        </div>
-
-        <div className="divide-y divide-slate-100">
-          {faqs.map((faq, idx) => (
-            <div key={idx} className="py-4 space-y-1">
-              <h4 className="text-sm font-bold text-slate-900">{faq.q}</h4>
-              <p className="text-xs text-slate-600 leading-relaxed font-normal">{faq.a}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* BOTTOM BANNER */}
-      <div className="p-6 sm:p-10 rounded-xl bg-night text-white text-center space-y-4">
-        <h3 className="text-2xl sm:text-3xl font-bold tracking-[-0.03em]">
-          Ready to post what you learned today?
-        </h3>
-        <p className="font-serif text-lg text-white/70 max-w-md mx-auto">
-          Start typing in the digital notepad or explore lessons shared by peers across finance, tech, and business colleges.
-        </p>
-        <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
-          <button
-            onClick={() => setCurrentView('notepad')}
-            className="px-6 py-3 rounded-md bg-highlight hover:bg-[#FBE995] text-night font-semibold text-[15px]"
-          >
-            Write today's note
-          </button>
-          <button
-            onClick={() => setCurrentView('discover')}
-            className="px-6 py-3 rounded-md border border-white/25 hover:bg-white/10 text-white font-semibold text-[15px]"
-          >
-            Browse notes
-          </button>
-        </div>
+    <div className="border-b border-line">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="w-full flex items-center justify-between gap-6 py-6 text-left cursor-pointer group"
+      >
+        <span className="text-[19px] sm:text-[21px] font-semibold text-ink tracking-[-0.02em] group-hover:text-ink/80">{q}</span>
+        <span className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center transition-colors ${open ? 'bg-ink text-white' : 'bg-white text-ink border border-line'}`}>
+          {open ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+        </span>
+      </button>
+      <div className={`grid transition-all duration-300 ease-out ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+        <p className="overflow-hidden text-[17px] leading-relaxed text-muted pr-14 pb-6">{a}</p>
       </div>
     </div>
   );
 };
+
+export const AboutView = () => {
+  const { setCurrentView } = useApp();
+  const root = useRef(null);
+  useReveal(root);
+
+  // Hero intro
+  useLayoutEffect(() => {
+    if (!root.current || prefersReducedMotion()) return undefined;
+    const ctx = gsap.context(() => {
+      gsap.timeline({ defaults: { ease: 'expo.out' } })
+        .from('.a-word', { yPercent: 110, duration: 1, stagger: 0.05 })
+        .from('.a-mark', { scaleX: 0, transformOrigin: 'left center', duration: 0.7, ease: 'power3.inOut' }, '-=0.5')
+        .from('.a-fade', { y: 20, opacity: 0, duration: 0.8, stagger: 0.08 }, '-=0.5')
+        .from('.a-doodle', { scale: 0, opacity: 0, duration: 0.6, stagger: 0.08, ease: 'back.out(2)' }, '-=0.6');
+    }, root);
+    return () => ctx.revert();
+  }, []);
+
+  const Word = ({ children }) => (
+    <span className="inline-block overflow-hidden align-bottom pb-[0.1em] -mb-[0.1em]">
+      <span className="a-word inline-block">{children}</span>
+    </span>
+  );
+
+  return (
+    <div ref={root} className="bg-paper">
+      {/* ---------- Hero ---------- */}
+      <section className="relative px-5 sm:px-8 pt-12 sm:pt-20 pb-16 sm:pb-24 overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <div className="a-fade flex items-center gap-2 text-marker-orange">
+            <Sparkle className="w-5 h-5" />
+            <span className="font-hand text-[20px] leading-none">Our story</span>
+          </div>
+
+          <h1 className="mt-5 max-w-4xl text-ink font-semibold leading-[1.02] tracking-[-0.055em] text-[clamp(2.6rem,6vw,5rem)]">
+            <Word>Built</Word> <Word>for</Word> <Word>students</Word> <Word>who</Word> <Word>learn</Word> <Word>in</Word>{' '}
+            <span className="relative inline-block">
+              <Word>minutes,</Word>
+              <span className="a-mark absolute left-0 right-0 bottom-[0.06em] h-[0.3em] bg-highlight -z-10 rounded-sm" aria-hidden="true" />
+            </span>{' '}
+            <Word>not</Word> <Word>hours.</Word>
+          </h1>
+
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+            <p className="a-fade lg:col-span-7 text-[18px] sm:text-[20px] leading-relaxed text-muted max-w-2xl">
+              WILT, short for <span className="text-ink font-semibold">What I Learned Today</span>, turns scattered notes and last-minute cramming into a small daily habit: write one thing you learned, get quizzed on it next week, and see what your classmates are learning too.
+            </p>
+            <div className="a-fade lg:col-span-5 flex flex-wrap gap-3 lg:justify-end">
+              <button
+                onClick={() => setCurrentView('notepad')}
+                className="btn-marker px-7 py-3.5 text-[16px] font-semibold inline-flex items-center gap-2 cursor-pointer"
+              >
+                <PenLine className="w-4 h-4" /> Write today's note
+              </button>
+              <button
+                onClick={() => setCurrentView('discover')}
+                className="px-7 py-3.5 rounded-full border-2 border-ink text-ink text-[16px] font-semibold hover:bg-ink hover:text-white transition-colors inline-flex items-center gap-2 cursor-pointer"
+              >
+                Browse notes <ArrowUpRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <Squiggle className="a-doodle hidden md:block absolute right-10 top-16 w-28 text-marker-green" />
+        <Smiley className="a-doodle hidden lg:block absolute right-40 top-40 w-14 text-ink" />
+      </section>
+
+      {/* ---------- Team ---------- */}
+      <section className="px-5 sm:px-8 pb-20 sm:pb-28">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div>
+              <div className="font-hand text-[20px] text-marker-orange">The people</div>
+              <h2 data-reveal="words" className="mt-2 text-ink font-semibold tracking-[-0.045em] leading-[1.05] text-[clamp(2rem,4.2vw,3.4rem)]">
+                Meet the team behind WILT
+              </h2>
+            </div>
+            <p data-reveal="up" className="max-w-sm text-[17px] text-muted leading-relaxed">
+              One builder in Montreal, two finance students in Pune, and one shared idea: learning sticks when you share it.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
+            {TEAM.map((p, i) => (
+              <article key={p.name} data-reveal="up" className="group">
+                {/* Portrait on a cut-paper panel */}
+                <div className={`relative h-[340px] sm:h-[380px] transition-transform duration-500 ease-out group-hover:-translate-y-1.5 ${p.tilt} group-hover:rotate-0`}>
+                  <div className={`absolute inset-0 ${p.panel}`} style={{ clipPath: CUTS[i] }} aria-hidden="true" />
+                  <img
+                    src={p.photo}
+                    alt={p.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[92%] w-auto max-w-[95%] object-contain object-bottom drop-shadow-[0_18px_24px_rgba(30,30,30,0.25)] transition-transform duration-500 ease-out group-hover:scale-[1.03] origin-bottom"
+                    style={{ clipPath: CUTS[i] }}
+                  />
+                  <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/95 text-ink text-[13px] font-semibold shadow-sm">
+                    {p.role}
+                  </span>
+                </div>
+
+                <div className="pt-6 space-y-3">
+                  <div>
+                    <h3 className="text-[24px] font-semibold text-ink tracking-[-0.03em] leading-tight">{p.name}</h3>
+                    <div className="mt-1.5 flex items-start gap-2 text-[15px] text-muted">
+                      <GraduationCap className="w-4 h-4 mt-0.5 shrink-0 text-ink" />
+                      <span>{p.school}</span>
+                    </div>
+                  </div>
+                  <blockquote className="font-hand text-[19px] leading-snug text-ink/85 border-l-[3px] border-highlight pl-4">
+                    “{p.quote}”
+                  </blockquote>
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    <span className="px-3 py-1 rounded-full bg-white border border-line text-[13px] font-medium text-ink">{p.focus}</span>
+                    <span className="px-3 py-1 rounded-full bg-ink text-white text-[13px] font-medium">{p.cohort}</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- How it works ---------- */}
+      <section className="px-5 sm:px-8 pb-20 sm:pb-28">
+        <div className="max-w-6xl mx-auto rounded-[32px] bg-white px-6 sm:px-12 py-14 sm:py-16">
+          <div className="max-w-2xl">
+            <div className="font-hand text-[20px] text-marker-green">The loop</div>
+            <h2 data-reveal="words" className="mt-2 text-ink font-semibold tracking-[-0.045em] leading-[1.05] text-[clamp(2rem,4.2vw,3.4rem)]">
+              How WILT works
+            </h2>
+          </div>
+          <ol className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
+            {STEPS.map((s) => (
+              <li key={s.n} data-reveal="up" className="border-t-2 border-ink pt-5">
+                <div className="text-[44px] font-semibold tracking-[-0.05em] leading-none text-ink/15 tabular-nums">{s.n}</div>
+                <h3 className="mt-4 text-[20px] font-semibold text-ink tracking-[-0.02em]">{s.title}</h3>
+                <p className="mt-2 text-[16px] leading-relaxed text-muted">{s.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* ---------- What makes it work ---------- */}
+      <section className="px-5 sm:px-8 pb-20 sm:pb-28">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-end gap-3">
+            <h2 data-reveal="words" className="text-ink font-semibold tracking-[-0.045em] leading-[1.05] text-[clamp(2rem,4.2vw,3.4rem)]">
+              What makes it stick
+            </h2>
+            <CurvyArrow className="hidden sm:block w-14 text-marker-orange rotate-[100deg] mb-2" />
+          </div>
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-5">
+            {PILLARS.map((p) => (
+              <div key={p.title} data-reveal="up" className="card-lift rounded-[28px] bg-white p-7 sm:p-8 flex gap-5">
+                <div className={`w-14 h-14 shrink-0 rounded-2xl ${p.color} flex items-center justify-center text-ink text-[22px] font-bold`}>
+                  {p.mark}
+                </div>
+                <div>
+                  <h3 className="text-[21px] font-semibold text-ink tracking-[-0.02em]">{p.title}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-muted">{p.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- FAQ ---------- */}
+      <section className="px-5 sm:px-8 pb-20 sm:pb-28">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-4">
+            <div className="font-hand text-[20px] text-marker-blue">Good questions</div>
+            <h2 data-reveal="words" className="mt-2 text-ink font-semibold tracking-[-0.045em] leading-[1.05] text-[clamp(2rem,4.2vw,3.4rem)]">
+              Asked often
+            </h2>
+          </div>
+          <div className="lg:col-span-8 border-t border-line" data-reveal="up">
+            {FAQS.map((f) => (
+              <FaqItem key={f.q} {...f} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <ClosingCta onWrite={() => setCurrentView('notepad')} />
+    </div>
+  );
+};
+
+export default AboutView;
