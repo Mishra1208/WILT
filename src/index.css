@@ -283,6 +283,14 @@ body {
     background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 35px, #EEEAE1 35px, #EEEAE1 36px);
     background-position: 0 6px;
   }
+  /* Notebook paper: faint blue ruled lines, same 36px rhythm as .ruled */
+  .notebook-lines {
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 35px, rgba(79, 157, 235, 0.3) 35px, rgba(79, 157, 235, 0.3) 36px);
+    background-position: 0 6px;
+    background-attachment: local;
+  }
+  .caret-blink { animation: caret-blink 1s steps(1) infinite; }
+  .pop-in { animation: pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 }
 
 @keyframes hl-draw {
@@ -312,4 +320,10 @@ body {
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
+}
+
+@keyframes caret-blink { 50% { opacity: 0; } }
+@keyframes pop-in {
+  0% { transform: scale(0.4) rotate(-10deg); opacity: 0; }
+  100% { transform: scale(1) rotate(-3deg); opacity: 1; }
 }

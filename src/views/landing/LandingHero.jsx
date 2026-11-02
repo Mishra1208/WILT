@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useRef } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { gsap, prefersReducedMotion } from '../../lib/gsap';
 import { Sparkle, CurvyArrow, Smiley, Squiggle } from './Doodles';
+import { StickyPrompt } from './NotebookExtras';
 
 // Slightly uneven "cut paper" edge for the panel behind the writing slate
 const CUT = 'polygon(1.5% 3%, 99% 0, 100% 97%, 0 100%)';
@@ -29,8 +30,10 @@ const MEANING = [
  * 2. Below it, centred, the writing slate (passed in as children) on an orange
  *    cut-paper panel — writing a note is the heart of WILT.
  */
-export const LandingHero = ({ onBrowse, notesCount = 0, avatars = [], children }) => {
+export const LandingHero = ({ onBrowse, onPrompt, notesCount = 0, avatars = [], children }) => {
   const root = useRef(null);
+  const tiltRef = useRef(null);
+  const tiltTo = useRef(null);
 
   useLayoutEffect(() => {
     if (!root.current || prefersReducedMotion()) return undefined;
@@ -44,11 +47,36 @@ export const LandingHero = ({ onBrowse, notesCount = 0, avatars = [], children }
         .from('.w-doodle', { scale: 0, opacity: 0, duration: 0.6, stagger: 0.08, ease: 'back.out(2)' }, '-=0.6');
 
       // The slate rises in as it scrolls into view
-      gsap.from('.h-panel', { y: 60, rotate: -4, opacity: 0, duration: 1.1, scrollTrigger: { trigger: '.h-panel', start: 'top 90%', once: true } });
-      gsap.from('.h-slate', { y: 80, opacity: 0, duration: 1.1, scrollTrigger: { trigger: '.h-panel', start: 'top 90%', once: true } });
+      const st = { trigger: '.h-panel', start: 'top 90%', once: true };
+      gsap.from('.h-panel', { y: 60, opacity: 0, duration: 1.1, clearProps: 'transform,opacity', scrollTrigger: st });
+      gsap.from('.h-slate', { y: 80, opacity: 0, duration: 1.1, clearProps: 'transform,opacity', scrollTrigger: st });
+      gsap.from('.h-sticky', { y: -40, rotate: 25, opacity: 0, duration: 1, delay: 0.35, ease: 'back.out(1.8)', clearProps: 'transform,opacity', scrollTrigger: st });
+
+      // Gentle 3D tilt toward the mouse (desktop only)
+      if (tiltRef.current && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        gsap.set(tiltRef.current, { transformPerspective: 1400 });
+        tiltTo.current = {
+          x: gsap.quickTo(tiltRef.current, 'rotationY', { duration: 0.8, ease: 'power3.out' }),
+          y: gsap.quickTo(tiltRef.current, 'rotationX', { duration: 0.8, ease: 'power3.out' })
+        };
+      }
     }, root);
     return () => ctx.revert();
   }, []);
+
+  const onTilt = (e) => {
+    if (!tiltTo.current) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    tiltTo.current.x(px * 4);
+    tiltTo.current.y(-py * 3);
+  };
+  const resetTilt = () => {
+    if (!tiltTo.current) return;
+    tiltTo.current.x(0);
+    tiltTo.current.y(0);
+  };
 
   return (
     <section ref={root} className="relative bg-paper overflow-hidden">
@@ -145,16 +173,23 @@ export const LandingHero = ({ onBrowse, notesCount = 0, avatars = [], children }
           </h2>
         </div>
 
-        <div className="relative">
+        {/* Today's prompt: above the page on phones and tablets, pinned beside it on wide screens */}
+        <div className="flex justify-center mb-10 xl:hidden">
+          <StickyPrompt onClick={onPrompt} className="h-sticky relative" />
+        </div>
+
+        <div ref={tiltRef} onMouseMove={onTilt} onMouseLeave={resetTilt} className="group/slate relative [transform-style:preserve-3d]">
+          {/* Orange paper: tilted at rest, straightens while you write */}
           <div
-            className="h-panel absolute -inset-x-2 sm:-inset-x-6 -top-6 sm:-top-8 -bottom-6 sm:-bottom-8 bg-marker-orange rotate-[-1.2deg]"
+            className="h-panel absolute -inset-x-2 sm:-inset-x-6 -top-6 sm:-top-8 -bottom-6 sm:-bottom-8 bg-marker-orange rotate-[-1.6deg] group-focus-within/slate:rotate-0 transition-transform duration-700 ease-out"
             style={{ clipPath: CUT }}
             aria-hidden="true"
           />
           <div className="hidden sm:flex absolute -top-16 -left-2 items-end gap-1 text-ink" aria-hidden="true">
             <span className="font-hand text-[22px] leading-none -rotate-3">start here</span>
-            <CurvyArrow className="w-14 rotate-[20deg] translate-y-3" />
+            <CurvyArrow className="w-14 rotate-[20deg] translate-y-3 group-focus-within/slate:opacity-0 transition-opacity" />
           </div>
+          <StickyPrompt onClick={onPrompt} className="h-sticky hidden xl:block absolute -top-20 -right-56 z-20" />
 
           <div id="write" className="h-slate relative scroll-mt-28 space-y-4">
             {children}

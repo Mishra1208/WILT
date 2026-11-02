@@ -32,6 +32,7 @@ import { FreshNotes } from './landing/FreshNotes';
 import { Faq } from './landing/Faq';
 import { ClosingCta } from './landing/ClosingCta';
 import { useReveal } from './landing/useReveal';
+import { useTypingExample, Holes, Tape } from './landing/NotebookExtras';
 import { topicColor } from '../lib/topicColor';
 
 export const NotepadLandingView = () => {
@@ -78,6 +79,15 @@ export const NotepadLandingView = () => {
   const [category, setCategory] = useDraftState('notepad_category', 'Tech & AI');
   const [customCategory, setCustomCategory] = useDraftState('notepad_custom_category', '');
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  // Example notes type themselves out while the page is empty and untouched
+  const typingExample = useTypingExample(!text && !isFocused && !isExpanded);
+  // How "full" the note is: drives the Post button's fill (2–3 lines ≈ full)
+  const writeProgress = Math.min(1, (text.trim().length + title.trim().length * 0.5) / 140);
+  const writeHint = !text.trim() && !title.trim()
+    ? '⌘ + Enter to post'
+    : writeProgress < 0.35 ? 'Keep going, a line or two more…' : writeProgress < 1 ? 'Nice, add an example if you can' : 'Looks great, ready to post';
 
   // Dynamic Reference List Handlers
   const handleAddReference = () => {
@@ -291,10 +301,16 @@ export const NotepadLandingView = () => {
     setIsSubmitted(true);
 
     try {
+      const box = document.getElementById('write')?.getBoundingClientRect();
+      const origin = box
+        ? { x: (box.left + box.width / 2) / window.innerWidth, y: (box.top + box.height * 0.3) / window.innerHeight }
+        : { y: 0.6 };
       confetti({
-        particleCount: 70,
-        spread: 60,
-        origin: { y: 0.6 }
+        particleCount: 90,
+        spread: 75,
+        startVelocity: 38,
+        origin,
+        colors: ['#FF6B35', '#2DB463', '#4F9DEB', '#FFD66B', '#1E1E1E']
       });
     } catch (err) {}
 
@@ -316,6 +332,7 @@ export const NotepadLandingView = () => {
     <div ref={pageRef} className="bg-paper">
       <LandingHero
         onBrowse={() => setCurrentView('discover')}
+        onPrompt={scrollToWrite}
         notesCount={(posts || []).length}
         avatars={heroAvatars}
       >
@@ -356,11 +373,25 @@ export const NotepadLandingView = () => {
         <form 
           onSubmit={handleOpenModal}
           onClick={() => setIsExpanded(true)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setIsFocused(false); }}
           className={cn(
-            "w-full relative rounded-[28px] bg-white border p-6 sm:p-8 text-left box-border shadow-[0_30px_60px_-36px_rgba(30,30,30,0.45)] transition-colors",
-            isExpanded ? "border-ink/40" : "border-line hover:border-ink/25"
+            "w-full relative rounded-[6px] bg-[#FFFEFA] pl-14 sm:pl-20 pr-5 sm:pr-8 py-7 sm:py-9 text-left box-border transition-shadow duration-500",
+            isFocused ? "shadow-[0_40px_70px_-36px_rgba(30,30,30,0.6)]" : "shadow-[0_30px_60px_-36px_rgba(30,30,30,0.45)]"
           )}
         >
+          {/* Notebook details: tape, punched holes, red margin line */}
+          <Tape />
+          <Holes />
+          <span className="pointer-events-none absolute top-0 bottom-0 left-10 sm:left-14 w-px bg-[#EE8C8C]" aria-hidden="true" />
+
+          {/* "Posted!" sticker */}
+          {isSubmitted && (
+            <div className="pop-in absolute -top-5 right-6 sm:right-10 z-10 px-4 py-2 rounded-md bg-marker-green text-white font-hand text-[22px] shadow-lg">
+              Posted! ✓
+            </div>
+          )}
+
           {/* 1. TOP TITLE FIELD (Revealed on click/focus) */}
           {isExpanded && (
             <div className="mb-3 pb-3 border-b border-slate-100 animate-fadeIn">
@@ -368,8 +399,8 @@ export const NotepadLandingView = () => {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Title / Heading of your insight..."
-                className="w-full text-xl sm:text-2xl font-bold tracking-[-0.02em] text-ink placeholder-muted/70 focus:outline-none bg-transparent"
+                placeholder="Give it a title…"
+                className="w-full font-hand font-bold text-[26px] sm:text-[30px] leading-tight text-ink placeholder-muted/60 focus:outline-none bg-transparent"
               />
             </div>
           )}
@@ -382,17 +413,27 @@ export const NotepadLandingView = () => {
 
           {/* 2. MAIN CONTENT TEXTAREA & RIGHT SIDE ATTACHMENTS TOOLBAR */}
           <div className="flex gap-3 sm:gap-4 items-start relative">
+            <div className="relative flex-1 min-w-0">
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
               onFocus={() => setIsExpanded(true)}
               onKeyDown={handleKeyDown}
-              placeholder={isExpanded ? "Explain it the way you'd tell a friend: what it is, why it matters, an example…" : "e.g. Why EBITDA isn't the same as cash flow…"}
+              aria-label="What did you learn today?"
+              placeholder={isExpanded || isFocused ? "Explain it the way you'd tell a friend: what it is, why it matters, an example…" : ''}
               className={cn(
-                "ruled w-full bg-transparent text-ink placeholder-muted/70 text-[18px] leading-[36px] focus:outline-none resize-none",
+                "notebook-lines w-full bg-transparent text-ink placeholder-muted/60 font-hand text-[21px] sm:text-[22px] leading-[36px] focus:outline-none resize-none",
                 isExpanded ? "h-[180px] sm:h-[216px]" : "h-[144px] sm:h-[180px]"
               )}
             />
+            {/* Typing example, shown only while the page is empty */}
+            {!text && !isExpanded && !isFocused && (
+              <div className="pointer-events-none absolute left-0 top-0 right-0 font-hand text-[21px] sm:text-[22px] leading-[36px] text-muted/70" aria-hidden="true">
+                <span className="text-muted/50">e.g. </span>{typingExample}
+                <span className="caret-blink inline-block w-[2px] h-[1.1em] bg-marker-orange align-middle ml-0.5" />
+              </div>
+            )}
+            </div>
 
             {/* RIGHT SIDE ATTACHMENT ACTION BAR */}
             <div className="flex flex-col gap-1 shrink-0">
@@ -525,16 +566,25 @@ export const NotepadLandingView = () => {
 
           {/* SUBMIT BUTTON & SHORTCUT */}
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-xs text-slate-500 hidden sm:inline">
-              ⌘ + Enter to post
+            <span className="font-hand text-[17px] text-muted hidden sm:inline">
+              {writeHint}
             </span>
             <button
               type="submit"
               disabled={!text.trim() && !title.trim()}
-              className="btn-marker px-6 py-3 flex items-center gap-2 text-[15px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ml-auto"
+              className={cn(
+                "relative overflow-hidden rounded-full px-7 py-3 flex items-center gap-2 text-[15px] font-semibold text-ink bg-marker-orange/25 ml-auto cursor-pointer disabled:cursor-not-allowed transition-transform active:scale-95",
+                writeProgress >= 1 && "hover:-translate-y-0.5"
+              )}
             >
-              <span>Post</span>
-              <CornerDownLeft className="w-4 h-4" />
+              {/* fills up as you write */}
+              <span
+                className="absolute inset-y-0 left-0 bg-marker-orange transition-[width] duration-500 ease-out"
+                style={{ width: `${Math.max(0, writeProgress) * 100}%` }}
+                aria-hidden="true"
+              />
+              <span className="relative">Post</span>
+              <CornerDownLeft className="relative w-4 h-4" />
             </button>
           </div>
         </form>
