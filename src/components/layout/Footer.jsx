@@ -82,6 +82,7 @@ export const Footer = () => {
           <nav className="md:col-span-2 flex flex-col gap-2.5" aria-label="Company">
             <span className="text-sm font-semibold text-ink mb-1">WILT</span>
             <button onClick={() => setCurrentView('about')} className={linkCls}>About</button>
+            <button onClick={() => setCurrentView('reviews')} className={linkCls}>Reviews</button>
             <button onClick={() => setCurrentView('standards')} className={linkCls}>Community standards</button>
             <button onClick={() => setCurrentView('privacy')} className={linkCls}>Privacy</button>
             <button onClick={() => setCurrentView('terms')} className={linkCls}>Terms</button>

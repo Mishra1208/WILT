@@ -10,6 +10,7 @@ const LINKS = [
   { id: 'knowledge-quest', label: 'Business news' },
   { id: 'quiz', label: 'Weekly quiz' },
   { id: 'leaderboard', label: 'Leaderboard' },
+  { id: 'reviews', label: 'Reviews' },
   { id: 'about', label: 'About' }
 ];
 

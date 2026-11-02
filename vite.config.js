@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 // In `npm run dev` there are no Vercel functions, so serve /api/mint-news
@@ -18,10 +18,35 @@ const devApi = () => ({
         res.end(JSON.stringify({ error: String(err), stories: [] }));
       }
     });
+
+    // Same for /api/reviews (reads REVIEWS_SCRIPT_URL / REVIEWS_SECRET from your .env.local if set)
+    server.middlewares.use('/api/reviews', async (req, res) => {
+      const send = (status, body) => {
+        res.statusCode = status;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(body));
+      };
+      try {
+        const reviews = await server.ssrLoadModule('/server/reviews.js');
+        if (req.method === 'POST') {
+          let raw = '';
+          for await (const chunk of req) raw += chunk;
+          const result = await reviews.submitReview(JSON.parse(raw || '{}'), 'dev');
+          return send(result.status, result.body);
+        }
+        return send(200, await reviews.listReviews());
+      } catch (err) {
+        return send(502, { error: String(err), reviews: [] });
+      }
+    });
   }
 });
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  // Make server-only secrets in .env.local visible to the dev API (not to the browser)
+  const env = loadEnv(mode, process.cwd(), '');
+  for (const k of ['REVIEWS_SCRIPT_URL', 'REVIEWS_SECRET']) if (env[k] && !process.env[k]) process.env[k] = env[k];
+  return {
   plugins: [react(), devApi()],
   server: {
     port: 5175,
@@ -42,4 +67,5 @@ export default defineConfig({
       }
     }
   }
+};
 });

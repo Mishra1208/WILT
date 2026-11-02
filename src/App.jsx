@@ -24,7 +24,8 @@ const viewLoaders = {
   revision: () => import('./views/RevisionView').then((m) => ({ default: m.RevisionView })),
   saved: () => import('./views/SavedView').then((m) => ({ default: m.SavedView })),
   notifications: () => import('./views/NotificationsView').then((m) => ({ default: m.NotificationsView })),
-  knowledgeQuest: () => import('./views/KnowledgeQuestView').then((m) => ({ default: m.KnowledgeQuestView }))
+  knowledgeQuest: () => import('./views/KnowledgeQuestView').then((m) => ({ default: m.KnowledgeQuestView })),
+  reviews: () => import('./views/ReviewsView').then((m) => ({ default: m.ReviewsView }))
 };
 
 const AboutView = lazy(viewLoaders.about);
@@ -40,6 +41,7 @@ const RevisionView = lazy(viewLoaders.revision);
 const SavedView = lazy(viewLoaders.saved);
 const NotificationsView = lazy(viewLoaders.notifications);
 const KnowledgeQuestView = lazy(viewLoaders.knowledgeQuest);
+const ReviewsView = lazy(viewLoaders.reviews);
 
 const ViewFallback = () => (
   <div className="p-6 sm:p-8 max-w-5xl mx-auto space-y-4" aria-busy="true" aria-label="Loading page">
@@ -152,6 +154,8 @@ export function App() {
       case 'settings':
       case 'about':
         return <AboutView />;
+      case 'reviews':
+        return <ReviewsView />;
       case 'privacy':
         return <PrivacyPolicyView />;
       case 'terms':

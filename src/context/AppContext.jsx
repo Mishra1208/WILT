@@ -117,7 +117,7 @@ export const AppProvider = ({ children }) => {
       const path = window.location.pathname.replace(/^\//, '').toLowerCase().trim();
       const validViews = [
         'notepad', 'discover', 'dictionary', 'quiz', 'knowledge-quest', 'quest',
-        'leaderboard', 'revision', 'saved', 'about',
+        'leaderboard', 'revision', 'saved', 'about', 'reviews',
         'notifications', 'settings', 'privacy', 'terms', 'standards'
       ];
       if (path === 'knowledge-quest' || path === 'quest') return 'knowledge-quest';

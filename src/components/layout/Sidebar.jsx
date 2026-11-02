@@ -13,7 +13,8 @@ import {
   Globe,
   AlertTriangle,
   PanelLeftClose,
-  House
+  House,
+  Star
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { goWrite } from '../../lib/goWrite';
@@ -39,6 +40,7 @@ export const Sidebar = () => {
 
   const accountNav = [
     { id: 'about', label: 'About WILT', icon: Info },
+    { id: 'reviews', label: 'Reviews', icon: Star },
     { id: 'report-bug', label: 'Report a Bug', icon: AlertTriangle, action: openReportBugModal },
     { id: 'notifications', label: 'Notifications', icon: Bell },
   ];
