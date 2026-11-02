@@ -5,9 +5,9 @@ import { gsap, prefersReducedMotion } from '../lib/gsap';
 import { useReveal } from './landing/useReveal';
 import { Sparkle, Squiggle, CurvyArrow, Smiley } from './landing/Doodles';
 import ClosingCta from './landing/ClosingCta';
-import narendraImg from '../assets/team/narendra.webp';
-import avinendraImg from '../assets/team/avinendra.webp';
-import kumarImg from '../assets/team/kumar.webp';
+import narendraImg from '../narendra.jpg';
+import avinendraImg from '../avinendra.JPG';
+import kumarImg from '../assets/team/kumar.jpg';
 
 // Slightly uneven "cut paper" edges, one per card so they don't look stamped
 const CUTS = [
@@ -23,6 +23,7 @@ const TEAM = [
     school: 'Concordia University, Canada',
     cohort: "Concordia '26",
     photo: narendraImg,
+    focusPos: 'object-[40%_30%]',
     panel: 'bg-marker-orange',
     tilt: '-rotate-2',
     quote: 'Knowledge grows when shared. WILT makes continuous peer learning seamless, high-yield, and accessible to every engineering, finance, and tech student.',
@@ -34,6 +35,7 @@ const TEAM = [
     school: 'Symbiosis School of Banking & Finance, Pune',
     cohort: "SSBF '26",
     photo: avinendraImg,
+    focusPos: 'object-[50%_20%]',
     panel: 'bg-marker-green',
     tilt: 'rotate-1',
     quote: "Students shouldn't have to reread 500-page finance textbooks for one formula. WILT is built so SSBF peers can teach each other in 30 seconds.",
@@ -45,6 +47,7 @@ const TEAM = [
     school: 'Symbiosis School of Banking & Finance, Pune',
     cohort: "SSBF '26",
     photo: kumarImg,
+    focusPos: 'object-[50%_20%]',
     panel: 'bg-marker-blue',
     tilt: '-rotate-1',
     quote: "The secret to acing banking exams isn't cramming. It's active recall. We engineered WILT to turn financial revision into a fast, gamified habit.",
@@ -192,17 +195,18 @@ export const AboutView = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
             {TEAM.map((p, i) => (
               <article key={p.name} data-reveal="up" className="group">
-                {/* Portrait on a cut-paper panel */}
+                {/* Original photo in a cut-paper frame, with the colour panel peeking out behind */}
                 <div className={`relative h-[340px] sm:h-[380px] transition-transform duration-500 ease-out group-hover:-translate-y-1.5 ${p.tilt} group-hover:rotate-0`}>
-                  <div className={`absolute inset-0 ${p.panel}`} style={{ clipPath: CUTS[i] }} aria-hidden="true" />
-                  <img
-                    src={p.photo}
-                    alt={p.name}
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[92%] w-auto max-w-[95%] object-contain object-bottom drop-shadow-[0_18px_24px_rgba(30,30,30,0.25)] transition-transform duration-500 ease-out group-hover:scale-[1.03] origin-bottom"
-                    style={{ clipPath: CUTS[i] }}
-                  />
+                  <div className={`absolute inset-0 translate-x-3 translate-y-3 ${p.panel}`} style={{ clipPath: CUTS[i] }} aria-hidden="true" />
+                  <div className="absolute inset-0 overflow-hidden bg-haze" style={{ clipPath: CUTS[i] }}>
+                    <img
+                      src={p.photo}
+                      alt={p.name}
+                      loading="lazy"
+                      decoding="async"
+                      className={`w-full h-full object-cover ${p.focusPos} transition-transform duration-700 ease-out group-hover:scale-[1.04]`}
+                    />
+                  </div>
                   <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/95 text-ink text-[13px] font-semibold shadow-sm">
                     {p.role}
                   </span>
