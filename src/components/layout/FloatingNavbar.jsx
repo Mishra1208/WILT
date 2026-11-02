@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { SignInButton, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, PenLine } from 'lucide-react';
+import { goWrite } from '../../lib/goWrite';
 
 const LINKS = [
   { id: 'discover', label: 'Notes' },
@@ -63,6 +64,16 @@ export const FloatingNavbar = () => {
         </nav>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => { setMobileMenuOpen(false); goWrite(currentView, setCurrentView); }}
+            title="Write today's note (N)"
+            className="group hidden sm:inline-flex items-center gap-2 pl-2 pr-5 py-2 rounded-full bg-marker-orange text-ink text-[15px] font-semibold shadow-[0_8px_24px_-16px_rgba(30,30,30,0.35)] hover:-translate-y-0.5 transition-transform cursor-pointer"
+          >
+            <span className="w-7 h-7 rounded-full bg-ink text-marker-orange flex items-center justify-center group-hover:rotate-[-12deg] transition-transform">
+              <PenLine className="w-4 h-4" />
+            </span>
+            Write
+          </button>
           <SignedOut>
             <SignInButton mode="modal">
               <button className="btn-iris hidden sm:inline-flex px-6 py-3 text-[15px] font-semibold cursor-pointer">Get started</button>
@@ -91,6 +102,12 @@ export const FloatingNavbar = () => {
       {mobileMenuOpen && (
         <div className="md:hidden px-5 pb-5">
           <div className="rounded-[24px] bg-white p-3 flex flex-col shadow-lift">
+            <button
+              onClick={() => { setMobileMenuOpen(false); goWrite(currentView, setCurrentView); }}
+              className="mb-1 flex items-center gap-3 text-left text-[17px] font-semibold px-4 py-3 rounded-full bg-marker-orange text-ink"
+            >
+              <PenLine className="w-5 h-5" /> Write today's note
+            </button>
             {LINKS.map((l) => (
               <button key={l.id} onClick={() => go(l.id)} className="text-left text-[17px] font-medium px-4 py-3 rounded-full text-ink hover:bg-paper">
                 {l.label}

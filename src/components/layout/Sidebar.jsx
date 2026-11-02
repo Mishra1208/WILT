@@ -15,6 +15,7 @@ import {
   PanelLeftClose
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { goWrite } from '../../lib/goWrite';
 import { useAuth } from '../../context/AuthContext';
 import { getTierProgress } from '../widgets/XpRing';
 
@@ -111,7 +112,10 @@ export const Sidebar = () => {
           </div>
 
           <button
-            onClick={() => handleNavClick('notepad')}
+            onClick={() => {
+              if (window.innerWidth < 768) toggleSidebar?.();
+              goWrite(currentView, setCurrentView);
+            }}
             className="btn-marker mx-0.5 flex items-center justify-center gap-2 py-3 text-[15px] font-semibold cursor-pointer"
           >
             <PenTool className="w-4 h-4" />

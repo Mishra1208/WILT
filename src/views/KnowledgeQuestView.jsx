@@ -489,7 +489,7 @@ export const KnowledgeQuestView = () => {
       {showScrollTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-ink text-white shadow-xl flex items-center justify-center cursor-pointer"
+          className="fixed bottom-24 right-6 sm:bottom-28 sm:right-8 z-40 w-11 h-11 rounded-full bg-white border border-line text-ink shadow-lg flex items-center justify-center cursor-pointer"
           aria-label="Back to top"
         >
           <ArrowUp className="w-5 h-5" />

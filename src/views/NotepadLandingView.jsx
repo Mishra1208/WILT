@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { 
   CornerDownLeft, 
@@ -32,6 +32,7 @@ import { FreshNotes } from './landing/FreshNotes';
 import { Faq } from './landing/Faq';
 import { ClosingCta } from './landing/ClosingCta';
 import { useReveal } from './landing/useReveal';
+import { WRITE_EVENT, consumeWriteRequest } from '../lib/goWrite';
 import { useTypingExample, Holes, Tape } from './landing/NotebookExtras';
 import { topicColor } from '../lib/topicColor';
 
@@ -53,6 +54,19 @@ export const NotepadLandingView = () => {
     }, 600);
   };
   const { user, requireAuth } = useAuth();
+
+  // Arrived here from the pen button / "Write" in the nav: jump to the notebook
+  useEffect(() => {
+    const go = () => scrollToWrite();
+    window.addEventListener(WRITE_EVENT, go);
+    let t;
+    if (consumeWriteRequest()) t = setTimeout(go, 350);
+    return () => {
+      window.removeEventListener(WRITE_EVENT, go);
+      clearTimeout(t);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Layout & Form States
   const [isExpanded, setIsExpanded] = useState(() => {

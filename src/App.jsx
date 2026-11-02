@@ -5,6 +5,7 @@ import { FloatingNavbar } from './components/layout/FloatingNavbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
+import { WriteFab } from './components/widgets/WriteFab';
 
 // Views — the landing page loads immediately; every other page is split into its
 // own chunk so phones download far less JavaScript up front.
@@ -193,6 +194,9 @@ export function App() {
           </div>
         </div>
       )}
+
+      {/* Floating pen: write a note from any page */}
+      <WriteFab />
 
       {/* Global Modals */}
       <NewPostModal />

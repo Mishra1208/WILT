@@ -1,11 +1,12 @@
 import React from 'react';
-import { Search, Bell, PanelLeftOpen } from 'lucide-react';
+import { Search, Bell, PanelLeftOpen, PenLine } from 'lucide-react';
+import { goWrite } from '../../lib/goWrite';
 import { SignInButton, UserButton, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const Header = () => {
-  const { searchQuery, setSearchQuery, setCurrentView, isSidebarOpen, toggleSidebar } = useApp();
+  const { searchQuery, setSearchQuery, currentView, setCurrentView, isSidebarOpen, toggleSidebar } = useApp();
   const { user } = useAuth();
 
   return (
@@ -38,6 +39,17 @@ export const Header = () => {
       </div>
 
       <div className="flex items-center gap-1.5 sm:gap-2">
+        <button
+          onClick={() => goWrite(currentView, setCurrentView)}
+          title="Write today's note (N)"
+          className="group hidden sm:inline-flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full bg-ink text-white text-sm font-semibold hover:bg-ink/90 transition-colors cursor-pointer"
+        >
+          <span className="w-6 h-6 rounded-full bg-marker-orange text-ink flex items-center justify-center group-hover:rotate-[-12deg] transition-transform">
+            <PenLine className="w-3.5 h-3.5" />
+          </span>
+          Write
+        </button>
+
         <button
           onClick={() => setCurrentView('quiz')}
           className="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-semibold text-ink hover:bg-haze transition-colors cursor-pointer"
