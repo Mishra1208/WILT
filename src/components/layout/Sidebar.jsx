@@ -12,7 +12,8 @@ import {
   Info,
   Globe,
   AlertTriangle,
-  PanelLeftClose
+  PanelLeftClose,
+  House
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { goWrite } from '../../lib/goWrite';
@@ -121,6 +122,11 @@ export const Sidebar = () => {
             <PenTool className="w-4 h-4" />
             Write today's note
           </button>
+
+          {/* Back to the landing page */}
+          <div className="-mt-2">
+            <NavItem item={{ id: 'notepad', label: 'Home', icon: House }} />
+          </div>
 
           <NavGroup label="Learn" items={learningNav} />
           <NavGroup label="Practice" items={recallNav} />

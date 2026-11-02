@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bell, PanelLeftOpen, PenLine } from 'lucide-react';
+import { Search, Bell, PanelLeftOpen, PenLine, House } from 'lucide-react';
 import { goWrite } from '../../lib/goWrite';
 import { SignInButton, UserButton, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { useApp } from '../../context/AppContext';
@@ -22,6 +22,18 @@ export const Header = () => {
         >
           <PanelLeftOpen className="w-4 h-4" />
         </button>
+
+        {/* Home, shown when the sidebar (which has its own Home link) is closed */}
+        {!isSidebarOpen && (
+          <button
+            onClick={() => setCurrentView('notepad')}
+            title="Home"
+            aria-label="Home"
+            className="hidden md:flex p-2 rounded-full border border-line text-ink hover:bg-paper transition-colors flex-shrink-0 cursor-pointer"
+          >
+            <House className="w-4 h-4" />
+          </button>
+        )}
 
         <div className="relative w-full">
           <Search className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
